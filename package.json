@@ -1,0 +1,23 @@
+{
+  "name": "leapot",
+  "version": "1.0.0",
+  "description": "This is for Complete Backend for LMS",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Muneeb-leapot/leapot-lms-backend.git"
+  },
+  "keywords": [
+    "LMS",
+    "Leapot"
+  ],
+  "author": "Leapot Technologist",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Muneeb-leapot/leapot-lms-backend/issues"
+  },
+  "homepage": "https://github.com/Muneeb-leapot/leapot-lms-backend#readme"
+}
