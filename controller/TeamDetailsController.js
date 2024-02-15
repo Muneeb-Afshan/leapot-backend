@@ -6,6 +6,12 @@ const TeamDetails = require('../model/TeamDetailSchema');
 
 exports.createTeamData = async (req, res) => {
     console.log(req.body)
+    const { name , designation , description , image } = req.body;
+    if (!(name && designation && description &&  image )) {
+      return res.json({
+        message: "all input feild require",
+      });
+    }
   try {
     const newData = await TeamDetails.create(req.body);
     res.status(201).json({
