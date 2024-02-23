@@ -11,8 +11,12 @@ const UserSchema = new Schema({
   token: { type: String },
   userStatus: { type: Boolean ,default :true },
   email_verified:{type: Boolean , default:false},
+  profile_complete:{type : Boolean, default:false},
   user_id:{type:String},
-  picture:{type:String}
+  picture:{type:String},
+  deleteStatus:{type :Boolean , default: false}
+}, {
+  timestamps: true
 });
 
 module.exports = mongoose.model('User', UserSchema);
