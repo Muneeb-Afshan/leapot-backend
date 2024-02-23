@@ -1,0 +1,102 @@
+openapi: 3.0.0
+info:
+  title: Leapot LMS
+  description: API documentation for my Leapot LMS 
+  version: 1.0.0
+paths:
+  api/register:
+    post:
+      summary: Register a new user
+      tags:
+        - Authentication
+      description: |
+        This endpoint allows an admin to register a new user.
+        It expects the user's email and role in the request body.
+        Upon successful registration, the user is added to the database.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                role:
+                  type: string
+              required:
+                - email
+                - role
+      responses:
+        '201':
+          description: User registered successfully
+        '400':
+          description: Bad request
+  api/login:
+    post:
+      summary: Login user using Google
+      tags:
+        - Authentication
+      description: |
+        This endpoint allows a user to log in using Google authentication.
+        It expects user information including name, email, picture, etc.
+        If the user already exists in the database, their details are updated.
+        Otherwise, an error message is returned.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                picture:
+                  type: string
+                email_verified:
+                  type: boolean
+                user_id:
+                  type: string
+      responses:
+        '200':
+          description: User logged in successfully
+        '400':
+          description: Bad request
+
+
+
+  api/userProfile:
+    get:
+      summary: /userProfile user using Google
+      tags:
+        - User Details
+         
+      description: |
+        This endpoint allows a user to log in using Google authentication.
+        It expects user information including name, email, picture, etc.
+        If the user already exists in the database, their details are updated.
+        Otherwise, an error message is returned.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                picture:
+                  type: string
+                email_verified:
+                  type: boolean
+                user_id:
+                  type: string
+      responses:
+        '200':
+          description: User logged in successfully
+        '400':
+          description: Bad request
