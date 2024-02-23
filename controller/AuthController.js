@@ -1,4 +1,5 @@
 const User = require("../model/UserSchema");
+const UserDetails = require('../model/UserDetailsSchema')
 //All Authentications rest API are list here
 
 // To add user, admin will add the user
@@ -22,6 +23,12 @@ const register = async (req, res) => {
     role: role,
   });
   NewUser.save();
+
+  const NewUserDetails = new UserDetails({
+    email: email,
+    userid:NewUser._id
+  });
+  NewUserDetails.save();
   return res.status(201).json({
     message: "Learner Add successfull",
     success: true,
