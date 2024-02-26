@@ -1,6 +1,6 @@
 // controllers/contactController.js
 
-const ContactForm = require('../model/ContactForm');
+const ContactForm = require('../../model/ContactForm');
 
 exports.ContactForm = async (req, res) => {
     console.log("dgnsdkbdsvbd")
@@ -28,7 +28,7 @@ exports.ContactForm = async (req, res) => {
 
 
 // to Add store FAQ 
-const FAQ = require('../model/FAQ');
+const FAQ = require('../../model/FAQ');
 
 // Create a new FAQ
 exports.createFAQ = async (req, res) => {

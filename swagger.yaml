@@ -65,19 +65,13 @@ paths:
         '400':
           description: Bad request
 
-
-
   api/userProfile:
-    get:
-      summary: /userProfile user using Google
+    post:
+      summary: To get use and Update user profile by email
       tags:
-        - User Details
-         
+        - UserProfile
       description: |
-        This endpoint allows a user to log in using Google authentication.
-        It expects user information including name, email, picture, etc.
-        If the user already exists in the database, their details are updated.
-        Otherwise, an error message is returned.
+        This endpoint updates the profile of a user identified by their email address.
       requestBody:
         required: true
         content:
@@ -85,18 +79,94 @@ paths:
             schema:
               type: object
               properties:
-                name:
-                  type: string
                 email:
+                  type: string
+                username:
+                  type: string
+                dateofbirth:
+                  type: string
+                bio:
+                  type: string
+                country:
+                  type: string
+                state:
+                  type: string
+                city:
+                  type: string
+                address:
+                  type: string
+                phoneNo:
                   type: string
                 picture:
                   type: string
-                email_verified:
-                  type: boolean
-                user_id:
+      responses:
+        '200':
+          description: User profile updated successfully
+        '500':
+          description: Server error
+
+  api/FindUserDetails:
+    get:
+      summary: Find all users details
+      tags:
+        - UserProfile
+      description: |
+        This endpoint retrieves details of all users.
+      responses:
+        '200':
+          description: List of user details
+        '500':
+          description: Server error
+
+  api/updateUserstatus:
+    put:
+      summary: Update user status by email
+      tags:
+        - UserProfile
+      description: |
+        This endpoint updates the status of a user identified by their email address.
+      
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                userStatus:
                   type: string
       responses:
         '200':
-          description: User logged in successfully
-        '400':
-          description: Bad request
+          description: User status updated successfully
+        '404':
+          description: User not found
+        '500':
+          description: Server error
+
+  api/updateDeleteStatus:
+    put:
+      summary: Update delete status by email
+      tags:
+        - UserProfile
+      description: |
+        This endpoint updates the delete status of a user identified by their email address.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                deleteStatus:
+                  type: boolean
+      responses:
+        '200':
+          description: Delete status updated successfully
+        '404':
+          description: User not found
+        '500':
+          description: Server error

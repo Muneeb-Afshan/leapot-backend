@@ -1,5 +1,5 @@
 // importing all controller 
-const {register , login} = require('../controller/AuthController')
+const {register , login} = require('../controller/authentication/AuthController')
 const auth = require('../middleware/AuthMiddleware');
 // const LoggingMiddleware = require('../middleware/LoggingMiddleware');
 

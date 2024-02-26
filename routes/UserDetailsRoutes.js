@@ -1,5 +1,5 @@
 const routerUserDetails = require("express").Router();
-const { GetUserProfileByEmail ,FindUsersDetails, updateUserStatusByEmail ,updateDeleteStatusByEmail} = require('../controller/UserDetailsController')
+const { GetUserProfileByEmail ,FindUsersDetails, updateUserStatusByEmail ,updateDeleteStatusByEmail} = require('../controller/userDetails/UserDetailsController')
 
 routerUserDetails.post("/userProfile",GetUserProfileByEmail);
 routerUserDetails.put('/updateUserstatus', updateUserStatusByEmail);

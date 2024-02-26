@@ -1,5 +1,5 @@
-const User = require("../model/UserSchema");
-const UserDetails = require('../model/UserDetailsSchema')
+const User = require("../../model/UserSchema");
+const UserDetails = require('../../model/UserDetailsSchema')
 //All Authentications rest API are list here
 
 // To add user, admin will add the user
