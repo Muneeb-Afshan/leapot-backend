@@ -32,6 +32,7 @@ const register = async (req, res) => {
   return res.status(201).json({
     message: "Learner Add successfull",
     success: true,
+    statsCode:201
   });
 };
 
