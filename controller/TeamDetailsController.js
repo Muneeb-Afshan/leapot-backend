@@ -1,8 +1,9 @@
 
 
 
-// controllers/dataController.js
+
 const TeamDetails = require('../model/TeamDetailSchema');
+
 
 exports.createTeamData = async (req, res) => {
     console.log(req.body)
@@ -24,14 +25,14 @@ exports.createTeamData = async (req, res) => {
   }
 };
 
-
-// controllers/teamController.js
-
-
 exports.getTeamDetails = async (req, res) => {
   try {
     const teams = await TeamDetails.find();
-    res.json(teams);
+    res.json(
+      {teams:teams,
+       statusCode:200,
+       message: "data get "
+      });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
