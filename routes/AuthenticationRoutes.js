@@ -7,7 +7,7 @@ const cache = apicache.middleware;
 // Initialise router 
 const router = require("express").Router();
 //router with endpoint and controller
-router.get("/login",auth,cache('5 minutes'),login);
+router.get("/login",auth,login);
 router.post("/register",register);
 
 module.exports = router;
