@@ -9,13 +9,13 @@ const InstructorModel = require ('../../model/Instructor')
 //         .catch(err => res.json(err));
 // }
 
-const User = require("../../model/EMuserSchema");
-const UserDetails = require('../../model/EMuserDetailSchema')
+const User = require("../../model/UserSchema");
+const UserDetails = require('../../model/UserDetailsSchema')
 //All Authentications rest API are list here
-
+const firebase = require('firebase-admin');
 // To add user, admin will add the user
 exports.createUser = async (req, res) => {
-  const { email, role } = req.body;
+  const { email, role , password , username } = req.body;
   if (!(email && role)) {
     return res.json({
       message: "all input feild require",
@@ -29,9 +29,17 @@ exports.createUser = async (req, res) => {
     });
   }
 
+  const userRecord = await firebase.auth().createUser({
+    email,
+    password
+  })
+  console.log("create" , userRecord.email)
+
   const NewUser = new User({
-    email: email,
+    email: userRecord.email,
     role: role,
+    username:username,
+    user_id:userRecord.uid
   });
   NewUser.save();
 
@@ -54,12 +62,20 @@ exports.fetchUser = async(req, res) => {
     .catch(err => res.json(err))
 }
 
-exports.logicalUserDelete = async(req, res) =>{
-    const id = req.params.id;
-    User.findByIdAndDelete({_id: id})
-    .then(res => res.json (res)) 
-    .catch(err => res.json(err))
-}
+exports.logicalUserDelete = async (req, res) => {
+    try {
+        const id = req.params.id;
+        
+        // Delete user from User table
+      const res =  await User.findByIdAndDelete(id);
+
+        // Delete user details from UserDetail table
+        await UserDetails.findOneAndDelete({ userid: id });
+        res.json({ message: 'User and UserDetails deleted successfully.' ,res : res});
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
 // //Updating the User
 exports.fetchUserById = async(req, res) => {
     const id = req.params.id;
@@ -81,6 +97,26 @@ exports.updateUserById = async(req, res) => {
     .catch(err => res.json(err))
 }
 
+
+exports.logicalAllUserDelete =async (req, res) =>{
+  const { rows } = req.body;
+  console.log(rows)
+
+    // Perform the deletion operation in your database
+    // This is just a placeholder, replace it with your actual database deletion logic
+    await UserDetails.deleteMany({ userid: { $in: rows} });
+    User.deleteMany({ _id: { $in: rows} })
+        .then(() => {
+         
+            // Return a success response if deletion is successful
+            res.status(200).json({ message: 'Rows deleted successfully' });
+        })
+        .catch(err => {
+            // Return an error response if an error occurs during deletion
+            console.error('Error deleting rows:', err);
+            res.status(500).json({ error: 'An error occurred while deleting rows' });
+        });
+}
 
 //Add Instructor
 

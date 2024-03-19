@@ -4,7 +4,7 @@ const UserDetails = require('../../model/UserDetailsSchema')
 
 // To add user, admin will add the user
 const register = async (req, res) => {
-  const { email, role } = req.body;
+  const { email, role , password} = req.body;
   if (!(email && role)) {
     return res.json({
       message: "all input feild require",
@@ -17,6 +17,9 @@ const register = async (req, res) => {
       success: false,
     });
   }
+
+  
+  
 
   const NewUser = new User({
     email: email,
@@ -68,7 +71,33 @@ const login = async (req, res) => {
   }
 };
 
+const loginWithEmail = async (req, res) => {
+  const {email} = req.user;
+  try {
+    // check if user already exist
+    // Validate if user exist in our database
+    const oldUser = await UserDetails.findOne({ email: email }).populate('userid');
+    if (oldUser) {
+      // Save the updated user document
+      return res.status(200).json({
+        user: oldUser,
+        message: "User Login Successfull",
+      });
+    } else {
+      return res.json({
+        message: "User not exit said admin to add you",
+      });
+    }
+  } catch (error) {
+    return res.json({
+      message: "Error Occurr During Login  ",
+      error: error,
+    });
+  }
+};
+
 module.exports = {
   register,
   login,
+  loginWithEmail
 };

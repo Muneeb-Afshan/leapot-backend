@@ -25,13 +25,14 @@
 // }
 
 
-const User = require("../../model/EMuserSchema");
-const UserDetails = require('../../model/EMuserDetailSchema')
+const User = require("../../model/UserSchema");
+const UserDetails = require('../../model/UserDetailsSchema')
 //All Authentications rest API are list here
+
 
 // To add user, admin will add the user
 const eventManagerSignUp = async (req, res) => {
-  const { email, role } = req.body;
+  const { email, role ,password } = req.body;
   if (!(email && role)) {
     return res.json({
       message: "all input feild require",
@@ -44,6 +45,9 @@ const eventManagerSignUp = async (req, res) => {
       success: false,
     });
   }
+
+  
+
 
   const NewUser = new User({
     email: email,
@@ -63,18 +67,34 @@ const eventManagerSignUp = async (req, res) => {
   });
 };
 
+
+// Delete user route
+// app.delete('/api/deleteuser', verifyToken, async (req, res) => {
+//   try {
+//     const uid = req.uid; // Extracting UID from the verified token
+
+//     // Delete the user from Firebase Authentication
+//     await firebase.auth().deleteUser(uid);
+
+//     res.status(200).json({ message: 'User deleted successfully' });
+//   } catch (error) {
+//     res.status(400).json({ message: 'Failed to delete user', error: error.message });
+//   }
+// });
+
+
 // login user using google
 const eventManagerSign = async (req, res) => {
   const { name, email, picture, email_verified, user_id } = req.user;
   try {
     // check if user already exist
     // Validate if user exist in our database
-    const oldUser = await User.findOne({ email: email });
+    const oldUser = await UserDetails.findOne({ email: email }).populate('userid');
     if (oldUser) {
-      oldUser.username = name;
-      oldUser.picture = picture;
-      oldUser.email_verified = email_verified;
-      oldUser.user_id = user_id;
+      oldUser.userid.username = name;
+      oldUser.userid.picture = picture;
+      oldUser.userid.email_verified = email_verified;
+      oldUser.userid.user_id = user_id;
 
       // Save the updated user document
       await oldUser.save();

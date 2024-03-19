@@ -20,7 +20,8 @@ const EventModel = require('../../model/Events')
 
   //FETCH
  exports.fetchEvent = (req, res) => { 
-  EventModel.find()
+  EventModel.find({ isDeleted: false })
+
   .then(event => res.json (event)) 
   .catch(err => res.json(err))
 }
@@ -88,6 +89,7 @@ const EventModel = require('../../model/Events')
       .then(() => res.json({ message: 'Event logically deleted' }))
       .catch(err => res.status(500).json(err))
 };
+
 
 
 //CSV POST

@@ -8,9 +8,18 @@ const User = require('../../model/UserSchema');
         if(oldDetails) {
             oldDetails.bio =bio ?? oldDetails.bio;
             oldDetails.userid.username = username ?? oldDetails?.userid?.username;
+            oldDetails.userid.phoneNo = phoneNo ?? oldDetails?.userid?.phoneNo;
+            oldDetails.userid.picture = picture ?? oldDetails?.userid?.picture;
+            oldDetails.dateofbirth = dateofbirth ?? oldDetails?.dateofbirth 
+            oldDetails.country = country ?? oldDetails?.country
+            oldDetails.state = state ?? oldDetails?.state
+            oldDetails.city = city ?? oldDetails?.city
+            oldDetails.address = address ?? oldDetails?.address
+
+
             await oldDetails.save();
             await oldDetails.userid.save();
-            return  res.status(200).json({ userDetails:oldDetails  });
+            return  res.status(200).json({ user:oldDetails  });
         }
 
     } catch (err) {
