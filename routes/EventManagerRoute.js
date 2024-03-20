@@ -23,7 +23,7 @@ eventManagerRouter.post('/eventManager/csvcreateEvent',csvCreateEvent);
 // user related routes
 eventManagerRouter.post('/eventManager/users', createUser);
 eventManagerRouter.get('/eventManager/getUsers',fetchUser);
-eventManagerRouter.delete('/eventManager/deleteUser/:id',logicalUserDelete);
+eventManagerRouter.put('/eventManager/deleteUser/:id',logicalUserDelete);
 eventManagerRouter.delete('/eventManager/deleteAllUser/',logicalAllUserDelete);
 eventManagerRouter.get('/eventManager/getUser/:id',fetchUserById);
 eventManagerRouter.put('/eventManager/updateUser/:id',updateUserById);

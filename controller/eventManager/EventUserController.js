@@ -57,7 +57,7 @@ exports.createUser = async (req, res) => {
 
 // //fetching the users details
 exports.fetchUser = async(req, res) => { 
-    User.find({})
+    User.find({ deleteStatus: false })
     .then(user => res.json (user)) 
     .catch(err => res.json(err))
 }
@@ -67,11 +67,12 @@ exports.logicalUserDelete = async (req, res) => {
         const id = req.params.id;
         
         // Delete user from User table
-      const res =  await User.findByIdAndDelete(id);
-
+      const res =  await User.findByIdAndUpdate(id , {deleteStatus :true});
+ console.log(res)
         // Delete user details from UserDetail table
-        await UserDetails.findOneAndDelete({ userid: id });
-        res.json({ message: 'User and UserDetails deleted successfully.' ,res : res});
+        // await UserDetails.findOneAndDelete({ userid: id });
+        
+        res.status(200).json({ message: 'User  deleted successfully.',res : res});
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
