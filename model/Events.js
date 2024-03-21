@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const EventSchema = new mongoose.Schema({
   serialNumber: { type: Number }, // New field for sequential number
-  Name: { type: String, default: null },
+  EventName: { type: String, default: null },
   OrgName : { type: String},
   SDate: { type: String},
   EDate: { type: String},

@@ -1,5 +1,7 @@
 
 const EventModel = require('../../model/Events')
+const createCsvWriter = require('csv-writer').createObjectCsvWriter;
+const fs = require('fs');
 
 
 // POST
@@ -20,7 +22,8 @@ const EventModel = require('../../model/Events')
 
   //FETCH
  exports.fetchEvent = (req, res) => { 
-  EventModel.find()
+  EventModel.find({ isDeleted: false })
+
   .then(event => res.json (event)) 
   .catch(err => res.json(err))
 }
@@ -90,6 +93,7 @@ const EventModel = require('../../model/Events')
 };
 
 
+
 //CSV POST
  exports.csvCreateEvent = async (req, res) => { 
   console.log(req.body)
@@ -106,10 +110,10 @@ const EventModel = require('../../model/Events')
         .then(() => console.log('CSV file created successfully'));
     }
     
-    csvWriter.writeRecords(req.body)
+    csvWriter.writeRecords(req.body[0])
       .then(() => console.log('Data appended to CSV file successfully'));
   
-  EventModel.create(req.body) 
+  EventModel.create(req.body[0]) 
   .then(event => res.json (event)) 
   .catch(err => res.json(err))
 }
