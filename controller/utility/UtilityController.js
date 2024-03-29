@@ -1,4 +1,5 @@
 // controllers/contactController.js
+const Role = require('../../model/Role');
 
 const ContactForm = require('../../model/ContactForm');
 
@@ -51,5 +52,30 @@ exports.getAllFAQs = async (req, res) => {
   } catch (error) {
     console.error('Error getting FAQs:', error);
     res.status(500).json({ message: 'An error occurred while getting FAQs' });
+  }
+};
+
+
+// controllers/roleController.js
+
+
+exports.addRole = async (req, res) => {
+  try {
+    const { name, description } = req.body;
+
+    // Check if the role with the same name already exists
+    const existingRole = await Role.findOne({ name });
+    if (existingRole) {
+      return res.status(400).json({ success: false, message: 'Role with this name already exists' });
+    }
+
+    // Create a new role
+    const role = new Role({ name, description });
+    await role.save();
+
+    return res.status(201).json({ success: true, message: 'Role added successfully', data: role });
+  } catch (error) {
+    console.error('Error adding role:', error);
+    return res.status(500).json({ success: false, message: 'Failed to add role' });
   }
 };
