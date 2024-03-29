@@ -14,6 +14,10 @@ const  routerTeam = require('./routes/TeamRoutes')
 const userDetail = require('./routes/UserDetailsRoutes')
 const utilityRoutes = require('./routes/UtilityRoutes')
 const EventManagerRoute = require('./routes/EventManagerRoute')
+const certificateRoute = require('./routes/CertificateRoutes')
+const courseRouter = require('./routes/CourseRoutes')
+
+
 //middleWares
 const bodyParser = require("body-parser");
 const cors = require("cors"); //to handle cors origin error we use cors
@@ -29,6 +33,8 @@ app.use("/api", router);
 app.use("/api",routerTeam)
 app.use("/api",userDetail)
 app.use("/api",EventManagerRoute)
+app.use("/api",certificateRoute)
+app.use("/api",courseRouter)
 app.use("/api",utilityRoutes)
 
 // api document 

@@ -14,7 +14,8 @@ const UserSchema = new Schema({
   profile_complete:{type : Boolean, default:false},
   user_id:{type:String},
   picture:{type:String},
-  deleteStatus:{type :Boolean , default: false}
+  deleteStatus:{type :Boolean , default: false},
+  blacklisted: { type: Boolean, default: false } 
 }, {
   timestamps: true
 });
