@@ -2,6 +2,7 @@ const UserDetails = require('../../model/UserDetailsSchema')
 const User = require('../../model/UserSchema');
   exports.GetUserProfileByEmail = async (req, res) =>{
     const {email ,username ,dateofbirth,bio,country,state ,city,address,phoneNo,picture } = req.body;
+   console.log("username" , username)
     try {
          
         const oldDetails = await UserDetails.findOne({email:email}).populate('userid')
@@ -19,7 +20,7 @@ const User = require('../../model/UserSchema');
 
             await oldDetails.save();
             await oldDetails.userid.save();
-            return  res.status(200).json({ user:oldDetails  });
+            return  res.status(200).json({ user:oldDetails  , message:"user profile update successfully" , statusCode:200});
         }
 
     } catch (err) {
