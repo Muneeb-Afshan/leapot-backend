@@ -32,7 +32,7 @@ const UserDetails = require('../../model/UserDetailsSchema')
 
 // To add user, admin will add the user
 const eventManagerSignUp = async (req, res) => {
-  const { email, role ,password } = req.body;
+  const { email, role ,password , username } = req.body;
   if (!(email && role)) {
     return res.json({
       message: "all input feild require",
@@ -52,6 +52,7 @@ const eventManagerSignUp = async (req, res) => {
   const NewUser = new User({
     email: email,
     role: role,
+    username:username,
   });
   NewUser.save();
 
@@ -91,8 +92,8 @@ const eventManagerSign = async (req, res) => {
     // Validate if user exist in our database
     const oldUser = await UserDetails.findOne({ email: email }).populate('userid');
     if (oldUser) {
-      oldUser.userid.username = name;
-      oldUser.userid.picture = picture;
+      oldUser.userid.username = oldUser.userid.username ?? name;
+      oldUser.userid.picture = oldUser.userid.picture ?? picture;
       oldUser.userid.email_verified = email_verified;
       oldUser.userid.user_id = user_id;
 
