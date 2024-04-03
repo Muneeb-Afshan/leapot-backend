@@ -31,19 +31,27 @@ const certificateSettingSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  isDeleted: { type: Boolean, default: false }
+
 });
 
 
-const certificateTemplateSchema = new mongoose.Schema({
+const TemplateSchema = new mongoose.Schema({
 
   orientationType: {
     type: String,
-    required: true,
+    // required: true,
   },
-  certificateBody: {
-    type: String,
-    required: true,
-  },
+  certificateName :{
+    type: String ,
+    required: true
+    
+   } ,
+   certificateBody : {
+    type : String,
+    require: true
+   } ,
+   isDeleted: { type: Boolean, default: false }
 });
 
 
@@ -74,7 +82,7 @@ const issueCertificateSchema = new mongoose.Schema({
   }
 });
 
-const eventCertificateSchema = new mongoose.Schema({
+const TemplateCertificateSchema = new mongoose.Schema({
    certificateName :{
     type: String 
     
@@ -85,15 +93,16 @@ const eventCertificateSchema = new mongoose.Schema({
    } ,
    user_id : {
     type: String
-   }
+   } ,
+   isDeleted: { type: Boolean, default: false }
 });
 
 
 module.exports = {
   CertificateSetting: mongoose.model('CertificateSetting', certificateSettingSchema),
   IssueCertificate: mongoose.model('IssueCertificate', issueCertificateSchema),
-  CertificateTemplate: mongoose.model('CertificateTemplate', certificateTemplateSchema),
+  Templates: mongoose.model('Template', TemplateSchema),
   IssueCertificate: mongoose.model('IssueCertificate', issueCertificateSchema),
-  EventCertificate: mongoose.model('EventCertificate', eventCertificateSchema),
+  Certificates: mongoose.model('Certificates', TemplateCertificateSchema),
 
 };
