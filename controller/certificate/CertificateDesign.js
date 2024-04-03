@@ -1,12 +1,13 @@
-const {CertificateTemplate , EventCertificate , IssueCertificate , CertificateSetting} = require('../../model/CertificateSchema');
+const {Templates , Certificates , IssueCertificate , CertificateSetting} = require('../../model/CertificateSchema');
 const User = require("../../model/UserSchema");
 const Event = require("../../model/Events")
 const BlacklistedUser= require("../../model/BlacklistedUser")
 const RegisterLearner = require("../../model/RegistrationSchema")
+
 exports.addTemplate = async(req, res)=>{
     try {
         const templateData = req.body;
-        const certificate = await CertificateTemplate.create(templateData);
+        const certificate = await Templates.create(templateData);
         return res.status(201).json({
             body : certificate,
             statusCode : 200,
@@ -19,14 +20,42 @@ exports.addTemplate = async(req, res)=>{
 }
 
 
+
+// Controller method to logically delete a template
+exports.logicalDeleteTemplate = async (req, res) => {
+  try {
+    const templateId = req.params.id;
+
+    // Find the template by ID and update it
+    const updatedTemplate = await Templates.findOneAndUpdate(
+      { _id: templateId },
+      { $set: { isDeleted: true } },
+      { new: true } // Return the updated document
+    );
+
+    // If the template doesn't exist, return 404 Not Found
+    if (!updatedTemplate) {
+      return res.status(404).json({ error: 'Template not found' });
+    }
+
+    // Respond with success message
+    return res.status(200).json({ message: 'Template deleted', template: updatedTemplate });
+  } catch (error) {
+    // Handle any errors
+    console.error('Error in logicalDeleteTemplate:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+
 exports.useTemplate = async(req, res)=>{
   try {
       const templateData = req.body;
-      const eventcertificate = await EventCertificate.create(templateData);
+      const eventcertificate = await Certificates.create(templateData);
       return res.status(201).json({
           body : eventcertificate,
           statusCode : 200,
-          message :"event certificate  copy successfully"
+          message :" certificate  copy successfully from template"
       }
           );
     } catch (error) {
@@ -35,31 +64,57 @@ exports.useTemplate = async(req, res)=>{
 }
 
 
-exports.editTemplate = async(req,res) => {
+exports.editCertificate = async(req,res) => {
     try {
         const { id } = req.params;
         console.log(id)
     
-        const result = await EventCertificate.findByIdAndUpdate({_id:id}, req.body ,  { new: true });
+        const result = await Certificates.findByIdAndUpdate({_id:id}, req.body ,  { new: true });
     
         if (!result) {
-          return res.status(404).json({ message: 'Template not found' });
+          return res.status(404).json({ message: 'certficate not found' });
         }
     
         return res.status(200).send({
             body : result,
             statusCode : 200,
-            message: 'Event Certificate  updated successfully' });
+            message: ' Certificate  updated successfully' });
       } catch (error) {
         console.log(error.message);
         return res.status(500).send({ message: error.message });
       }
 }
 
+exports.logicalDeleteCertificate = async (req, res) => {
+  try {
+    const certificateId = req.params.id;
+
+    // Find the template by ID and update it
+    const DeleteCertificate = await Certificates.findOneAndUpdate(
+      { _id: certificateId },
+      { $set: { isDeleted: true } },
+      { new: true } // Return the updated document
+    );
+
+    // If the template doesn't exist, return 404 Not Found
+    if (!DeleteCertificate) {
+      return res.status(404).json({ error: 'Template not found' });
+    }
+
+    // Respond with success message
+    return res.status(200).json({ message: 'Certificate deleted', template: DeleteCertificate });
+  } catch (error) {
+    // Handle any errors
+    console.error('Error in logicalDeleteTemplate:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+
 // Controller function to fetch all templates
 exports.getAllTemplates= async(req, res)=> {
   try {
-    const templates = await CertificateTemplate.find();
+    const templates = await Templates.find();
     return res.status(200).send({
       templates : templates,
       statusCode : 200,
@@ -72,11 +127,11 @@ exports.getAllTemplates= async(req, res)=> {
 
 exports.getAllCertificate= async(req, res)=> {
   try {
-    const certificate = await EventCertificate.find();
+    const certificate = await Certificates.find();
     return res.status(200).send({
       certificates : certificate,
       statusCode : 200,
-      message: 'Event Certificate fetched  successfully' });
+      message: ' Certificates fetched  successfully' });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -87,7 +142,7 @@ exports.getOriantation = async(req,res)=>{
     try {
         const { type, orientation } = req.query;
         if(type || orientation) {
-          const certificate = await CertificateTemplate.find({type:type, orientation:orientation});
+          const certificate = await Templates.find({type:type, orientation:orientation});
           console.log(type);
           console.log(orientation);
           return res.status(200).json(certificate);
@@ -266,6 +321,34 @@ exports.fetchSetting = async (req, res) => {
     });
   }
 };
+
+
+
+exports.DeleteSettingOfEvent = async (req, res) => {
+  try {
+    const CertificateSettingId = req.params.id;
+
+    // Find the template by ID and update it
+    const DeleteCertificateSetting = await CertificateSetting.findOneAndUpdate(
+      { _id: CertificateSettingId },
+      { $set: { isDeleted: true } },
+      { new: true } // Return the updated document
+    );
+
+    // If the template doesn't exist, return 404 Not Found
+    if (!DeleteCertificateSetting) {
+      return res.status(404).json({ error: 'Certificate setting is  not found' });
+    }
+
+    // Respond with success message
+    return res.status(200).json({ message: 'Certificate Setting deleted', template: DeleteCertificateSetting });
+  } catch (error) {
+    // Handle any errors
+    console.error('Error in DeleteCertificateSetting:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
 
 
 exports.fetchIssueCertificate = async (req, res) => {
