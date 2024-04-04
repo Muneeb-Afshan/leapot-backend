@@ -137,6 +137,20 @@ exports.getAllCertificate= async(req, res)=> {
   }
 }
 
+exports.getSingleCertificate = async(req, res)=> {
+   const { id } = req.params;
+  try {
+    const certificate = await Certificates.find({_id : id});
+    return res.status(200).send({
+      certificates : certificate,
+      statusCode : 200,
+      message: ' Certificates fetched  successfully' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}
+
+
 
 exports.getOriantation = async(req,res)=>{
     try {
@@ -305,6 +319,31 @@ exports.fetchSetting = async (req, res) => {
   try {
     // Fetch issued certificates from the database
     const certificatesSetting = await CertificateSetting.find();
+
+    // Return the fetched certificates as a response
+    return res.status(200).json({
+      statusCode: 200,
+      data: certificatesSetting,
+      message: " certificate Setting  fetched successfully"
+    });
+  } catch (error) {
+    // Handle any errors that occur during fetching
+    console.error("Error fetching issued certificates:", error);
+    return res.status(500).json({
+      statusCode: 500,
+      message: "Internal server error occurred while fetching issued certificates"
+    });
+  }
+};
+
+
+exports.fetchSingleSetting = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+
+    // Fetch issued certificates from the database
+    const certificatesSetting = await CertificateSetting.find({_id : id});
 
     // Return the fetched certificates as a response
     return res.status(200).json({
