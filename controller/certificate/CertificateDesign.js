@@ -374,28 +374,53 @@ exports.fetchIssueCertificate = async (req, res) => {
 
 
 
+// exports.blacklistUsers = async (req, res) => {
+//   try {
+    
+//     const { users , reason , status} = req.body; // Array of user objects to blacklist
+//     // Extract user IDs from the array of user objects
+//     const email = users.map(user => user.email);
+//     // Update the users with the provided IDs to set blacklisted to true
+//     const updatedUsers = await User.updateMany({ email: { $in: email } }, { blacklisted: true });
+   
+//     const insertedUsers = await BlacklistedUser.insertMany(users.map(user => ({
+//       email: user.email,
+//       reason: reason,
+//       status: status ,
+//       blacklisted: true 
+
+//     })));
+
+//     return res.status(200).json({
+//       success: true,
+//       message: 'Users blacklisted successfully',
+//       statusCode:200,
+//       data: updatedUsers
+//     });
+//   } catch (error) {
+//     console.error('Error blacklisting users:', error);
+//     return res.status(500).json({
+//       success: false,
+//       message: 'Failed to blacklist users'
+//     });
+//   }
+// };
+
+
+
 exports.blacklistUsers = async (req, res) => {
   try {
     
-    const { users , reason , status} = req.body; // Array of user objects to blacklist
+    const { email, reason , status} = req.body; // Array of user objects to blacklist
     // Extract user IDs from the array of user objects
-    const email = users.map(user => user.email);
-    // Update the users with the provided IDs to set blacklisted to true
-    const updatedUsers = await User.updateMany({ email: { $in: email } }, { blacklisted: true });
-   
-    const insertedUsers = await BlacklistedUser.insertMany(users.map(user => ({
-      email: user.email,
-      reason: reason,
-      status: status ,
-      blacklisted: true 
-
-    })));
+    
+    const data = await BlacklistedUser.create( req.body);
 
     return res.status(200).json({
       success: true,
       message: 'Users blacklisted successfully',
       statusCode:200,
-      data: updatedUsers
+      data: data
     });
   } catch (error) {
     console.error('Error blacklisting users:', error);
@@ -405,7 +430,6 @@ exports.blacklistUsers = async (req, res) => {
     });
   }
 };
-
 
 exports.getBlacklistedUsers = async (req, res) => {
   try {
