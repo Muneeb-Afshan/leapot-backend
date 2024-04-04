@@ -18,7 +18,7 @@ const blacklistedUserSchema = new Schema({
     required: true,
     // enum: ['Active', 'Inactive', 'Invalid' , 'Email Changed' , 'Deactivate'] // Adjust as needed
   },
-  blacklisted: { type: Boolean, default: false } 
+  blacklisted: { type: Boolean, default: true } 
 ,
   createdAt: {
     type: Date,
