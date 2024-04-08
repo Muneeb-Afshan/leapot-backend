@@ -23,13 +23,13 @@ exports.createCertificateSetting = async (req, res) => {
       };
     } else if (certificateSettingData.serialNumberType.type === 'Incremental') {
       // Check if serialNumberType is 'Incremental' and required fields are provided
-      if (!certificateSettingData.prefix || !certificateSettingData.nextNumber) {
+      if (!certificateSettingData.serialNumberType.prefix || !certificateSettingData.serialNumberType.nextNumber) {
         return res.status(400).json({ message: "Both 'prefix' and 'nextNumber' are required for Incremental serialNumberType." });
       }
       serialNumberType = {
         type: 'Incremental',
-        prefix: certificateSettingData.prefix,
-        nextNumber: certificateSettingData.nextNumber
+        prefix: certificateSettingData.serialNumberType.prefix,
+        nextNumber: certificateSettingData.serialNumberType.nextNumber
       };
     } else {
       return res.status(400).json({ message: "Invalid serialNumberType. Allowed values are 'Random' and 'Incremental'." });
@@ -37,6 +37,37 @@ exports.createCertificateSetting = async (req, res) => {
 
     // Assign constructed serialNumberType object to certificateSettingData
     certificateSettingData.serialNumberType = serialNumberType;
+
+
+    let certificateType;
+    if (certificateSettingData.certificateType.type === 'KnowledgeBased') {
+
+      if (!certificateSettingData.certificateType.quizeType || !certificateSettingData.certificateType.passingPercentage) {
+        return res.status(400).json({ message: "Both 'quizeType' and 'passingPercentage' are required for Incremental serialNumberType." });
+      }
+      certificateType = {
+        type: 'KnowledgeBased',
+        quizeType: certificateSettingData.certificateType.quizeType,
+        passingPercentage: certificateSettingData.certificateType.passingPercentage
+     
+      };
+    } else if (certificateSettingData.certificateType.type === 'Completion') {
+      // Check if serialNumberType is 'Incremental' and required fields are provided
+      if (!certificateSettingData.certificateType.completionPercentage || !certificateSettingData.certificateType.minimumPassingPercentage) {
+        return res.status(400).json({ message: "Both 'completionPercentage' and 'minimumPassingPercentage' are required for Incremental serialNumberType." });
+      }
+      certificateType = {
+        type: 'Completion',
+        completionPercentage: certificateSettingData.certificateType.completionPercentage,
+        minimumPassingPercentage: certificateSettingData.certificateType.minimumPassingPercentage
+      };
+    } else {
+      return res.status(400).json({ message: "Invalid serialNumberType. Allowed values are 'Completion' and 'KnowledgeBased'." });
+    }
+
+    // Assign constructed serialNumberType object to certificateSettingData
+    certificateSettingData.certificateType = certificateType;
+
 
     // Create a new certificate setting document
     const certificateSetting = new CertificateSetting(certificateSettingData);
