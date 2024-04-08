@@ -67,10 +67,11 @@ exports.useTemplate = async(req, res)=>{
 exports.editCertificate = async(req,res) => {
     try {
         const { id } = req.params;
-        console.log(id)
-    
-        const result = await Certificates.findByIdAndUpdate({_id:id}, req.body ,  { new: true });
-    
+        console.log("id",id);
+        var serializedObj = JSON.stringify(req.body); 
+        console.log("XYZ", serializedObj);
+        const result = await Certificates.findByIdAndUpdate({_id:id}, {certificateBody:serializedObj.template} ,  { new: true });
+        console.log("result",result);
         if (!result) {
           return res.status(404).json({ message: 'certficate not found' });
         }
@@ -318,7 +319,8 @@ exports.bulkIssue = async(req, res)=>{
 exports.fetchSetting = async (req, res) => {
   try {
     // Fetch issued certificates from the database
-    const certificatesSetting = await CertificateSetting.find();
+    const certificatesSetting = await CertificateSetting.find().populate("eventId");
+    console.log(certificatesSetting);
 
     // Return the fetched certificates as a response
     return res.status(200).json({
