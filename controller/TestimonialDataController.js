@@ -12,7 +12,8 @@ exports.createTestimonial = async (req, res) => {
         const newData = await TestimonialDetail.create(req.body)
         res.status(201).json({
             message:"success",
-            user:req.body
+            Data:newData,
+            statusCode:200,
         });
     } catch (err) {
         res.status(400).json({message:err.message});
