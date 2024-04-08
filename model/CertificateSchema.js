@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
-
+const Schema = mongoose.Schema;
 const certificateSettingSchema = new mongoose.Schema({
 
-  eventId: mongoose.Schema.Types.ObjectId,
+  eventId: {type: Schema.Types.ObjectId, ref:'events', unique: true},
   serialNumberType: {
     type: {
       type: String,
