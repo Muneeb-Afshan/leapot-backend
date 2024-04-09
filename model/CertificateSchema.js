@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 const certificateSettingSchema = new mongoose.Schema({
 
   eventId: {type: Schema.Types.ObjectId, ref:'events', unique: true},
+  certificateId: {type: Schema.Types.ObjectId, ref:'Certificates'},
   serialNumberType: {
     type: {
       type: String,
