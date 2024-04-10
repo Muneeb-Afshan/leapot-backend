@@ -258,7 +258,7 @@ exports.singleIssue = async (req, res) => {
     if (!existingCertificate) {
       return res
         .status(400)
-        .json({ message: "Certificate has already created for the event" });
+        .json({ message: "Certificate has already issue to user  for the event" });
     }
     // Generate serial number based on serial number type
     let serialNumber;

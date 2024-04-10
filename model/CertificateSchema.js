@@ -100,10 +100,10 @@ const issueCertificateSchema = new mongoose.Schema({
     type: Date,
     required: true
   },
-  status: {
-    type: String,
-    required: true
-  }
+  // status: {
+  //   type: String,
+  //   required: true
+  // }
 });
 
 const TemplateCertificateSchema = new mongoose.Schema({
