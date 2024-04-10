@@ -255,7 +255,7 @@ exports.singleIssue = async (req, res) => {
       email: issueData.email,
       eventid: eventData._id,
     }).populate("userid");
-    if (!existingCertificate) {
+    if (existingCertificate) {
       return res
         .status(400)
         .json({ message: "Certificate has already issue to user  for the event" });
@@ -378,8 +378,8 @@ exports.fetchSetting = async (req, res) => {
   try {
     // Fetch issued certificates from the database
     const certificatesSetting = await CertificateSetting.find().populate(
-      "eventId"
-    );
+      "eventId"      
+    ).populate("certificateId");
     console.log(certificatesSetting);
 
     // Return the fetched certificates as a response
