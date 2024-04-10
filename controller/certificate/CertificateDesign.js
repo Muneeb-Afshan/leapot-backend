@@ -69,14 +69,14 @@ exports.editCertificate = async (req, res) => {
   try {
     const { id } = req.params;
     console.log("id", id);
-    var serializedObj = JSON.stringify(req.body);
-    console.log("XYZ", serializedObj);
+    // var serializedObj = JSON.stringify(req.body);
+    console.log("XYZ", req.body);
     const result = await Certificates.findByIdAndUpdate(
       { _id: id },
-      { certificateBody: serializedObj.template },
+      { certificateBody: req.body.template },
       { new: true }
     );
-    console.log("result", result);
+    // console.log("result", result);
     if (!result) {
       return res.status(404).json({ message: "certficate not found" });
     }
@@ -122,7 +122,7 @@ exports.logicalDeleteCertificate = async (req, res) => {
 // Controller function to fetch all templates
 exports.getAllTemplates = async (req, res) => {
   try {
-    const templates = await Templates.find();
+    const templates = await Templates.find({ isDeleted: false });
     return res.status(200).send({
       templates: templates,
       statusCode: 200,
@@ -135,7 +135,7 @@ exports.getAllTemplates = async (req, res) => {
 
 exports.getAllCertificate = async (req, res) => {
   try {
-    const certificate = await Certificates.find();
+    const certificate = await Certificates.find({ isDeleted: false });
     return res.status(200).send({
       certificates: certificate,
       statusCode: 200,
@@ -296,83 +296,83 @@ exports.singleIssue = async (req, res) => {
   }
 };
 
-exports.bulkIssue = async (req, res) => {
-  try {
-    const { users, eventName, issueDate, status, serialNumber } = req.body; // Array of user objects to blacklist
-
-    const issuedUsers = await IssueCertificate.insertMany(
-      users.map((user) => ({
-        email: user.email,
-        eventName: eventName,
-        issueDate: issueDate,
-        serialNumber: serialNumber,
-        status: status,
-      }))
-    );
-
-    return res.status(200).json({
-      success: true,
-      message: "Certificate issued to Users successfully",
-      statusCode: 200,
-      data: issuedUsers,
-    });
-  } catch (error) {
-    console.error("Error blacklisting users:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Failed to blacklist users",
-    });
-  }
-};
-
 // exports.bulkIssue = async (req, res) => {
 //   try {
-//     const issueDataList = req.body; // Assuming req.body contains an array of issue data
-//     const successfulIssues = [];
-//     const failedIssues = [];
+//     const { users, eventName, issueDate, status, serialNumber } = req.body; // Array of user objects to blacklist
 
-//     for (const issueData of issueDataList) {
-//       const { email, eventName } = issueData;
-
-//       // Fetch event data
-//       const eventData = await Event.findOne({ EventName: eventName });
-//       if (!eventData) {
-//         failedIssues.push({ message: `Event name ${eventName} is not found for email ${email}` });
-//         continue; // Continue to the next issueData
-//       }
-
-//       // Check if the user is registered for the event
-//       const registrationData = await RegisterLearner.findOne({ email, eventid: eventData._id }).populate('userid');
-//       if (!registrationData) {
-//         failedIssues.push({ message: `User with email ${email} is not registered for the event ${eventName}` });
-//         continue; // Continue to the next issueData
-//       }
-
-//       const issueCertificate = await IssueCertificate.findOne({ email, eventName: eventName });
-//       if (issueCertificate) {
-//         failedIssues.push({ message: `Certificate is already issued to user with email ${email} for event ${eventName}` });
-//         continue; // Continue to the next issueData
-//       }
-
-//       // Proceed with issuing the certificate
-//       try {
-//         const issue = await IssueCertificate.create({ ...issueData, username: registrationData.userid.username });
-//         successfulIssues.push(issue);
-//       } catch (error) {
-//         failedIssues.push({ message: `Unable to issue certificate for user with email ${email} for event ${eventName}` });
-//       }
-//     }
+//     const issuedUsers = await IssueCertificate.insertMany(
+//       users.map((user) => ({
+//         email: user.email,
+//         eventName: eventName,
+//         issueDate: issueDate,
+//         serialNumber: serialNumber,
+//         status: status,
+//       }))
+//     );
 
 //     return res.status(200).json({
-//       successfulIssues,
-//       failedIssues,
-//       message: "Bulk certificate issuance completed"
+//       success: true,
+//       message: "Certificate issued to Users successfully",
+//       statusCode: 200,
+//       data: issuedUsers,
 //     });
 //   } catch (error) {
-//     console.log(error);
-//     return res.status(500).json('Unable to issue certificates');
+//     console.error("Error blacklisting users:", error);
+//     return res.status(500).json({
+//       success: false,
+//       message: "Failed to blacklist users",
+//     });
 //   }
-// }
+// };
+
+exports.bulkIssue = async (req, res) => {
+  try {
+    const issueDataList = req.body; // Assuming req.body contains an array of issue data
+    const successfulIssues = [];
+    const failedIssues = [];
+
+    for (const issueData of issueDataList) {
+      const { email, eventName } = issueData;
+
+      // Fetch event data
+      const eventData = await Event.findOne({ EventName: eventName });
+      if (!eventData) {
+        failedIssues.push({ message: `Event name ${eventName} is not found for email ${email}` });
+        continue; // Continue to the next issueData
+      }
+
+      // Check if the user is registered for the event
+      const registrationData = await RegisterLearner.findOne({ email, eventid: eventData._id }).populate('userid');
+      if (!registrationData) {
+        failedIssues.push({ message: `User with email ${email} is not registered for the event ${eventName}` });
+        continue; // Continue to the next issueData
+      }
+
+      const issueCertificate = await IssueCertificate.findOne({ email, eventName: eventName });
+      if (issueCertificate) {
+        failedIssues.push({ message: `Certificate is already issued to user with email ${email} for event ${eventName}` });
+        continue; // Continue to the next issueData
+      }
+
+      // Proceed with issuing the certificate
+      try {
+        const issue = await IssueCertificate.create({ ...issueData, username: registrationData.userid.username });
+        successfulIssues.push(issue);
+      } catch (error) {
+        failedIssues.push({ message: `Unable to issue certificate for user with email ${email} for event ${eventName}` });
+      }
+    }
+
+    return res.status(200).json({
+      successfulIssues,
+      failedIssues,
+      message: "Bulk certificate issuance completed"
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json('Unable to issue certificates');
+  }
+}
 
 exports.fetchSetting = async (req, res) => {
   try {
