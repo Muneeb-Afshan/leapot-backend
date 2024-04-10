@@ -404,7 +404,9 @@ exports.fetchSingleSetting = async (req, res) => {
 
   try {
     // Fetch issued certificates from the database
-    const certificatesSetting = await CertificateSetting.find({ _id: id }).populate("certificateId");
+    const certificatesSetting = await CertificateSetting.find({ _id: id }).populate(
+      "eventId"      
+    ).populate("certificateId");
 
     // Return the fetched certificates as a response
     return res.status(200).json({
