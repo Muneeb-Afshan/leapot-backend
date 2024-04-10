@@ -258,7 +258,7 @@ exports.singleIssue = async (req, res) => {
     if (existingCertificate) {
       return res
         .status(400)
-        .json({ message: "Certificate has already created for the event" });
+        .json({ message: "Certificate has already issue to user  for the event" });
     }
     // Generate serial number based on serial number type
     let serialNumber;
@@ -404,7 +404,9 @@ exports.fetchSingleSetting = async (req, res) => {
 
   try {
     // Fetch issued certificates from the database
-    const certificatesSetting = await CertificateSetting.find({ _id: id }).populate("certificateId");
+    const certificatesSetting = await CertificateSetting.find({ _id: id }).populate(
+      "eventId"      
+    ).populate("certificateId");
 
     // Return the fetched certificates as a response
     return res.status(200).json({
