@@ -49,6 +49,7 @@ exports.createUser = async (req, res) => {
   });
   NewUserDetails.save();
   return res.status(201).json({
+    data: NewUser,
     message: "Learner Add successfull",
     success: true,
     statsCode:201

@@ -8,6 +8,7 @@ const User = require("../../model/UserSchema");
 const Event = require("../../model/Events");
 const BlacklistedUser = require("../../model/BlacklistedUser");
 const RegisterLearner = require("../../model/RegistrationSchema");
+// const RegistrationSchema = require("../../model/RegistrationSchema");
 
 exports.addTemplate = async (req, res) => {
   try {
@@ -253,8 +254,8 @@ exports.singleIssue = async (req, res) => {
 
     const existingCertificate = await IssueCertificate.findOne({
       email: issueData.email,
-      eventid: eventData._id,
-    }).populate("userid");
+      eventName: issueData.eventName
+    })
     if (existingCertificate) {
       return res
         .status(400)
@@ -327,39 +328,88 @@ exports.singleIssue = async (req, res) => {
 
 exports.bulkIssue = async (req, res) => {
   try {
-    const issueDataList = req.body; // Assuming req.body contains an array of issue data
+    // const issueDataList = []; // Assuming req.body contains an array of issue data
+    const data = req.body;
+   console.log("req.body" ,data )
     const successfulIssues = [];
     const failedIssues = [];
+ 
+    const issueDataList = await RegisterLearner.find({
+      eventid: data.eventid,
+    }); 
 
+    console.log(issueDataList, "issueDataList")
+    if (!issueDataList) {
+      return res
+        .status(400)
+        .json({ message: "No User is Register for This event" });
+    }
+    const certificateSetting = await CertificateSetting.findOne({
+      eventId: data.eventid,
+    });
+
+    if (!certificateSetting) {
+      return res
+        .status(400)
+        .json({ message: "Certificate Setting not found for the event" });
+    }
+
+
+  // Fetch event data
+  const eventData = await Event.findOne({ _id: data.eventid });
+  if (!eventData) {
+    if (!certificateSetting) {
+      return res
+        .status(400)
+        .json({ message: "Event Name is not found " });
+    }
+
+  } 
+  const eventName = eventData.EventName
+  const issueDate = data.issueDate
     for (const issueData of issueDataList) {
-      const { email, eventName } = issueData;
+      const { email } = issueData;
 
-      // Fetch event data
-      const eventData = await Event.findOne({ EventName: eventName });
-      if (!eventData) {
-        failedIssues.push({ message: `Event name ${eventName} is not found for email ${email}` });
-        continue; // Continue to the next issueData
-      }
+    
 
       // Check if the user is registered for the event
-      const registrationData = await RegisterLearner.findOne({ email, eventid: eventData._id }).populate('userid');
+      const registrationData = await RegisterLearner.findOne({ email, eventid: data.eventid  }).populate('userid');
+      console.log(registrationData , "registrationData")
       if (!registrationData) {
-        failedIssues.push({ message: `User with email ${email} is not registered for the event ${eventName}` });
+        failedIssues.push({ message: `User with email ${email} is not registered for the event ${eventData.EventName}` });
         continue; // Continue to the next issueData
       }
 
-      const issueCertificate = await IssueCertificate.findOne({ email, eventName: eventName });
+      const issueCertificate = await IssueCertificate.findOne({ email, eventName: eventData.EventName});
       if (issueCertificate) {
-        failedIssues.push({ message: `Certificate is already issued to user with email ${email} for event ${eventName}` });
+        failedIssues.push({ message: `Certificate is already issued to user with email ${email} for event ${eventData.EventName}` });
         continue; // Continue to the next issueData
+      }
+      // Generate serial number based on serial number type
+      let serialNumber;
+      if (certificateSetting.serialNumberType.type === "Random") {
+        serialNumber = generateRandomValue();
+      } else if (certificateSetting.serialNumberType.type === "Incremental") {
+        serialNumber = generateNextBumber(certificateSetting);
+        console.log(serialNumber);
+        certificateSetting.serialNumberType.nextNumber = serialNumber;
+        await certificateSetting.save();
+      } else {
+        return res
+          .status(400)
+          .json({
+            message:
+              "Invalid serialNumberType. Allowed values are 'Random' and 'Incremental'.",
+          });
       }
 
       // Proceed with issuing the certificate
       try {
-        const issue = await IssueCertificate.create({ ...issueData, username: registrationData.userid.username });
+        const issue = await IssueCertificate.create({ email ,  issueDate , eventName, serialNumber, username: registrationData.userid.username });
         successfulIssues.push(issue);
       } catch (error) {
-        failedIssues.push({ message: `Unable to issue certificate for user with email ${email} for event ${eventName}` });
+        console.log(error.message)
+        failedIssues.push({ message: `Unable to issue certificate for user with email ${email} for event ${eventData.EventName}` });
       }
     }
 
