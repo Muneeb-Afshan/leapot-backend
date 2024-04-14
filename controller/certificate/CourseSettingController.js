@@ -220,9 +220,10 @@ exports.updateCertificateSetting = async (req, res) => {
     // Assign constructed serialNumberType object to certificateSettingData
     certificateSettingData.certificateType = certificateType;
 
+     console.log(certificateSettingData,"certificateSettingData")
     // Create a new certificate setting document
     const certificateSetting = await CertificateSetting.findByIdAndUpdate({_id:id} ,   { $set: certificateSettingData },
-      );
+      { new: true }  );
 
 
     // Send the saved document as response
