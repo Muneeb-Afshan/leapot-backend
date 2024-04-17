@@ -16,6 +16,9 @@ const utilityRoutes = require('./routes/UtilityRoutes')
 const EventManagerRoute = require('./routes/EventManagerRoute')
 const certificateRoute = require('./routes/CertificateRoutes')
 const courseRouter = require('./routes/CourseRoutes')
+const routerBlog = require('./routes/BlogsRoutes')
+const routerTestimonial = require('./routes/TestimonialsRoutes')
+
 
 
 //middleWares
@@ -36,9 +39,12 @@ app.use("/api",EventManagerRoute)
 app.use("/api",certificateRoute)
 app.use("/api",courseRouter)
 app.use("/api",utilityRoutes)
+app.use("/api", routerBlog)
+app.use("/api",routerTestimonial)
 
 // api document 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 
 //server listen
 app.listen(process.env.PORT, () => {

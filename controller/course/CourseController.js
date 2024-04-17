@@ -2,18 +2,27 @@ const Event = require('../../model/EventsSchema');
 const Module = require('../../model/ModuleSchema');
 const Lesson = require('../../model/LessonSchema');
 
-exports.createEvent = async (req, res) => {
-  try {
-    const event = new Event(req.body);
-    await event.save();
-    res.json(event);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Error creating event' });
-  }
+const Course = require('../../model/courseBuilder/CourseSchema');
+
+exports.createCourse = async (req, res) => {
+    try {
+        const course = new Course(req.body);
+        await course.save();
+        res.status(201).json({ success: true, data: course , message:"Course added Sucessfully" , statusCode:200 });
+    } catch (err) {
+        res.status(400).json({ success: false, error: err.message });
+    }
 };
 
-
+exports.fetchCourses = async (req, res) => {
+  try {
+      const course = await Course.find({})
+    
+      res.status(201).json({ success: true, data: course , message:"Course Fetch Sucessfully" , statusCode:200});
+  } catch (err) {
+      res.status(400).json({ success: false, error: err.message });
+  }
+};
 
 // controllers/moduleController.js
 
@@ -83,25 +92,25 @@ exports.getAllData = async (req, res) => {
 // controllers/courseController.js
 
 
-exports.fetchCourses = async (req, res) => {
-  try {
-    // Fetch all events (courses)
-    const events = await Event.find();
-    // Fetch modules for each event
-    const populatedEvents = [];
-    for (const event of events) {
-      const modules = await Module.find({ eventId: event._id });
-      const populatedModules = [];
-      for (const module of modules) {
-        const lessons = await Lesson.find({ moduleId: module._id });
-        populatedModules.push({ ...module.toJSON(), lessons });
-      }
-      populatedEvents.push({ ...event.toJSON(), modules: populatedModules });
-    }
+// exports.fetchCourses = async (req, res) => {
+//   try {
+//     // Fetch all events (courses)
+//     const events = await Event.find();
+//     // Fetch modules for each event
+//     const populatedEvents = [];
+//     for (const event of events) {
+//       const modules = await Module.find({ eventId: event._id });
+//       const populatedModules = [];
+//       for (const module of modules) {
+//         const lessons = await Lesson.find({ moduleId: module._id });
+//         populatedModules.push({ ...module.toJSON(), lessons });
+//       }
+//       populatedEvents.push({ ...event.toJSON(), modules: populatedModules });
+//     }
 
-    res.json(populatedEvents);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Error fetching courses' });
-  }
-};
+//     res.json(populatedEvents);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ message: 'Error fetching courses' });
+//   }
+// };
