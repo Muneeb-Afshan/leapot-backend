@@ -95,25 +95,49 @@ const fs = require('fs');
 
 
 //CSV POST
- exports.csvCreateEvent = async (req, res) => { 
-  console.log(req.body)
-  const headers = Object.keys(req.body[0]);
-  const csvWriter = createCsvWriter({
-      path: 'output.csv',
-      header: headers, // Assuming all objects have the same structure
-      append: true, // Add this option to append to the existing file
-    });
+//  exports.csvCreateEvent = async (req, res) => { 
+//   console.log(req.body)
+//   const headers = Object.keys(req.body[0]);
+//   const csvWriter = createCsvWriter({
+//       path: 'output.csv',
+//       header: headers, // Assuming all objects have the same structure
+//       append: true, // Add this option to append to the existing file
+//     });
     
-    // Check if the file exists, if not, create a new file with headers
-    if (!fs.existsSync('output.csv')) {
-      csvWriter.writeRecords([{}])
-        .then(() => console.log('CSV file created successfully'));
-    }
+//     // Check if the file exists, if not, create a new file with headers
+//     if (!fs.existsSync('output.csv')) {
+//       csvWriter.writeRecords([{}])
+//         .then(() => console.log('CSV file created successfully'));
+//     }
     
-    csvWriter.writeRecords(req.body[0])
-      .then(() => console.log('Data appended to CSV file successfully'));
+//     csvWriter.writeRecords(req.body[0])
+//       .then(() => console.log('Data appended to CSV file successfully'));
   
-  EventModel.create(req.body[0]) 
-  .then(event => res.json (event)) 
-  .catch(err => res.json(err))
-}
+//   EventModel.create(req.body[0]) 
+//   .then(event => res.json (event)) 
+//   .catch(err => res.json(err))
+// }
+
+exports.csvCreateEvent = async (req, res) => {
+  try {
+    console.log(req.body);
+
+    const headers = Object.keys(req.body[0]);
+
+    const csvWriter = createCsvWriter({
+      path: 'output.csv',
+      header: headers,
+      append: true,
+    });
+
+    await csvWriter.writeRecords(req.body);
+
+    await EventModel.insertMany(req.body);
+
+    res.status(200).json({ message: 'CSV data processed successfully.' });
+  } catch (error) {
+    console.error('Error processing CSV data:', error);
+    res.status(500).json({ error: 'Internal server error.' });
+  }
+};
+
