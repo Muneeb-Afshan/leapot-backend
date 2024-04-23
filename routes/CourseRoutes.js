@@ -1,13 +1,18 @@
 const express = require('express');
 const courseRouter = express.Router();
-// const {createLesson} = require('../controller/course/CourseController');
+const {createCourse ,fetchCourses , addCourseDetails , fetchAllCoursesWithDetails , logicalDeleteCourse} = require('../controller/course/CourseController');
 const {registerLearner} = require('../controller/course/RegistrationController');
-const { createCourse , fetchCourses} = require('../controller/course/CourseController');
+// const {  addCourseDetails , getAllCourses} = require('../controller/course/CourseController');
 
 
 courseRouter.post('/event/eventRegistration',registerLearner);
 courseRouter.post('/course/createCourse',createCourse);
+courseRouter.post('/course/addCourseDetails',addCourseDetails);
 courseRouter.get('/course/fetchCourses',fetchCourses);
+
+courseRouter.get('/course/fetchAllCoursesWithDetails',fetchAllCoursesWithDetails);
+courseRouter.put('/course/logicalDeleteCourse/:id',logicalDeleteCourse);
+
 
 
 module.exports = courseRouter;

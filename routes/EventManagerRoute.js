@@ -5,7 +5,7 @@ const apicache = require('apicache');
 const cache = apicache.middleware;
 //controller added here
 const {createEvent , fetchEvent,fetchEventById,updateEvent,logicalEventDelete ,csvCreateEvent } = require('../controller/eventManager/EventController');
-const {createUser ,fetchUser ,logicalUserDelete ,logicalAllUserDelete, fetchUserById ,updateUserById , addInstructure ,getInstructor}  = require('../controller/eventManager/EventUserController')
+const {passwordResetLink,createUser ,fetchUser ,logicalUserDelete ,logicalAllUserDelete, fetchUserById ,updateUserById , addInstructure ,getInstructor}  = require('../controller/eventManager/EventUserController')
 const {eventManagerSignUp , eventManagerSign}  = require("../controller/eventManager/EventAuthController")
 
 // Event Manager Authentication Routes 
@@ -21,6 +21,8 @@ eventManagerRouter.patch('/eventManager/deleteEvent/:id',logicalEventDelete);
 eventManagerRouter.post('/eventManager/csvcreateEvent',csvCreateEvent);
 
 // user related routes
+
+eventManagerRouter.post('/eventManager/passwordResetLink', passwordResetLink);
 eventManagerRouter.post('/eventManager/users', createUser);
 eventManagerRouter.get('/eventManager/getUsers',fetchUser);
 eventManagerRouter.put('/eventManager/deleteUser/:id',logicalUserDelete);
