@@ -15,7 +15,7 @@ const UserDetails = require("../../model/UserDetailsSchema");
 const firebase = require("firebase-admin");
 // To add user, admin will add the user
 exports.createUser = async (req, res) => {
-  const { firstname, lastname, email, role, password, username } = req.body;
+  const { firstname, lastname, email, role, password } = req.body;
 
   if (!(email && role)) {
     return res.json({
@@ -41,7 +41,7 @@ exports.createUser = async (req, res) => {
     lastname: lastname,
     email: userRecord.email,
     role: role,
-    username: username,
+
     user_id: userRecord.uid,
   });
   console.log(NewUser);
@@ -69,7 +69,7 @@ exports.createUsersByCSV = async (req, res) => {
   const insertUserDetials = [];
 
   for (let i = 0; i < users.length; i++) {
-    const {firstname,lastname, email, role, password, username } = users[i];
+    const {firstname,lastname, email, role, password} = users[i];
 
     console.log(users[i]);
     if (!(email && role)) {
@@ -97,7 +97,7 @@ exports.createUsersByCSV = async (req, res) => {
       lastname:lastname,
       email: userRecord.email,
       role: role,
-      username: username,
+
       user_id: userRecord.uid,
     });
     const saveUser = await NewUser.save();
