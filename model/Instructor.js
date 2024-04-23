@@ -1,10 +1,13 @@
 const mongoose = require("mongoose");
 
 const InstructorSchema = new mongoose.Schema({
-  Name: { type: String, default: null },
-  Code: { type: String}
+  email: { type: String, required: true, unique: true },
+  username: { type: String },
+  Code: { type: String},
+  user_id:{type:String},
+
   
 })
 
-const InstructorModel = mongoose.model("instructor", InstructorSchema) 
+const InstructorModel = mongoose.model("instructorLookup", InstructorSchema) 
 module.exports = InstructorModel
