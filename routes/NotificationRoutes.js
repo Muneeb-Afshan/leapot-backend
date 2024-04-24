@@ -4,10 +4,16 @@ const {
   createNotification,
   fetchNotification,
   updateNotification,
+  fetchSingleNotification,
 } = require("../controller/notification/NotificationController");
 
 notificationRouter.post("/notification/postnotification", createNotification);
 notificationRouter.get("/notification/getnotifications", fetchNotification);
+notificationRouter.get(
+  "/notification/getSingleNotification/:id",
+  fetchSingleNotification
+);
+
 notificationRouter.put(
   "/notification/editnotification/:id",
   updateNotification

@@ -25,6 +25,18 @@ exports.fetchNotification = async (req, res) => {
   }
 };
 
+//controller to fetch single notifications
+
+exports.fetchSingleNotification = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const notify = await CreateNotification.find({ _id: id });
+    return res.status(200).json(notify);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 //controller to update existing notifications
 exports.updateNotification = async (req, res) => {
   try {
