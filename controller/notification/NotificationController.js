@@ -21,7 +21,7 @@ exports.createNotification = async (req, res) => {
 //controller to fetch notifications
 exports.fetchNotification = async (req, res) => {
   try {
-    const templatenot = await CreateNotification.find({});
+    const templatenot = await CreateNotification.find({ isDeleted: false });
     return res.status(200).json(templatenot);
   } catch (error) {
     res.status(500).json({ message: error.message });
