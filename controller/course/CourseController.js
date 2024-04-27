@@ -1,107 +1,127 @@
-const Event = require('../../model/EventsSchema');
-const Module = require('../../model/ModuleSchema');
-const Lesson = require('../../model/LessonSchema');
+// const Event = require('../../model/EventsSchema');
+// const Module = require('../../model/ModuleSchema');
+// const Lesson = require('../../model/LessonSchema');
 
-exports.createEvent = async (req, res) => {
+// const Course = require('../../model/courseBuilder/CourseSchema');
+const {
+  Topic,
+  Chapter,
+  Module,
+  CourseDetails,
+  Course,
+} = require("../../model/courseBuilder/CourseSchema");
+
+exports.createCourse = async (req, res) => {
   try {
-    const event = new Event(req.body);
-    await event.save();
-    res.json(event);
+    const course = new Course(req.body);
+    await course.save();
+    res
+      .status(201)
+      .json({
+        success: true,
+        data: course,
+        message: "Course added Sucessfully",
+        statusCode: 200,
+      });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Error creating event' });
+    res.status(400).json({ success: false, error: err.message });
   }
 };
-
-
-
-// controllers/moduleController.js
-
-exports.createModule = async (req, res) => {
-  try {
-    const { eventId } = req.params;
-    const event = await Event.findById(eventId);
-    if (!event) {
-      return res.status(404).json({ message: 'Event not found' });
-    }
-    const module = new Module({
-      ...req.body,
-      eventId,
-    });
-    await module.save();
-    res.json(module);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Error creating module' });
-  }
-};
-
-
-
-
-// controllers/lessonController.js
-
-exports.createLesson = async (req, res) => {
-  try {
-    const { eventId, moduleId } = req.params;
-    const module = await Module.findOne({ _id: moduleId, eventId });
-    if (!module) {
-      return res.status(404).json({ message: 'Module not found for the event' });
-    }
-    const lesson = new Lesson({
-      ...req.body,
-      eventId,
-      moduleId,
-    });
-    await lesson.save();
-    res.json(lesson);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Error creating lesson' });
-  }
-};
-
-
-// controllers/dataController.js
-
-exports.getAllData = async (req, res) => {
-  try {
-    const events = await Event.find().populate({
-      path: 'modules',
-      populate: {
-        path: 'lessons',
-      },
-    });
-    res.json(events);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Error fetching data' });
-  }
-};
-
-
-// controllers/courseController.js
-
 
 exports.fetchCourses = async (req, res) => {
   try {
-    // Fetch all events (courses)
-    const events = await Event.find();
-    // Fetch modules for each event
-    const populatedEvents = [];
-    for (const event of events) {
-      const modules = await Module.find({ eventId: event._id });
-      const populatedModules = [];
-      for (const module of modules) {
-        const lessons = await Lesson.find({ moduleId: module._id });
-        populatedModules.push({ ...module.toJSON(), lessons });
-      }
-      populatedEvents.push({ ...event.toJSON(), modules: populatedModules });
-    }
+    const course = await Course.find({});
 
-    res.json(populatedEvents);
+    res
+      .status(201)
+      .json({
+        success: true,
+        data: course,
+        message: "Course Fetch Sucessfully",
+        statusCode: 200,
+      });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Error fetching courses' });
+    res.status(400).json({ success: false, error: err.message });
   }
 };
+
+// Controller method to logically delete a template
+exports.logicalDeleteCourse = async (req, res) => {
+  try {
+    const courseId = req.params.id;
+
+    // Find the template by ID and update it
+    const updatedCourseforDelete = await Course.findOneAndUpdate(
+      { _id: courseId },
+      { $set: { isDeleted: true } },
+      { new: true } // Return the updated document
+    );
+
+    // If the template doesn't exist, return 404 Not Found
+    if (!updatedCourseforDelete) {
+      return res.status(404).json({ error: "course is not found" });
+    }
+
+    // Respond with success message
+    return res
+      .status(200)
+      .json({ message: "course deleted", course: updatedCourseforDelete });
+  } catch (error) {
+    // Handle any errors
+    console.error("Error in logicalDeleteCourse:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// Controller function to add a new course as well as update a new course 
+exports.addCourseDetails = async (req, res) => {
+  try {
+    const { course_id, modules } = req.body;
+
+    // Check if the course_id already exists
+    const existingCourse = await CourseDetails.findOne({ course_id });
+    // if (!existingCourse) {
+    //   return res.status(400).json({ error: 'Course not exists' });
+    // }
+
+    // Check if the course exists in the database
+    let course = await CourseDetails.findOne({ course_id });
+
+    // If the course exists, update it; otherwise, create a new course
+    if (course) {
+      // Update the existing course with the new data
+      course.modules = modules;
+    } else {
+      // Create a new course instance
+      course = new CourseDetails({ course_id, modules });
+    }
+    // Save the course to the database
+    const savedCourse = await course.save();
+    res.status(201).json({
+      success: true,
+      data: savedCourse,
+      message: "Course saved Sucessfully",
+      statusCode: 200,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error });
+  }
+};
+
+// Controller function to get all courses
+exports.fetchAllCoursesWithDetails = async (req, res) => {
+  try {
+    // Retrieve all courses from the database
+    const courses = await CourseDetails.find();
+    res.status(200).json({
+      success: true,
+      data: courses,
+      message: "Course fetch Sucessfully",
+      statusCode: 200,
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+

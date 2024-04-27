@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
-
+const Schema = mongoose.Schema;
 const certificateSettingSchema = new mongoose.Schema({
 
-  eventId: mongoose.Schema.Types.ObjectId,
+  eventId: {type: Schema.Types.ObjectId, ref:'events', unique: true},
+  certificateId: {type: Schema.Types.ObjectId, ref:'Certificates'},
   serialNumberType: {
     type: {
       type: String,
@@ -24,12 +25,35 @@ const certificateSettingSchema = new mongoose.Schema({
     required: true,
   },
   certificateType: {
-    type: String,
-    required: true,
+   type: {
+      type: String,
+      enum: ['Completion', 'KnowledgeBased'], // Define the allowed types
+      required: true
+    },
+    completionPercentage: {
+      type: String,
+      required: function() { return this.certificateType === 'Completion'; } // Required if serialNumberType is Incremental
+    },
+    minimumPassingPercentage: {
+      type: Number,
+      required: function() { return this.certificateType === 'Completion'; } // Required if serialNumberType is Incremental
+    },
+
+    quizeType: {
+      type: String,
+      required: function() { return this.certificateType === 'KnowledgeBased'; } // Required if serialNumberType is Incremental
+    },
+    passingPercentage: {
+      type: Number,
+      required: function() { return this.certificateType === 'KnowledgeBased'; } // Required if serialNumberType is Incremental
+    },
+    
+  
   },
+
   certificateTemplate: {
     type: String,
-    required: true,
+    // required: true,
   },
   isDeleted: { type: Boolean, default: false }
 
@@ -76,10 +100,10 @@ const issueCertificateSchema = new mongoose.Schema({
     type: Date,
     required: true
   },
-  status: {
-    type: String,
-    required: true
-  }
+  // status: {
+  //   type: String,
+  //   required: true
+  // }
 });
 
 const TemplateCertificateSchema = new mongoose.Schema({
