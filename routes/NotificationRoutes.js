@@ -6,7 +6,7 @@ const {
   updateNotification,
   fetchSingleNotification,
   logicalDeleteNotification,
-  sendIndividualNotification,
+  sendNotifications,
   getNotifications,
 } = require("../controller/notification/NotificationController");
 
@@ -25,10 +25,7 @@ notificationRouter.put(
   "/notification/deleteNotification/:id",
   logicalDeleteNotification
 );
-notificationRouter.post(
-  "/notification/postindividualnotification",
-  sendIndividualNotification
-);
+notificationRouter.post("/notification/sendnotifications", sendNotifications);
 notificationRouter.get("/notification/fetchnotifications", getNotifications);
 
 module.exports = notificationRouter;

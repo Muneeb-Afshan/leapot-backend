@@ -31,14 +31,20 @@ CreateNotificationSchema.statics.getNotificationTypes = async function () {
 };
 
 //create send to individual notification schema
-const IndividualNotificationSchema = new mongoose.Schema({
+const SendNotificationSchema = new mongoose.Schema({
   email_Type: {
     type: String,
     required: true,
   },
   user_recipients: {
-    type: String,
+    type: [String], // Array type for multiple recipients
     required: true,
+    validate: {
+      validator: function (value) {
+        return value.every((email) => validateEmail(email));
+      },
+      message: "Invalid email address",
+    },
   },
   cc: { type: String },
   bcc: { type: String },
@@ -57,13 +63,19 @@ const IndividualNotificationSchema = new mongoose.Schema({
   },
 });
 
+// Custom email validation function
+const validateEmail = (email) => {
+  // Regular expression for basic email validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  // Test the email against the regex
+  return emailRegex.test(String(email).toLowerCase());
+};
+
 module.exports = {
   CreateNotification: mongoose.model(
     "CreateNotification",
     CreateNotificationSchema
   ),
-  IndividualNotification: mongoose.model(
-    "IndividualNotification",
-    IndividualNotificationSchema
-  ),
+  SendNotification: mongoose.model("SendNotification", SendNotificationSchema),
 };

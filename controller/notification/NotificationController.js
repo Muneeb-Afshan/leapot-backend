@@ -1,6 +1,6 @@
 const {
   CreateNotification,
-  IndividualNotification,
+  SendNotification,
 } = require("../../model/NotificationSchema");
 //controller to post notifications
 exports.createNotification = async (req, res) => {
@@ -95,11 +95,11 @@ exports.logicalDeleteNotification = async (req, res) => {
 };
 
 //controller to post notifications to individual user
-exports.sendIndividualNotification = async (req, res) => {
+exports.sendNotifications = async (req, res) => {
   try {
     const { email_Type, email_Subject, email_Body, cc, bcc, user_recipients } =
       req.body;
-    const individualnotification = await IndividualNotification.create({
+    const individualnotification = await SendNotification.create({
       email_Type,
       cc,
       bcc,
@@ -118,7 +118,7 @@ exports.sendIndividualNotification = async (req, res) => {
 
 exports.getNotifications = async (req, res) => {
   try {
-    const notifications = await IndividualNotification.find({});
+    const notifications = await SendNotification.find({});
     return res.status(200).json(notifications);
   } catch (err) {
     res.status(500).json({ message: err.message });
