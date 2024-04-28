@@ -9,6 +9,9 @@ const {
   sendNotifications,
   getNotifications,
   searchNotifications,
+  createNotificationSettings,
+  getNotificationsByRole,
+  toggleNotificationSettings,
 } = require("../controller/notification/NotificationController");
 
 notificationRouter.post("/notification/postnotification", createNotification);
@@ -29,5 +32,14 @@ notificationRouter.put(
 notificationRouter.post("/notification/sendnotifications", sendNotifications);
 notificationRouter.get("/notification/fetchnotifications", getNotifications);
 notificationRouter.get("/notifications/search", searchNotifications);
+notificationRouter.post(
+  "/notifications/notificationsettings",
+  createNotificationSettings
+);
+notificationRouter.get("/notifications/:role", getNotificationsByRole);
+notificationRouter.put(
+  "/notifications/notificationsettings/:id/toggle",
+  toggleNotificationSettings
+);
 
 module.exports = notificationRouter;
