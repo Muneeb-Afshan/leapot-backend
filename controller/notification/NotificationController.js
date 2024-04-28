@@ -124,3 +124,25 @@ exports.getNotifications = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+// Controller method to search notifications
+exports.searchNotifications = async (req, res) => {
+  try {
+    const { searchQuery } = req.query;
+
+    // Perform the database query to search notifications
+    const notifications = await CreateNotification.find({
+      $or: [
+        { notificationType: { $regex: searchQuery, $options: "i" } },
+        { subject: { $regex: searchQuery, $options: "i" } },
+      ],
+      isDeleted: false,
+    });
+
+    // Return the filtered notifications
+    res.status(200).json(notifications);
+  } catch (error) {
+    console.error("Error searching notifications:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};

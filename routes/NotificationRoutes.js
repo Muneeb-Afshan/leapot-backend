@@ -8,6 +8,7 @@ const {
   logicalDeleteNotification,
   sendNotifications,
   getNotifications,
+  searchNotifications,
 } = require("../controller/notification/NotificationController");
 
 notificationRouter.post("/notification/postnotification", createNotification);
@@ -27,5 +28,6 @@ notificationRouter.put(
 );
 notificationRouter.post("/notification/sendnotifications", sendNotifications);
 notificationRouter.get("/notification/fetchnotifications", getNotifications);
+notificationRouter.get("/notifications/search", searchNotifications);
 
 module.exports = notificationRouter;
