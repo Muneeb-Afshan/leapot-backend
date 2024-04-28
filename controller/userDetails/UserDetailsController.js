@@ -1,7 +1,7 @@
 const UserDetails = require('../../model/UserDetailsSchema')
 const User = require('../../model/UserSchema');
   exports.GetUserProfileByEmail = async (req, res) =>{
-    const {email ,username ,dateofbirth,bio,country,state ,city,address,phoneNo,picture } = req.body;
+    const {email ,username ,dateofbirth,bio,country,state ,city,address1,address2,phoneNo,picture } = req.body;
    console.log("username" , username)
     try {
          
@@ -15,7 +15,8 @@ const User = require('../../model/UserSchema');
             oldDetails.country = country ?? oldDetails?.country
             oldDetails.state = state ?? oldDetails?.state
             oldDetails.city = city ?? oldDetails?.city
-            oldDetails.address = address ?? oldDetails?.address
+            oldDetails.address1 = address1 ?? oldDetails?.address1
+            oldDetails.address2 = address2 ?? oldDetails?.address2
 
 
             await oldDetails.save();
