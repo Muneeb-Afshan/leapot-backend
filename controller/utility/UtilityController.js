@@ -2,7 +2,6 @@
 
 // controllers/contactController.js
 const Role = require("../../model/Role");
-const sendNotificationEmail = require("./EmailNotification");
 
 const ContactForm = require("../../model/ContactForm");
 
@@ -10,7 +9,7 @@ exports.ContactForm = async (req, res) => {
   console.log("dgnsdkbdsvbd");
   try {
     const { name, email, mobile, message, attachments } = req.body;
-    const ownerEmail = "gauravhiwarale1448@gmail.com";
+    // const ownerEmail = 'gauravhiwarale1448@gmail.com';
 
     // Create a new contact form submission
     const contactForm = new ContactForm({
@@ -25,7 +24,7 @@ exports.ContactForm = async (req, res) => {
     await contactForm.save();
 
     // Send Notificaton to mail
-    await sendNotificationEmail(name, email, ownerEmail);
+    // await sendNotificationEmail(name, email, ownerEmail);
 
     res.status(201).json({
       message: "Contact form submitted successfully",
