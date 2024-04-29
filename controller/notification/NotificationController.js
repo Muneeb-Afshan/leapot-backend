@@ -148,21 +148,49 @@ exports.searchNotifications = async (req, res) => {
 };
 
 // Controller function to create notification settings
+// exports.createNotificationSettings = async (req, res) => {
+//   try {
+//     console.log(req.body);
+//     const { settingsName, description, roles } = req.body;
+
+//     // If roles include "Select All", set roles to all predefined roles
+//     const rolesToSave = roles.includes("Select All")
+//       ? [
+//           "Admin",
+//           "Learner",
+//           "Instructor",
+//           "Course Reviewer",
+//           "Course Developer",
+//         ]
+//       : roles;
+
+//     const newNotificationSettings = await NotificationSettings.create({
+//       settingsName,
+//       description,
+//       roles: rolesToSave,
+//     });
+
+//     return res.status(200).json(newNotificationSettings);
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+// Controller function to create notification settings
 exports.createNotificationSettings = async (req, res) => {
   try {
-    console.log(req.body);
     const { settingsName, description, roles } = req.body;
 
     // If roles include "Select All", set roles to all predefined roles
-    const rolesToSave = roles.includes("Select All")
-      ? [
-          "Admin",
-          "Learner",
-          "Instructor",
-          "Course Reviewer",
-          "Course Developer",
-        ]
-      : roles;
+    const rolesToSave =
+      roles[0].role === "Select All"
+        ? [
+            { role: "Admin", isEnabled: false },
+            { role: "Learner", isEnabled: false },
+            { role: "Instructor", isEnabled: false },
+            { role: "Course Reviewer", isEnabled: false },
+            { role: "Course Developer", isEnabled: false },
+          ]
+        : roles;
 
     const newNotificationSettings = await NotificationSettings.create({
       settingsName,
@@ -175,6 +203,7 @@ exports.createNotificationSettings = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 //controller to fetch settings based on roles
 // exports.getNotificationsByRole = async (req, res) => {
 //   try {
@@ -231,12 +260,11 @@ exports.getAllNotifications = async (req, res) => {
 //     return res.status(500).json({ error: "Internal server error" });
 //   }
 // };
-// Controller function to toggle the isEnabled field for a specific role
-// Controller function to toggle the isEnabled field for a specific role
+
+// Controller function to toggle the isEnabled field for a specific role, if the role doesn't exist then it will be updated correctly
 exports.toggleNotificationSettings = async (req, res) => {
   try {
     const { id } = req.params;
-    const { role } = req.body;
 
     // Find the settings by ID
     const notificationSettings = await NotificationSettings.findById(id);
@@ -246,20 +274,35 @@ exports.toggleNotificationSettings = async (req, res) => {
       return res.status(404).json({ error: "Notification settings not found" });
     }
 
-    // Find the role object in the settings
-    const roleObject = notificationSettings.roles.find(
-      (roleObj) => roleObj.role === role
-    );
+    // If there's only one role in the data, update its isEnabled field directly
+    if (notificationSettings.roles.length === 1) {
+      notificationSettings.roles[0].isEnabled = true;
+    } else {
+      // If there are multiple roles, check if role is specified in the request body
+      const { role } = req.body;
 
-    // If the role object doesn't exist, return 400 Bad Request
-    if (!roleObject) {
-      return res
-        .status(400)
-        .json({ error: "Role not found in notification settings" });
+      // If the role is not specified, return 400 Bad Request
+      if (!role) {
+        return res
+          .status(400)
+          .json({ error: "Role must be specified in the request body" });
+      }
+
+      // Find the role object in the settings
+      const roleObject = notificationSettings.roles.find(
+        (roleObj) => roleObj.role === role
+      );
+
+      // If the role object doesn't exist, return 400 Bad Request
+      if (!roleObject) {
+        return res
+          .status(400)
+          .json({ error: "Role not found in notification settings" });
+      }
+
+      // Update the isEnabled field for the specified role
+      roleObject.isEnabled = true;
     }
-
-    // Update the isEnabled field for the specified role
-    roleObject.isEnabled = true;
 
     // Save the updated settings
     await notificationSettings.save();
