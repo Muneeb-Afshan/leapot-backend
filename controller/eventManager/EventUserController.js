@@ -13,6 +13,42 @@ const User = require("../../model/UserSchema");
 const UserDetails = require('../../model/UserDetailsSchema')
 //All Authentications rest API are list here
 const firebase = require('firebase-admin');
+
+
+// Initialize Nodemailer transporter
+// const transporter = nodemailer.createTransport({
+//   service: 'Gmail',
+//   auth: {
+//     user: 'YOUR_GMAIL_EMAIL',
+//     pass: 'YOUR_GMAIL_PASSWORD'
+//   }
+// });
+
+// function generateRandomPassword(length) {
+//   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+//   let password = '';
+//   for (let i = 0; i < length; i++) {
+//     const randomIndex = Math.floor(Math.random() * characters.length);
+//     password += characters.charAt(randomIndex);
+//   }
+//   return password;
+// }
+
+
+exports.passwordResetLink = async (req, res) =>{
+  const { email } = req.body;
+  const passwordResetLink = await firebase.auth().generatePasswordResetLink(email);
+  console.log('passwordResetLink email link:', passwordResetLink);
+
+ // Send email with password reset link
+//  await transporter.sendMail({
+//   from: 'YOUR_GMAIL_EMAIL',
+//   to: email,
+//   subject: 'Password Reset',
+//   text: `Click the following link to reset your password: ${passwordResetLink}`
+// });
+}
+
 // To add user, admin will add the user
 exports.createUser = async (req, res) => {
   const { email, role , password , username } = req.body;
@@ -29,10 +65,31 @@ exports.createUser = async (req, res) => {
     });
   }
 
+  
+  // const password = generateRandomPassword(6)
   const userRecord = await firebase.auth().createUser({
     email,
     password
   })
+  await firebase.auth().generateEmailVerificationLink(email)
+  .then((link) => {
+    console.log('Verification email link:', link);
+    // You can send this link to the user via email
+  });
+
+  const passwordResetLink = await firebase .auth().generatePasswordResetLink(email);
+  console.log('passwordResetLink email link:', passwordResetLink);
+
+ // Send email with password reset link
+//  await transporter.sendMail({
+//   from: 'YOUR_GMAIL_EMAIL',
+//   to: email,
+//   subject: 'Password Reset',
+//   text: `Click the following link to reset your password: ${passwordResetLink}`
+// });
+
+
+
   console.log("create" , userRecord.email)
 
   const NewUser = new User({
@@ -48,7 +105,21 @@ exports.createUser = async (req, res) => {
     userid:NewUser._id
   });
   NewUserDetails.save();
+
+if(role === 'Instructor'){
+  
+  const addInstructor = new InstructorModel({
+    email: email,
+    userid:NewUser._id,
+    username:username,
+
+  });
+  addInstructor.save();
+
+}
+
   return res.status(201).json({
+    data: NewUser,
     message: "Learner Add successfull",
     success: true,
     statsCode:201
