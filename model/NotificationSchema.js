@@ -73,6 +73,33 @@ const validateEmail = (email) => {
 };
 
 //create send to individual notification schema
+// const NotificationSettingsSchema = new mongoose.Schema({
+//   settingsName: {
+//     type: String,
+//     required: true,
+//   },
+//   description: {
+//     type: String,
+//     required: true,
+//   },
+//   roles: {
+//     type: [String],
+//     enum: [
+//       "Admin",
+//       "Learner",
+//       "Instructor",
+//       "Course Reviewer",
+//       "Course Developer",
+//       "Select All",
+//     ],
+//     required: true,
+//   },
+
+//   isEnabled: {
+//     type: Boolean,
+//     default: false,
+//   },
+// });
 const NotificationSettingsSchema = new mongoose.Schema({
   settingsName: {
     type: String,
@@ -83,50 +110,28 @@ const NotificationSettingsSchema = new mongoose.Schema({
     required: true,
   },
   roles: {
-    type: [String],
-    enum: [
-      "Admin",
-      "Learner",
-      "Instructor",
-      "Course Reviewer",
-      "Course Developer",
-      "Select All",
+    type: [
+      {
+        role: {
+          type: String,
+          enum: [
+            "Admin",
+            "Learner",
+            "Instructor",
+            "Course Reviewer",
+            "Course Developer",
+            "Select All",
+          ],
+        },
+        isEnabled: {
+          type: Boolean,
+          default: false,
+        },
+      },
     ],
     required: true,
   },
-  // roles: {
-  //   type: [
-  //     {
-  //       type: String,
-  //       enum: [
-  //         "Admin",
-  //         "Learner",
-  //         "Instructor",
-  //         "Course Reviewer",
-  //         "Select All",
-  //       ],
-  //     },
-  //   ],
-  //   validate: {
-  //     validator: function(value) {
-  //       // Check if 'Select All' is present and it's the only role
-  //       if (value.includes("Select All") && value.length === 1) {
-  //         return true;
-  //       }
-  //       // Check if all roles are present except 'Select All'
-  //       const allRoles = ["Admin", "Learner", "Instructor", "Course Reviewer"];
-  //       return allRoles.every(role => value.includes(role));
-  //     },
-  //     message: props => `Invalid roles: ${props.value}`,
-  //   },
-  //   required: true,
-  // },
-  isEnabled: {
-    type: Boolean,
-    default: false,
-  },
 });
-
 module.exports = {
   CreateNotification: mongoose.model(
     "CreateNotification",

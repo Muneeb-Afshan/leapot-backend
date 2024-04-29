@@ -204,20 +204,65 @@ exports.getAllNotifications = async (req, res) => {
 };
 
 // Controller function to toggle the isEnabled field
+// exports.toggleNotificationSettings = async (req, res) => {
+//   try {
+//     const settingsId = req.params.id;
+//     const { role } = req.body;
+//     // Find the settings by ID and update it
+//     const notificationSettings = await NotificationSettings.findOneAndUpdate(
+//       { _id: settingsId, roles: role },
+//       { $set: { isEnabled: true } },
+//       { new: true } // Return the updated document
+//     );
+
+//     // If the settings doesn't exist, return 404 Not Found
+//     if (!notificationSettings) {
+//       return res.status(404).json({ error: "Notification settings not found" });
+//     }
+
+//     // Respond with success message
+//     return res.status(200).json({
+//       message: "Notification settings updated ",
+//       notification: notificationSettings,
+//     });
+//   } catch (error) {
+//     // Handle any errors
+//     console.error("Error in settingsNotification:", error);
+//     return res.status(500).json({ error: "Internal server error" });
+//   }
+// };
+// Controller function to toggle the isEnabled field for a specific role
+// Controller function to toggle the isEnabled field for a specific role
 exports.toggleNotificationSettings = async (req, res) => {
   try {
-    const settingsId = req.params.id;
-    // Find the settings by ID and update it
-    const notificationSettings = await NotificationSettings.findOneAndUpdate(
-      { _id: settingsId },
-      { $set: { isEnabled: true } },
-      { new: true } // Return the updated document
-    );
+    const { id } = req.params;
+    const { role } = req.body;
+
+    // Find the settings by ID
+    const notificationSettings = await NotificationSettings.findById(id);
 
     // If the settings doesn't exist, return 404 Not Found
     if (!notificationSettings) {
       return res.status(404).json({ error: "Notification settings not found" });
     }
+
+    // Find the role object in the settings
+    const roleObject = notificationSettings.roles.find(
+      (roleObj) => roleObj.role === role
+    );
+
+    // If the role object doesn't exist, return 400 Bad Request
+    if (!roleObject) {
+      return res
+        .status(400)
+        .json({ error: "Role not found in notification settings" });
+    }
+
+    // Update the isEnabled field for the specified role
+    roleObject.isEnabled = true;
+
+    // Save the updated settings
+    await notificationSettings.save();
 
     // Respond with success message
     return res.status(200).json({
@@ -226,7 +271,7 @@ exports.toggleNotificationSettings = async (req, res) => {
     });
   } catch (error) {
     // Handle any errors
-    console.error("Error in settingsNotification:", error);
+    console.error("Error in toggleNotificationSettings:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
 };
