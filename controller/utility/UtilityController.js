@@ -1,24 +1,34 @@
+
+
+
+// code 2
+
 // controllers/contactController.js
 const Role = require('../../model/Role');
+const sendNotificationEmail = require('./EmailNotification')
 
 const ContactForm = require('../../model/ContactForm');
 
 exports.ContactForm = async (req, res) => {
     console.log("dgnsdkbdsvbd")
   try {
-    const { name, email, subject, message, attachments } = req.body;
+    const { name, email, mobile, message, attachments } = req.body;
+    const ownerEmail = 'gauravhiwarale1448@gmail.com';
 
     // Create a new contact form submission
     const contactForm = new ContactForm({
       name,
       email,
-      subject,
+      mobile,
       message,
       attachments
     });
-
+    
     // Save the submission to the database
     await contactForm.save();
+
+    // Send Notificaton to mail
+    await sendNotificationEmail(name, email, ownerEmail);
 
     res.status(201).json({ message: 'Contact form submitted successfully', ContactInfo :contactForm });
   } catch (error) {
@@ -58,7 +68,6 @@ exports.getAllFAQs = async (req, res) => {
 
 // controllers/roleController.js
 
-
 exports.addRole = async (req, res) => {
   try {
     const { name, description } = req.body;
@@ -79,7 +88,3 @@ exports.addRole = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Failed to add role' });
   }
 };
-
-
-
-
