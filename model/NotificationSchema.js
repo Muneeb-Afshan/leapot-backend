@@ -84,7 +84,14 @@ const NotificationSettingsSchema = new mongoose.Schema({
   },
   roles: {
     type: [String],
-    enum: ["Admin", "Learner", "Instructor", "Course Reviewer", "Select All"],
+    enum: [
+      "Admin",
+      "Learner",
+      "Instructor",
+      "Course Reviewer",
+      "Course Developer",
+      "Select All",
+    ],
     required: true,
   },
   // roles: {

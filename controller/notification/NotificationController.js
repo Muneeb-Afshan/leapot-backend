@@ -155,7 +155,13 @@ exports.createNotificationSettings = async (req, res) => {
 
     // If roles include "Select All", set roles to all predefined roles
     const rolesToSave = roles.includes("Select All")
-      ? ["Admin", "Learner", "Instructor", "Course Reviewer"]
+      ? [
+          "Admin",
+          "Learner",
+          "Instructor",
+          "Course Reviewer",
+          "Course Developer",
+        ]
       : roles;
 
     const newNotificationSettings = await NotificationSettings.create({
@@ -170,17 +176,27 @@ exports.createNotificationSettings = async (req, res) => {
   }
 };
 //controller to fetch settings based on roles
-exports.getNotificationsByRole = async (req, res) => {
+// exports.getNotificationsByRole = async (req, res) => {
+//   try {
+//     const { role } = req.params;
+
+//     let notifications;
+//     if (role === "Select All") {
+//       notifications = await NotificationSettings.find({});
+//     } else {
+//       notifications = await NotificationSettings.find({ roles: role });
+//     }
+
+//     res.status(200).json(notifications);
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
+//controller to fetch all settings
+exports.getAllNotifications = async (req, res) => {
   try {
-    const { role } = req.params;
-
-    let notifications;
-    if (role === "Select All") {
-      notifications = await NotificationSettings.find({});
-    } else {
-      notifications = await NotificationSettings.find({ roles: role });
-    }
-
+    const notifications = await NotificationSettings.find({});
     res.status(200).json(notifications);
   } catch (error) {
     res.status(500).json({ message: error.message });
