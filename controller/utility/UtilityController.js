@@ -1,3 +1,5 @@
+// code 2
+
 // controllers/contactController.js
 const Role = require("../../model/Role");
 
@@ -6,19 +8,23 @@ const ContactForm = require("../../model/ContactForm");
 exports.ContactForm = async (req, res) => {
   console.log("dgnsdkbdsvbd");
   try {
-    const { name, email, subject, message, attachments } = req.body;
+    const { name, email, mobile, message, attachments } = req.body;
+    // const ownerEmail = 'gauravhiwarale1448@gmail.com';
 
     // Create a new contact form submission
     const contactForm = new ContactForm({
       name,
       email,
-      subject,
+      mobile,
       message,
       attachments,
     });
 
     // Save the submission to the database
     await contactForm.save();
+
+    // Send Notificaton to mail
+    // await sendNotificationEmail(name, email, ownerEmail);
 
     res.status(201).json({
       message: "Contact form submitted successfully",
@@ -32,8 +38,21 @@ exports.ContactForm = async (req, res) => {
   }
 };
 
-// to Add store FAQ
-const FAQ = require("../../model/FAQ");
+
+const Application = require('../../model/CareerSchema');
+
+exports.createApplication = async (req, res) => {
+    try {
+        const application = await Application.create(req.body);
+        res.status(201).json({ message: 'Contact form submitted successfully', data :application , statusCode:200 })
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+};
+
+// to Add store FAQ 
+const FAQ = require('../../model/FAQ');
+const { create } = require('../../model/Instructor');
 
 // Create a new FAQ
 exports.createFAQ = async (req, res) => {

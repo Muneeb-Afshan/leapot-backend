@@ -19,6 +19,7 @@ const certificateRoute = require("./routes/CertificateRoutes");
 const courseRouter = require("./routes/CourseRoutes");
 const routerBlog = require("./routes/BlogsRoutes");
 const routerTestimonial = require("./routes/TestimonialsRoutes");
+const routerJob = require('./routes/JobRoutes')
 
 //middleWares
 const bodyParser = require("body-parser");
@@ -45,7 +46,7 @@ app.use("/api", courseRouter);
 app.use("/api", utilityRoutes);
 app.use("/api", routerBlog);
 app.use("/api", routerTestimonial);
-
+app.use("/api",routerJob)
 // api document
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
