@@ -27,7 +27,7 @@ exports.ContactForm = async (req, res) => {
     await contactForm.save();
 
     // Send Notificaton to mail
-    await sendNotificationEmail(name, email, ownerEmail);
+    // await sendNotificationEmail(name, email, ownerEmail);
 
     res.status(201).json({
       message: "Contact form submitted successfully",
@@ -95,6 +95,22 @@ exports.addRole = async (req, res) => {
     return res
       .status(500)
       .json({ success: false, message: "Failed to add role" });
+  }
+};
+
+
+exports.fetchRole = async (req, res) => {
+  try {
+    // Check if the role with the same name already exists
+    const role = await Role.find();
+    return res
+      .status(201)
+      .json({ success: true, message: "Role fetch successfully", data: role });
+  } catch (error) {
+    console.error("Error adding role:", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch role" });
   }
 };
 
