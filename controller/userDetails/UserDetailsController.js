@@ -3,7 +3,8 @@ const User = require("../../model/UserSchema");
 exports.GetUserProfileByEmail = async (req, res) => {
   const {
     email,
-    username,
+    firstname,
+    lastname,
     dateofbirth,
     bio,
     country,
@@ -20,7 +21,8 @@ exports.GetUserProfileByEmail = async (req, res) => {
     );
     if (oldDetails) {
       oldDetails.bio = bio ?? oldDetails.bio;
-      oldDetails.userid.username = username ?? oldDetails?.userid?.username;
+      oldDetails.userid.firstname = username ?? oldDetails?.userid?.firstname;
+      oldDetails.userid.lastname = username ?? oldDetails?.userid?.lastname;
       oldDetails.userid.phoneNo = phoneNo ?? oldDetails?.userid?.phoneNo;
       oldDetails.userid.picture = picture ?? oldDetails?.userid?.picture;
       oldDetails.dateofbirth = dateofbirth ?? oldDetails?.dateofbirth;
