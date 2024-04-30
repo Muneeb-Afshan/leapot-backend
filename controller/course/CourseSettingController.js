@@ -54,12 +54,11 @@ exports.saveOrUpdateCourseAppearanceSetting = async (req, res) => {
   }
 };
 
-
 // Controller function to save or update progress and completion data
 exports.saveOrUpdateProgressAndCompletion = async (req, res) => {
   try {
     const { name } = req.body;
-     
+
     // Check if progress and completion data with the given name already exists
     let progressAndCompletion = await CourseProgressAndCompletion.findOne({ name });
 
