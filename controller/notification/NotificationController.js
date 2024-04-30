@@ -44,7 +44,8 @@ exports.fetchSingleNotification = async (req, res) => {
 exports.updateNotification = async (req, res) => {
   try {
     const { id } = req.params;
-    const { notificationType, subject, notificationBody } = req.body;
+    const { notificationType, subject, notificationBody } =
+      req.body.updatedData;
     // Update the notification using findByIdAndUpdate
     const updatednotification = await CreateNotification.findByIdAndUpdate(
       { _id: id }, // ID to update
@@ -268,7 +269,7 @@ exports.toggleNotificationSettings = async (req, res) => {
 
     // Find the settings by ID
     const notificationSettings = await NotificationSettings.findById(id);
-
+    console.log(req.body);
     // If the settings doesn't exist, return 404 Not Found
     if (!notificationSettings) {
       return res.status(404).json({ error: "Notification settings not found" });
@@ -276,7 +277,7 @@ exports.toggleNotificationSettings = async (req, res) => {
 
     // If there's only one role in the data, update its isEnabled field directly
     if (notificationSettings.roles.length === 1) {
-      notificationSettings.roles[0].isEnabled = true;
+      notificationSettings.roles[0].isEnabled = req.body.isEnabled;
     } else {
       // If there are multiple roles, check if role is specified in the request body
       const { role } = req.body;
@@ -301,7 +302,7 @@ exports.toggleNotificationSettings = async (req, res) => {
       }
 
       // Update the isEnabled field for the specified role
-      roleObject.isEnabled = true;
+      roleObject.isEnabled = req.body.isEnabled;
     }
 
     // Save the updated settings
