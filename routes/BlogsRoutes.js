@@ -6,5 +6,3 @@ routerBlog.post("/insertBlogData",createBlogData);
 routerBlog.get("/getBlogData", cache('5 minutes'), getBlogDdata);
 
 module.exports = routerBlog;
-
-
