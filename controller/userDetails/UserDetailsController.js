@@ -2,7 +2,7 @@
 const UserDetails = require('../../model/UserDetailsSchema')
 const User = require('../../model/UserSchema');
   exports.GetUserProfileByEmail = async (req, res) =>{
-    const {email , firstname, lastname, ,dateofbirth,bio,country,state ,city,address1,address2,phoneNo,picture } = req.body;
+    const {email , firstname, lastname, dateofbirth,bio,country,state ,city,address1,address2,phoneNo,picture } = req.body;
    console.log("username" , username)
     try {
          
