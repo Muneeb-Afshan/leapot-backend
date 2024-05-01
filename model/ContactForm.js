@@ -11,7 +11,7 @@ const contactFormSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  subject: {type : String},
+  mobile: {type : Number},
   message: {
     type: String,
     required: true

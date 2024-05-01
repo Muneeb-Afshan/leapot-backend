@@ -1,49 +1,39 @@
-const UserDetails = require("../../model/UserDetailsSchema");
-const User = require("../../model/UserSchema");
-exports.GetUserProfileByEmail = async (req, res) => {
-  const {
-    email,
-    firstname,
-    lastname,
-    dateofbirth,
-    bio,
-    country,
-    state,
-    city,
-    address,
-    phoneNo,
-    picture,
-  } = req.body;
-  console.log("username", username);
-  try {
-    const oldDetails = await UserDetails.findOne({ email: email }).populate(
-      "userid"
-    );
-    if (oldDetails) {
-      oldDetails.bio = bio ?? oldDetails.bio;
-      oldDetails.userid.firstname = username ?? oldDetails?.userid?.firstname;
-      oldDetails.userid.lastname = username ?? oldDetails?.userid?.lastname;
-      oldDetails.userid.phoneNo = phoneNo ?? oldDetails?.userid?.phoneNo;
-      oldDetails.userid.picture = picture ?? oldDetails?.userid?.picture;
-      oldDetails.dateofbirth = dateofbirth ?? oldDetails?.dateofbirth;
-      oldDetails.country = country ?? oldDetails?.country;
-      oldDetails.state = state ?? oldDetails?.state;
-      oldDetails.city = city ?? oldDetails?.city;
-      oldDetails.address = address ?? oldDetails?.address;
 
-      await oldDetails.save();
-      await oldDetails.userid.save();
-      return res
-        .status(200)
-        .json({
-          user: oldDetails,
-          message: "user profile update successfully",
-          statusCode: 200,
-        });
+const UserDetails = require('../../model/UserDetailsSchema')
+const User = require('../../model/UserSchema');
+  exports.GetUserProfileByEmail = async (req, res) =>{
+    const {email , firstname, lastname, ,dateofbirth,bio,country,state ,city,address1,address2,phoneNo,picture } = req.body;
+   console.log("username" , username)
+    try {
+         
+        const oldDetails = await UserDetails.findOne({email:email}).populate('userid')
+        if(oldDetails) {
+            oldDetails.bio =bio ?? oldDetails.bio;
+            oldDetails.userid.firstname = firstname ?? oldDetails?.userid?.firstname;
+            oldDetails.userid.lastname = lastname ?? oldDetails?.userid?.lastname;
+            oldDetails.userid.phoneNo = phoneNo ?? oldDetails?.userid?.phoneNo;
+            oldDetails.userid.picture = picture ?? oldDetails?.userid?.picture;
+            oldDetails.userid.profile_complete = true;
+
+            oldDetails.dateofbirth = dateofbirth ?? oldDetails?.dateofbirth 
+            oldDetails.country = country ?? oldDetails?.country
+            oldDetails.state = state ?? oldDetails?.state
+            oldDetails.city = city ?? oldDetails?.city
+
+            oldDetails.address1 = address1 ?? oldDetails?.address1
+            oldDetails.address2 = address2 ?? oldDetails?.address2
+
+
+            await oldDetails.save();
+            await oldDetails.userid.save();
+            return  res.status(200).json({ user:oldDetails  , message:"user profile update successfully" , statusCode:200});
+        }
+
+    } catch (err) {
+     return res.status(500).json({ message: err.message });
+
     }
-  } catch (err) {
-    return res.status(500).json({ message: err.message });
-  }
+  
 };
 
 exports.FindUsersDetails = async (req, res) => {
