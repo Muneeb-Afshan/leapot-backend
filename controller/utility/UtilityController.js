@@ -122,3 +122,16 @@ exports.fetchRole = async (req, res) => {
       .json({ success: false, message: "Failed to fetch role" });
   }
 };
+
+exports.fetchRole = async (req, res) => {
+  try {
+   
+
+    // Check if the role with the same name already exists
+    const role = await Role.find();
+    return res.status(201).json({ success: true, message: 'Role fetch successfully', data: role });
+  } catch (error) {
+    console.error('Error adding role:', error);
+    return res.status(500).json({ success: false, message: 'Failed to fetch role' });
+  }
+};
