@@ -41,15 +41,6 @@ exports.passwordResetLink = async (req, res) =>{
   console.log("email", email)
 
   try{
-    // const oldUser = await User.findOne({ email: req.body });
-    // console.log(oldUser)
-    // if (!oldUser) {
-    //   return res.json({
-    //     message: "User not exist in database",
-    //     success: false,
-    //   });
-    // }
-  
   const passwordResetLink = await firebase.auth().generatePasswordResetLink(email);
   console.log('passwordResetLink email :', passwordResetLink);
 
@@ -109,7 +100,7 @@ exports.createUser = async (req, res) => {
   subject: 'Password Reset Link For Acoount',
   html: `
   <p>You are receiving this email because a request was made to reset the password for your account.</p>
-  <p>Please follow these steps to reset your password:</p>
+
   <p><a href="${passwordResetLink}" style="background-color: green; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Reset Password</a></p>
 `
 });
