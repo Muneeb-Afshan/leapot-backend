@@ -11,10 +11,13 @@ const User = require('../../model/UserSchema');
             oldDetails.userid.username = username ?? oldDetails?.userid?.username;
             oldDetails.userid.phoneNo = phoneNo ?? oldDetails?.userid?.phoneNo;
             oldDetails.userid.picture = picture ?? oldDetails?.userid?.picture;
+            oldDetails.userid.profile_complete = true;
+
             oldDetails.dateofbirth = dateofbirth ?? oldDetails?.dateofbirth 
             oldDetails.country = country ?? oldDetails?.country
             oldDetails.state = state ?? oldDetails?.state
             oldDetails.city = city ?? oldDetails?.city
+
             oldDetails.address1 = address1 ?? oldDetails?.address1
             oldDetails.address2 = address2 ?? oldDetails?.address2
 

@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 
+
 const EventSchema = new mongoose.Schema({
   serialNumber: { type: Number }, // New field for sequential number
   EventName: { type: String, default: null },
@@ -59,12 +60,12 @@ const EventSchema = new mongoose.Schema({
 );
 
 // Pre-save hook to assign sequential number
-EventSchema.pre('save', async function(next) {
+EventSchema.pre("save", async function (next) {
   try {
     if (!this.isNew) {
       return next(); // If the document is being updated, skip assigning a sequential number
     }
-    
+
     // Find the total count of documents in the collection and increment it by 1
     const totalCount = await this.constructor.countDocuments();
     this.serialNumber = totalCount + 1;
@@ -75,8 +76,5 @@ EventSchema.pre('save', async function(next) {
   }
 });
 
-
-
-
-const EventModel = mongoose.model("events", EventSchema) 
-module.exports = EventModel
+const EventModel = mongoose.model("events", EventSchema);
+module.exports = EventModel;

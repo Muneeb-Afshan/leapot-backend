@@ -13,6 +13,64 @@ const User = require("../../model/UserSchema");
 const UserDetails = require('../../model/UserDetailsSchema')
 //All Authentications rest API are list here
 const firebase = require('firebase-admin');
+const nodemailer = require('nodemailer');
+
+// Initialize Nodemailer transporter
+const transporter = nodemailer.createTransport({
+  service: 'Gmail',
+  auth: {
+    user: 'intern.lpt@gmail.com',
+    pass: 'uppm qskv gihw vecc'
+  }
+});
+
+// function generateRandomPassword(length) {
+//   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+//   let password = '';
+//   for (let i = 0; i < length; i++) {
+//     const randomIndex = Math.floor(Math.random() * characters.length);
+//     password += characters.charAt(randomIndex);
+//   }
+//   return password;
+// }
+
+
+exports.passwordResetLink = async (req, res) =>{
+  const { email } = req.body;
+  console.log("email", req.body)
+  console.log("email", email)
+
+  try{
+    // const oldUser = await User.findOne({ email: req.body });
+    // console.log(oldUser)
+    // if (!oldUser) {
+    //   return res.json({
+    //     message: "User not exist in database",
+    //     success: false,
+    //   });
+    // }
+  
+  const passwordResetLink = await firebase.auth().generatePasswordResetLink(email);
+  console.log('passwordResetLink email :', passwordResetLink);
+
+ // Send email with password reset link
+ await transporter.sendMail({
+  from: 'intern.lpt@gmail.com',
+  to: email,
+  subject: 'Password Reset',
+  html: `
+  <p>You are receiving this email because a request was made to reset the password for your account.</p>
+  <p>Please follow these steps to reset your password:</p>
+  <p><a href="${passwordResetLink}" style="background-color: green; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Reset Password</a></p>
+`
+}); 
+res.json({ success: true });
+  } catch(e){
+    console.log(e.message)
+    res.json({ success: false });
+  }
+}
+
 // To add user, admin will add the user
 exports.createUser = async (req, res) => {
   const { email, role , password , username } = req.body;
@@ -29,10 +87,35 @@ exports.createUser = async (req, res) => {
     });
   }
 
+  
+  // const password = generateRandomPassword(6)
   const userRecord = await firebase.auth().createUser({
     email,
     password
   })
+  await firebase.auth().generateEmailVerificationLink(email)
+  .then((link) => {
+    console.log('Verification email link:', link);
+    // You can send this link to the user via email
+  });
+
+  const passwordResetLink = await firebase .auth().generatePasswordResetLink(email);
+  console.log('passwordResetLink email link:', passwordResetLink);
+
+//  Send email with password reset link
+ await transporter.sendMail({
+  from: 'contact@leapot.in',
+  to: email,
+  subject: 'Password Reset Link For Acoount',
+  html: `
+  <p>You are receiving this email because a request was made to reset the password for your account.</p>
+  <p>Please follow these steps to reset your password:</p>
+  <p><a href="${passwordResetLink}" style="background-color: green; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Reset Password</a></p>
+`
+});
+
+
+
   console.log("create" , userRecord.email)
 
   const NewUser = new User({
@@ -48,6 +131,19 @@ exports.createUser = async (req, res) => {
     userid:NewUser._id
   });
   NewUserDetails.save();
+
+if(role === 'Instructor'){
+  
+  const addInstructor = new InstructorModel({
+    email: email,
+    userid:NewUser._id,
+    username:username,
+
+  });
+  addInstructor.save();
+
+}
+
   return res.status(201).json({
     data: NewUser,
     message: "Learner Add successfull",
