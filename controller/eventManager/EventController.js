@@ -41,10 +41,10 @@ const fs = require('fs');
   const id = req.params.id;
   // EventModel.findByIdAndUpdate(id, req.body, { new: true })
   EventModel.findByIdAndUpdate({_id: id}, {
-      Name: req.body.Name,
+      EventName: req.body.EventName,
       OrgName: req.body.OrgName,
-      SDate: req.body.Date,
-      EDate: req.body.Date,
+      SDate: req.body.SDate,
+      EDate: req.body.EDate,
       STime: req.body.STime,
       ETime: req.body.ETime,
       Duration: req.body.Duration,
@@ -72,7 +72,8 @@ const fs = require('fs');
       CourseAffilation: req.body.CourseAffilation,
       EventAccess: req.body.EventAccess,
       OutlookCal: req.body.OutlookCal,
-      Tags: req.body.Tags,
+      CourseFees: req.body.CourseFees,
+      tags: Array.isArray(req.body.tags) ? req.body.tags : [],
       CancelPolicy: req.body.CancelPolicy,
       OptOut: req.body.OptOut,
       Certificate: req.body.Certificate,
