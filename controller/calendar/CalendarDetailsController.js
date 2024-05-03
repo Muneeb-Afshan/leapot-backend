@@ -29,12 +29,26 @@ exports.putAllTags = async (req, res) => {
   }
 };
 //Controller to fetch tags
+// exports.getAllTags = async (req, res) => {
+//   try {
+//     const tags = await TagsDetails.find({});
+//     return res.status(200).json(tags);
+//   } catch (err) {
+//     res.status(500).json({ message: err.message });
+//   }
+// };
 exports.getAllTags = async (req, res) => {
   try {
-    const tags = await TagsDetails.find({});
-    return res.status(200).json(tags);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+    const allEvents = await EventModule.find({}, "tags");
+    let allTags = [];
+    allEvents.forEach((event) => {
+      allTags = allTags.concat(event.tags);
+    });
+    // Remove duplicate tags
+    const uniqueTags = [...new Set(allTags)];
+    return res.status(200).send(uniqueTags);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -54,7 +68,7 @@ exports.getEventDetails = async (req, res) => {
     const { eventname } = req.params;
     const eventdetails = await EventModule.findOne(
       { EventName: eventname },
-      "EventName EventDesp InstName EventId Duration CourseType SDate CourseFees Tags tagsInput CourseLearningOutcomes "
+      "EventName EventDesp InstName EventId Duration CourseType SDate CourseFees tags EventSummary "
     );
     if (!eventdetails) {
       return res.status(404).json({ message: "Event not found" });
