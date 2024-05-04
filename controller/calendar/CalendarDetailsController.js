@@ -28,6 +28,18 @@ exports.putAllTags = async (req, res) => {
     res.st;
   }
 };
+
+// Controller to fetch events by tag
+exports.getEventsByTags = async (req, res) => {
+  try {
+    const { tag } = req.params;
+    // Query events based on the provided tag
+    const events = await EventModule.find({ tags: tag });
+    res.status(200).json({ events: events });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 //Controller to fetch tags
 // exports.getAllTags = async (req, res) => {
 //   try {
