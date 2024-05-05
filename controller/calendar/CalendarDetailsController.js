@@ -51,7 +51,7 @@ exports.getEventsByTags = async (req, res) => {
 // };
 exports.getAllTags = async (req, res) => {
   try {
-    const allEvents = await EventModule.find({}, "tags");
+    const allEvents = await EventModule.find({ isDeleted: false }, "tags");
     let allTags = [];
     allEvents.forEach((event) => {
       allTags = allTags.concat(event.tags);
