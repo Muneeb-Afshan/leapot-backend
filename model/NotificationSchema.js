@@ -5,6 +5,7 @@ const CreateNotificationSchema = new mongoose.Schema({
   role: {
     type: String,
     enum: [
+      "SuperAdmin",
       "Admin",
       "Learner",
       "Instructor",
@@ -127,6 +128,7 @@ const NotificationSettingsSchema = new mongoose.Schema({
         role: {
           type: String,
           enum: [
+            "SuperAdmin",
             "Admin",
             "Learner",
             "Instructor",
