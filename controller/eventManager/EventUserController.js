@@ -155,7 +155,8 @@ if(role === 'Instructor'){
   const addInstructor = new InstructorModel({
     email: email,
     userid:NewUser._id,
-    username:username,
+    firstname:firstname,
+    lastname:lastname,
 
   });
   addInstructor.save();
