@@ -78,10 +78,7 @@ exports.getAllEvents = async (req, res) => {
 exports.getEventDetails = async (req, res) => {
   try {
     const { eventname } = req.params;
-    const eventdetails = await EventModule.findOne(
-      { EventName: eventname },
-      "EventName EventDesp InstName EventId Duration CourseType SDate CourseFees tags EventSummary "
-    );
+    const eventdetails = await EventModule.findOne({ EventName: eventname });
     if (!eventdetails) {
       return res.status(404).json({ message: "Event not found" });
     }
