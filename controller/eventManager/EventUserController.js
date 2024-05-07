@@ -20,8 +20,8 @@ const nodemailer = require('nodemailer');
 const transporter = nodemailer.createTransport({
   service: 'Gmail',
   auth: {
-    user: 'intern.lpt@gmail.com',
-    pass: 'uppm qskv gihw vecc'
+    user: 'hr.leapot@gmail.com',
+    pass: 'tlnb zajb dnqz katg'
   }
 });
 
@@ -34,6 +34,31 @@ const transporter = nodemailer.createTransport({
 //   }
 //   return password;
 // }
+
+
+exports.emailTest = async (req, res) =>{
+  const { email } = req.body;
+  console.log("email", req.body)
+  console.log("email", email)
+
+  try{
+ 
+
+ // Send email with password reset link
+ await transporter.sendMail({
+  from: 'contact@leapot.in',
+  to: email,
+  subject: 'Password Reset',
+  html: `
+  <p>hii this is tedting mail</p>
+`
+}); 
+res.json({ success: true });
+  } catch(e){
+    console.log(e.message)
+    res.json({ success: false });
+  }
+}
 
 
 exports.passwordResetLink = async (req, res) =>{
