@@ -12,18 +12,12 @@ const InstructorModel = require("../../model/Instructor");
 const User = require("../../model/UserSchema");
 const UserDetails = require("../../model/UserDetailsSchema");
 //All Authentications rest API are list here
-
+const {sendEmail} = require('../emailUtility/SendEmailFunction')
 const firebase = require('firebase-admin');
 const nodemailer = require('nodemailer');
 
 // Initialize Nodemailer transporter
-const transporter = nodemailer.createTransport({
-  service: 'Gmail',
-  auth: {
-    user: 'hr.leapot@gmail.com',
-    pass: 'tlnb zajb dnqz katg'
-  }
-});
+// Create transporter
 
 // function generateRandomPassword(length) {
 //   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -40,19 +34,34 @@ exports.emailTest = async (req, res) =>{
   const { email } = req.body;
   console.log("email", req.body)
   console.log("email", email)
+  const name  = "Ganesh"
 
   try{
- 
 
- // Send email with password reset link
- await transporter.sendMail({
-  from: 'contact@leapot.in',
-  to: email,
-  subject: 'Password Reset',
-  html: `
-  <p>hii this is tedting mail</p>
-`
-}); 
+    const emailOptions = {
+      from: '"Leapot Technologies" <contact@leapot.in>',
+      to: email,
+      subject: 'Custom Subject',
+      html: `<p><span style="font-size:11pt;">Dear ${name},</span></p>
+      <p><br></p>
+      <p><span style="font-size:11pt;">Greetings of the day! We wanted to take a moment to express our gratitude for your recent application for the&nbsp;</span><span style="background-color:#ffff00;font-size:11pt;">[Position Title]</span><span style="font-size:11pt;">&nbsp;role here at Leapot Technologies. We appreciate the time and effort you&apos;ve invested in applying for the position.</span></p>
+      <p><br></p>
+      <p><span style="font-size:11pt;">Your application is important to us, and we are currently reviewing it carefully to assess how your skills, experience, and qualifications align with the requirements of the role. We understand that waiting can be challenging, but please rest assured that we are diligently working through the applications.</span></p>
+      <p><br></p>
+      <p><span style="font-size:11pt;">Should your qualifications match what we&apos;re looking for, we will reach out to you to schedule an interview or to request further information. In the meantime, feel free to explore more about our company and the work we do on our website or social media channels.</span></p>
+      <p><br></p>
+      <p><span style="font-size:11pt;">Once again, thank you for considering a career opportunity with us. We appreciate your interest in joining our team.</span></p>
+      <p><br></p>
+      <p><span style="font-size:11pt;">Best regards,</span></p>
+      <p><br></p>
+      <p><span style="font-size:11pt;">HR</span></p>
+      <p><span style="font-size:11pt;">Leapot Technologies</span></p>
+      <p><a href="mailto:hr@leapot.in"><u><span style="color:#1155cc;font-size:11pt;">hr@leapot.in</span></u></a></p>`
+    };
+    
+    // Call the sendEmail function with the email options
+    sendEmail(emailOptions);
+ 
 res.json({ success: true });
   } catch(e){
     console.log(e.message)
