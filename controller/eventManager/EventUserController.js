@@ -17,7 +17,7 @@ const nodemailer = require('nodemailer');
 
 // Initialize Nodemailer transporter
 const transporter = nodemailer.createTransport({
-  service: 'Gmail',
+  service: 'Gmail', 
   auth: {
     user: 'intern.lpt@gmail.com',
     pass: 'uppm qskv gihw vecc'
@@ -233,3 +233,6 @@ exports.getInstructor = async(req, res) => {
     .then(event => res.json (event)) 
     .catch(err => res.json(err))
 }
+
+
+

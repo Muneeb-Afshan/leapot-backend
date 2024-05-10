@@ -37,10 +37,10 @@ const jobApplicationSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  currentpercent: {
-    type: Number,
-    required: true
-  },
+  // currentpercent: {
+  //   type: Number,
+  //   required: true
+  // },
   withoutpay: {
     type: String,
     enum: ['yes', 'no'],

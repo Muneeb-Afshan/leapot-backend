@@ -4,39 +4,77 @@
 const Role = require("../../model/Role");
 
 const ContactForm = require("../../model/ContactForm");
+const nodemailer = require('nodemailer');
+
+
+const transporter = nodemailer.createTransport({
+  service: 'Gmail',
+  auth: {
+    user: 'hr.leapot@gmail.com',
+    pass: 'tlnb zajb dnqz katg'
+  }
+});
 
 exports.ContactForm = async (req, res) => {
-  console.log("dgnsdkbdsvbd");
   try {
-    const { name, email, mobile, message, attachments } = req.body;
-    // const ownerEmail = 'gauravhiwarale1448@gmail.com';
+    const { name, email, mobile, message } = req.body;
 
-    // Create a new contact form submission
     const contactForm = new ContactForm({
       name,
       email,
       mobile,
       message,
-      attachments,
     });
 
-    // Save the submission to the database
     await contactForm.save();
 
-    // Send Notificaton to mail
-    // await sendNotificationEmail(name, email, ownerEmail);
+
+    await transporter.sendMail({
+      from: 'hr@leapot.in',
+      to: email,
+      subject: 'Thank You for Your Inquiry!',
+      html: `
+        <p>Dear ${name},</p>
+        <p>Thank you for reaching out to us! We have received your inquiry and are excited to assist you. Our team will review your message carefully and get back to you as soon as possible.</p>
+        <p>In the meantime, if you have any urgent questions or concerns, feel free to contact us directly at +91-7038585222</p>
+        <p>Thank you for considering Leapot Technologies!</p>
+        <p>Best regards,</p>
+        <p>Leapot Technologies</p>
+      `
+    });
+
+    // owner
+    await transporter.sendMail({
+      from: email,
+      to: 'contact@leapot.in', 
+      subject: 'New Inquiry Received',
+      html: `
+        <p>Hi,</p>        
+        <p>You've got a new inquiry! A user has submitted a message via our website. Please find the details below:</p>        
+        <ul>
+        <li><strong>Name:</strong> ${name}</li>
+        <li><strong>Email:</strong> ${email}</li>
+        <li><strong>Mobile:</strong> ${mobile}</li>
+        <li><strong>Message:</strong> ${message}</li>
+        </ul>
+        <p>Please review the inquiry at your earliest convenience and reach out to the user to provide assistance or further information.</p>        
+        <p>Thank you for your attention to this matter.</p>        
+        <p>Best regards,</p>        
+        <p>Leapot Technologies</p>        
+
+      `
+    });
 
     res.status(201).json({
-      message: "Contact form submitted successfully",
+      message: 'Contact form submitted successfully',
       ContactInfo: contactForm,
     });
   } catch (error) {
-    console.error("Error submitting contact form:", error);
-    res
-      .status(500)
-      .json({ message: "An error occurred while processing your request" });
+    console.error('Error submitting contact form:', error);
+    res.status(500).json({ message: 'An error occurred while processing your request' });
   }
 };
+
 
 
 const Application = require('../../model/CareerSchema');

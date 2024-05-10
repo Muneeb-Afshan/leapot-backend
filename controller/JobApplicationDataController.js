@@ -3,7 +3,7 @@ const JobApplication = require('../model/JobApplicationSchema');
 exports.JobApplication = async (req, res) => {
     console.log("this is job application!")
     try{
-        const {title, name, dob, nationality, contactno, email, collegename, yearofpassing, percent, currentpercent, withoutpay, Employmenttype} = req.body;
+        const {title, name, dob, nationality, contactno, email, collegename, yearofpassing, percent, withoutpay, Employmenttype} = req.body;
 
         const jobApplication = new JobApplication({
             title, 
@@ -15,7 +15,7 @@ exports.JobApplication = async (req, res) => {
             collegename, 
             yearofpassing, 
             percent, 
-            currentpercent, 
+            // currentpercent, 
             withoutpay, 
             Employmenttype, 
             // uploadresume 
