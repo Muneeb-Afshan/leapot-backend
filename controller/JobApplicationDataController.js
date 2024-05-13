@@ -4,7 +4,7 @@ const {sendEmail} = require('./emailUtility/SendEmailFunction')
 exports.JobApplication = async (req, res) => {
     console.log("this is job application!")
     try{
-        const {title, name, dob, nationality, contactno, email, collegename, yearofpassing, percent, currentpercent, withoutpay, Employmenttype , resumeLink} = req.body;
+        const {title, name, dob, nationality, contactno, email, collegename, yearofpassing, percent, withoutpay, Employmenttype , resumeLink} = req.body;
 
         const jobApplication = new JobApplication({
             title, 
