@@ -8,7 +8,10 @@ const fs = require('fs');
  exports.createEvent =  async (req, res) => {
     try {
       // Create a new instance of EventModel
-      const newEvent = new EventModel(req.body);
+      const newEvent = new EventModel({
+        ...req.body,
+        dynamicFields: req.body.dynamicFields, // Ensure this part is correctly passed
+      });
       
       // Save the new event
       const event = await newEvent.save();
@@ -47,6 +50,7 @@ const fs = require('fs');
       EDate: req.body.EDate,
       STime: req.body.STime,
       ETime: req.body.ETime,
+      ExpiryDate: req.body.ExpiryDate,
       Duration: req.body.Duration,
       Role: req.body.Role,
       Criteria: req.body.Criteria,
@@ -61,6 +65,7 @@ const fs = require('fs');
       Exam: req.body.Exam,
       EventId: req.body.EventId,
       OrgId: req.body.OrgId,
+      CourseAvailable : req.body.CourseAvailable,
       EventDesp: req.body.EventDesp,
       SchoolId: req.body.SchoolId,
       SponsorName: req.body.SponsorName,
@@ -89,6 +94,7 @@ const fs = require('fs');
       OptOut: req.body.OptOut,
       Certificate: req.body.Certificate,
       tagsInput: req.body.tagsInput,
+      dynamicFields: Array.isArray(req.body.dynamicFields) ? req.body.dynamicFields : [],
       updatedBy: req.body.updatedBy 
     }, { new: true })
   .then(event => res.json (event)) 
