@@ -28,13 +28,39 @@ exports.putAllTags = async (req, res) => {
     res.st;
   }
 };
+
+// Controller to fetch events by tag
+exports.getEventsByTags = async (req, res) => {
+  try {
+    const { tag } = req.params;
+    // Query events based on the provided tag
+    const events = await EventModule.find({ tags: tag });
+    res.status(200).json({ events: events });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 //Controller to fetch tags
+// exports.getAllTags = async (req, res) => {
+//   try {
+//     const tags = await TagsDetails.find({});
+//     return res.status(200).json(tags);
+//   } catch (err) {
+//     res.status(500).json({ message: err.message });
+//   }
+// };
 exports.getAllTags = async (req, res) => {
   try {
-    const tags = await TagsDetails.find({});
-    return res.status(200).json(tags);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+    const allEvents = await EventModule.find({ isDeleted: false }, "tags");
+    let allTags = [];
+    allEvents.forEach((event) => {
+      allTags = allTags.concat(event.tags);
+    });
+    // Remove duplicate tags
+    const uniqueTags = [...new Set(allTags)];
+    return res.status(200).send(uniqueTags);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -52,10 +78,7 @@ exports.getAllEvents = async (req, res) => {
 exports.getEventDetails = async (req, res) => {
   try {
     const { eventname } = req.params;
-    const eventdetails = await EventModule.findOne(
-      { EventName: eventname },
-      "EventName EventDesp InstName EventId Duration CourseType SDate CourseFees Tags tagsInput CourseLearningOutcomes "
-    );
+    const eventdetails = await EventModule.findOne({ EventName: eventname });
     if (!eventdetails) {
       return res.status(404).json({ message: "Event not found" });
     }

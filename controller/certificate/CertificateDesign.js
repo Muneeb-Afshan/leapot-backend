@@ -382,7 +382,7 @@ exports.bulkIssue = async (req, res) => {
 
       const issueCertificate = await IssueCertificate.findOne({ email, eventName: eventData.EventName});
       if (issueCertificate) {
-        failedIssues.push({ message: `Certificate is already issued to user with email ${email} for event ${eventData.EventName}` });
+        failedIssues.push({ message: `Certificate is already issued to ${email}` });
         continue; // Continue to the next issueData
       }
       // Generate serial number based on serial number type
@@ -406,10 +406,10 @@ exports.bulkIssue = async (req, res) => {
       // Proceed with issuing the certificate
       try {
         const issue = await IssueCertificate.create({ email ,  issueDate , eventName, serialNumber, username: registrationData.userid.username });
-        successfulIssues.push(issue);
+        successfulIssues.push({ message: `Certificate is successful issued to ${email} ` });
       } catch (error) {
         console.log(error.message)
-        failedIssues.push({ message: `Unable to issue certificate for user with email ${email} for event ${eventData.EventName}` });
+        failedIssues.push({ message: `Unable to issue certificate to ${email}` });
       }
     }
 

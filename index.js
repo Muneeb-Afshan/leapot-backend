@@ -14,12 +14,15 @@ const routerTeam = require("./routes/TeamRoutes");
 const userDetail = require("./routes/UserDetailsRoutes");
 const utilityRoutes = require("./routes/UtilityRoutes");
 const EventManagerRoute = require("./routes/EventManagerRoute");
-const calendarRoute = require("./routes/CalendarRoutes");
-const certificateRoute = require("./routes/CertificateRoutes");
+
+const notificationRoute = require("./routes/NotificationRoutes");
 const courseRouter = require("./routes/CourseRoutes");
 const routerBlog = require("./routes/BlogsRoutes");
 const routerTestimonial = require("./routes/TestimonialsRoutes");
-const routerJob = require('./routes/JobRoutes')
+
+const calendarRoute = require("./routes/CalendarRoutes");
+const certificateRoute = require("./routes/CertificateRoutes");
+const routerJob = require("./routes/JobRoutes");
 
 //middleWares
 const bodyParser = require("body-parser");
@@ -40,13 +43,18 @@ app.use("/api", router);
 app.use("/api", routerTeam);
 app.use("/api", userDetail);
 app.use("/api", EventManagerRoute);
-app.use("/api", calendarRoute);
+
 app.use("/api", certificateRoute);
+app.use("/api", notificationRoute);
+
+app.use("/api", calendarRoute);
+
 app.use("/api", courseRouter);
 app.use("/api", utilityRoutes);
 app.use("/api", routerBlog);
 app.use("/api", routerTestimonial);
-app.use("/api",routerJob)
+app.use("/api", routerJob);
+
 // api document
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 

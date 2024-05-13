@@ -35,7 +35,7 @@ const jobApplicationSchema = new mongoose.Schema({
   },
   percent: {
     type: Number,
-    required: true
+    // required: true
   },
   // currentpercent: {
   //   type: Number,
@@ -51,10 +51,10 @@ const jobApplicationSchema = new mongoose.Schema({
     enum: ['full-time', 'part-time'], 
     required: true
   },
-  // uploadresume: {
-  //   data: Buffer, // Binary data
-  //   contentType: String // MIME type of the file
-  // },
+  resumeLink: {
+    type: String,// Binary data
+    required: true
+  },
   status: {
     type: String,
     enum: ['new', 'in progress', 'resolved'],

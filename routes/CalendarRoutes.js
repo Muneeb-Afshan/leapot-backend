@@ -15,10 +15,13 @@ const {
   addAnnouncements,
   getAnnouncementInfo,
   putUserDetails,
+  getEventsByTags,
 } = require("../controller/calendar/CalendarDetailsController");
 
 calendarRouter.post("/calendar/postTags", putAllTags);
 calendarRouter.get("/calendar/fetchTags", getAllTags);
+calendarRouter.get("/calendar/fetchEventsbyTags/:tag", getEventsByTags);
+
 calendarRouter.get("/calendar/fetchAllEvents", getAllEvents);
 calendarRouter.get(
   "/calendar/fetchEventByStartDate/:startDate",
