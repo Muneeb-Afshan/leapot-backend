@@ -49,11 +49,11 @@ exports.JobApplication = async (req, res) => {
           };
           
           // Call the sendEmail function with the email options
-          sendEmail(emailOptions);
+           await sendEmail(emailOptions);
 
           const HRemailOptions = {
             from: '"Leapot Technologies" <hr@leapot.in>',
-            to: 'hr@leapot.in',
+            to: 'hr.leapot@gmail.com',
             subject: ' New Job Application Received',
             text: `Hi,
             You've got a new job application! A user has submitted a job application via our website. Please find the details below:
@@ -71,7 +71,7 @@ exports.JobApplication = async (req, res) => {
             Leapot Technologies
             `,
             html: `` }
-          sendEmail(HRemailOptions);
+         await sendEmail(HRemailOptions);
 
 
 
