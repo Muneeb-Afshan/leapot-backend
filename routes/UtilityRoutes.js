@@ -6,7 +6,7 @@ const {ContactForm , createFAQ , getAllFAQs , addRole, fetchRole} = require('../
 
 UtilityRoutes.post("/addContactUs",ContactForm);
 UtilityRoutes.post("/addFAQ",createFAQ);
-UtilityRoutes.get("/FAQ",getAllFAQs);
+UtilityRoutes.get("/FAQ",getAllFAQs); 
 UtilityRoutes.post('/role', addRole);
 UtilityRoutes.get('/fetchRole', fetchRole);
 
