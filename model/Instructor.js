@@ -2,7 +2,8 @@ const mongoose = require("mongoose");
 
 const InstructorSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
-  username: { type: String },
+  firstname: { type : String},
+  lastname: { type : String},
   Code: { type: String},
   user_id:{type:String},
 

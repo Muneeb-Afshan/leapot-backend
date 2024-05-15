@@ -1,34 +1,65 @@
 // const nodemailer = require('nodemailer');
+// const ContactForm = require('../../model/ContactForm');
 
-// const sendNotificationEmail = async (senderName, senderEmail, ownerEmail) => {
+// // Initialize Nodemailer transporter
+// const transporter = nodemailer.createTransport({
+//   service: 'Gmail',
+//   auth: {
+//     user: 'intern.lpt@gmail.com',
+//     pass: 'uppm qskv gihw vecc'
+//   }
+// });
+
+// exports.ContactForm = async (req, res) => {
 //   try {
-//     console.log('Starting sendNotificationEmail function...');
+//     const { name, email, mobile, message } = req.body;
 
-//     const transporter = nodemailer.createTransport({
-//       service: 'Gmail',
-//       auth: {
-//         user: 'gauravhiwarale01@gmail.com', 
-//         pass: 'Home123@gaurav' 
-//       }
+//     // Create a new contact form submission
+//     const contactForm = new ContactForm({
+//       name,
+//       email,
+//       mobile,
+//       message,
 //     });
-    
-//     console.log('Nodemailer transporter created...');
 
-//     const mailOptions = {
-//       from: senderEmail, 
-//       to: ownerEmail, 
+//     // Save the submission to the database
+//     await contactForm.save();
+
+//     // Send acknowledgment email to the user
+//     await transporter.sendMail({
+//       from: 'intern.lpt@gmail.com',
+//       to: email,
+//       subject: 'Contact Form Submission Received',
+//       html: `
+//         <p>Dear ${name},</p>
+//         <p>Thank you for contacting us. We have received your message and will get back to you shortly.</p>
+//         <p>Regards,</p>
+//         <p>Your Company Name</p>
+//       `
+//     });
+
+//     // Send notification email to the owner
+//     await transporter.sendMail({
+//       from: 'your_gmail_address@gmail.com',
+//       to: 'owner_email@example.com', // Replace with owner's email address
 //       subject: 'New Contact Form Submission',
-//       text: `You have a new contact form submission from ${senderName} (${senderEmail}).` // Notification message with sender's name and email
-//     };
+//       html: `
+//         <p>You have received a new contact form submission:</p>
+//         <ul>
+//           <li><strong>Name:</strong> ${name}</li>
+//           <li><strong>Email:</strong> ${email}</li>
+//           <li><strong>Mobile:</strong> ${mobile}</li>
+//           <li><strong>Message:</strong> ${message}</li>
+//         </ul>
+//       `
+//     });
 
-//     console.log('Mail options composed:', mailOptions);
-
-//     await transporter.sendMail(mailOptions);
-//     console.log('Notification email sent successfully');
+//     res.status(201).json({
+//       message: 'Contact form submitted successfully',
+//       ContactInfo: contactForm,
+//     });
 //   } catch (error) {
-//     console.error('Error sending notification email:', error);
-//     console.error(error.stack);
+//     console.error('Error submitting contact form:', error);
+//     res.status(500).json({ message: 'An error occurred while processing your request' });
 //   }
 // };
-
-// module.exports = sendNotificationEmail;

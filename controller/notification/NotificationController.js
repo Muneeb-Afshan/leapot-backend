@@ -6,7 +6,7 @@ const {
 //controller to post notifications
 exports.createNotification = async (req, res) => {
   try {
-    const { notificationType, subject, notificationBody } = req.body;
+    const { notificationType, subject, notificationBody, role } = req.body;
     const newnotifications = await CreateNotification.create({
       role,
       notificationType,

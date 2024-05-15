@@ -324,3 +324,323 @@ paths:
                       type: string
         '500':
           description: Server error
+
+
+  /api/calendar/tags:
+    put:
+      summary: Add tags to the database
+      tags:
+        - Calendar
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddTagsRequest'
+      responses:
+        '200':
+          description: Tag added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddTagsResponse'
+        '400':
+          description: Tag already exists or bad request
+  /api/calendar/tags:
+    get:
+      summary: Get all tags from the database
+      tags:
+        - Calendar
+      responses:
+        '200':
+          description: List of tags retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagsListResponse'
+        '500':
+          description: Internal server error
+  /api/calendar/events:
+    get:
+      summary: Get all events
+      tags:
+        - Calendar
+      responses:
+        '200':
+          description: List of events retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventsListResponse'
+        '500':
+          description: Internal server error
+  /api/calendar/events/{eventname}:
+    get:
+      summary: Get details of a particular event
+      tags:
+        - Calendar
+      parameters:
+        - name: eventname
+          in: path
+          required: true
+          description: Name of the event to retrieve details for
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Event details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventDetailsResponse'
+        '404':
+          description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+  /api/calendar/announcements:
+    get:
+      summary: Get all announcement details
+      tags:
+        - Calendar
+      responses:
+        '200':
+          description: List of announcements retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnnouncementsListResponse'
+        '500':
+          description: Internal server error
+    post:
+      summary: Add announcement
+      tags:
+        - Calendar
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddAnnouncementRequest'
+      responses:
+        '200':
+          description: Announcement added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddAnnouncementResponse'
+        '500':
+          description: Internal server error
+  /api/calendar/announcements/{annNo}:
+    get:
+      summary: Get details of a specific announcement
+      tags:
+        - Calendar
+      parameters:
+        - name: annNo
+          in: path
+          required: true
+          description: Number of the announcement to retrieve details for
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Announcement details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnnouncementDetailsResponse'
+        '404':
+          description: Announcement not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+  /api/calendar/user-statistics:
+    put:
+      summary: Add user statistics to the database
+      tags:
+        - Calendar
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserStatisticsRequest'
+      responses:
+        '200':
+          description: User statistics added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserStatisticsResponse'
+        '500':
+          description: Internal server error
+    get:
+      summary: Get user statistics
+      tags:
+        - Calendar
+      responses:
+        '200':
+          description: List of user statistics retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserStatisticsListResponse'
+        '500':
+          description: Internal server error
+  /api/calendar/enrolled-users-details:
+    put:
+      summary: Add enrolled users details to the database
+      tags:
+        - Calendar
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnrolledUsersDetailsRequest'
+      responses:
+        '200':
+          description: Enrolled users details added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnrolledUsersDetailsResponse'
+        '500':
+          description: Internal server error
+    get:
+      summary: Get enrolled users details
+      tags:
+        - Calendar
+      responses:
+        '200':
+          description: List of enrolled users details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnrolledUsersDetailsListResponse'
+        '500':
+          description: Internal server error
+  /api/calendar/user-details:
+    put:
+      summary: Add user details to the database
+      tags:
+        - Calendar
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDetailsRequest'
+      responses:
+        '200':
+          description: User details added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetailsResponse'
+        '500':
+          description: Internal server error
+    get:
+      summary: Get user details
+      tags:
+        - Calendar
+      responses:
+        '200':
+          description: List of user details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetailsListResponse'
+        '500':
+          description: Internal server error
+components:
+  schemas:
+    AddTagsRequest:
+      type: object
+      properties:
+        tagNo:
+          type: integer
+        tags_name:
+          type: string
+      required:
+        - tagNo
+        - tags_name
+    AddTagsResponse:
+      type: object
+      properties:
+        // Define properties for the response
+    TagsListResponse:
+      type: array
+      items:
+        // Define properties for each tag
+    EventsListResponse:
+      type: array
+      items:
+        // Define properties for each event
+    EventDetailsResponse:
+      type: object
+      properties:
+        // Define properties for the event details
+    AnnouncementsListResponse:
+      type: array
+      items:
+        // Define properties for each announcement
+    AddAnnouncementRequest:
+      type: object
+      properties:
+        // Define properties for the request body
+    AddAnnouncementResponse:
+      type: object
+      properties:
+        // Define properties for the response
+    AnnouncementDetailsResponse:
+      type: object
+      properties:
+        // Define properties for the announcement details
+    ErrorResponse:
+      type: object
+      properties:
+        // Define properties for the error response
+    UserStatisticsRequest:
+      type: object
+      properties:
+        // Define properties for the request body
+    UserStatisticsResponse:
+      type: object
+      properties:
+        // Define properties for the response
+    UserStatisticsListResponse:
+      type: array
+      items:
+        // Define properties for each user statistic
+    EnrolledUsersDetailsRequest:
+      type: object
+      properties:
+        // Define properties for the request body
+    EnrolledUsersDetailsResponse:
+      type: object
+      properties:
+        // Define properties for the response
+    EnrolledUsersDetailsListResponse:
+      type: array
+      items:
+        // Define properties for each enrolled user detail
+    UserDetailsRequest:
+      type: object
+      properties:
+        // Define properties for the request body
+    UserDetailsResponse:
+      type: object
+      properties:
+        // Define properties for the response
+    UserDetailsListResponse:
+      type: array
+      items:
+        // Define properties for each user detail
