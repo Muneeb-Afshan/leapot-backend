@@ -6,9 +6,9 @@ const cache = apicache.middleware;
 //controller added here
 
 const {createEvent , fetchEvent,fetchEventById,updateEvent,logicalEventDelete ,csvCreateEvent } = require('../controller/eventManager/EventController');
-const {passwordResetLink,createUser ,fetchUser ,logicalUserDelete ,logicalAllUserDelete, fetchUserById ,updateUserById , addInstructure ,getInstructor}  = require('../controller/eventManager/EventUserController')
+const {passwordResetLink,createUser ,fetchUser ,logicalUserDelete ,logicalAllUserDelete, fetchUserById ,updateUserById , addInstructure ,getInstructor,emailTest}  = require('../controller/eventManager/EventUserController')
 const {eventManagerSignUp , eventManagerSign}  = require("../controller/eventManager/EventAuthController")
-
+const { eventType, createEventType, createMemberType, fetchMemberType, createDeliveryMethod, fetchDeliveryMethod, createEventAffiliation, fetchEventAffiliation, createEventAccessibility, fetchEventAccessibility } = require('../controller/eventManager/EventUtilityController');
 
 // Event Manager Authentication Routes
 eventManagerRouter.post("/eventManager/signUp", eventManagerSignUp);
@@ -21,6 +21,17 @@ eventManagerRouter.get("/eventManager/getEventById/:id", fetchEventById);
 eventManagerRouter.put("/eventManager/updateEvent/:id", updateEvent);
 eventManagerRouter.patch("/eventManager/deleteEvent/:id", logicalEventDelete);
 eventManagerRouter.post("/eventManager/csvcreateEvent", csvCreateEvent);
+eventManagerRouter.post("/eventManager/createEventType", createEventType);
+eventManagerRouter.get("/eventManager/eventType", eventType);
+eventManagerRouter.post("/eventManager/createMemberType", createMemberType);
+eventManagerRouter.get("/eventManager/fetchMemberType", fetchMemberType);
+eventManagerRouter.post("/eventManager/createDeliveryMethod", createDeliveryMethod);
+eventManagerRouter.get("/eventManager/fetchDeliveryMethod", fetchDeliveryMethod);
+eventManagerRouter.post("/eventManager/createEventAffiliation", createEventAffiliation);
+eventManagerRouter.get("/eventManager/fetchEventAffiliation", fetchEventAffiliation);
+eventManagerRouter.post("/eventManager/createEventAccessibility", createEventAccessibility);
+eventManagerRouter.get("/eventManager/fetchEventAccessibility", fetchEventAccessibility);
+
 
 // user related routes
 
@@ -33,5 +44,7 @@ eventManagerRouter.get('/eventManager/getUser/:id',fetchUserById);
 eventManagerRouter.put('/eventManager/updateUser/:id',updateUserById);
 eventManagerRouter.post('/eventManager/addInstructor', addInstructure);
 eventManagerRouter.get('/eventManager/getInstructor', getInstructor);
+eventManagerRouter.get('/eventManager/sendDemoMail', emailTest);
+
 
 module.exports = eventManagerRouter;
