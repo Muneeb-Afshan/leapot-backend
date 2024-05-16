@@ -118,7 +118,7 @@ exports.getEventByStartDate = async (req, res) => {
 // Controller to fetch all announcement details
 exports.getannouncementDetails = async (req, res) => {
   try {
-    const announcements = await AddAnnouncements.find({});
+    const announcements = await AddAnnouncements.find({ active: true });
     return res.status(200).json(announcements);
   } catch (error) {
     res.status(500).json({ message: error.message });
