@@ -127,13 +127,25 @@ exports.getannouncementDetails = async (req, res) => {
 
 exports.addAnnouncements = async (req, res) => {
   try {
-    const { announcementNo, eventName, eventDate, type, image } = req.body;
+    const {
+      announcementNo,
+      eventName,
+      eventDate,
+      eventEndDate,
+      type,
+      image,
+      startTime,
+      endTime,
+    } = req.body;
     const newAnnouncement = await AddAnnouncements.create({
       announcementNo,
       eventName,
       eventDate,
+      eventEndDate,
       type,
       image,
+      startTime,
+      endTime,
     });
     return res.status(200).send({
       newAnnouncement: newAnnouncement,
