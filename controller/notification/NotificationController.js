@@ -1,8 +1,10 @@
+const { sendEmail } = require('../emailUtility/SendEmailFunction')
 const {
   CreateNotification,
   SendNotification,
   NotificationSettings,
 } = require("../../model/NotificationSchema");
+
 //controller to post notifications
 exports.createNotification = async (req, res) => {
   try {
@@ -104,11 +106,23 @@ exports.sendNotifications = async (req, res) => {
     const individualnotification = await SendNotification.create({
       email_Type,
       cc,
-      bcc,
+      // bcc,
       email_Subject,
       email_Body,
       user_recipients,
     });
+
+    const emailOptions = {
+      from: '"Leapot Technologies" <hr.leapot@gmail.com>',
+      to: user_recipients,
+      cc: cc,
+      // bcc: bcc,
+      subject: email_Subject,
+      text: email_Body,
+      html: `<p>${email_Body}</p>`,
+    };
+
+    await sendEmail(emailOptions);
 
     return res.status(200).json(individualnotification);
   } catch (error) {
