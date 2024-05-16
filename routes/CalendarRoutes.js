@@ -18,6 +18,12 @@ const {
   getEventsByTags,
 } = require("../controller/calendar/CalendarDetailsController");
 
+const {
+  addAnnouncementImage,
+} = require("../controller/calendar/UploadImageController");
+
+const { AddAnnouncements } = require("../model/CalendarSchema");
+
 calendarRouter.post("/calendar/postTags", putAllTags);
 calendarRouter.get("/calendar/fetchTags", getAllTags);
 calendarRouter.get("/calendar/fetchEventsbyTags/:tag", getEventsByTags);
@@ -49,5 +55,6 @@ calendarRouter.get(
 );
 calendarRouter.post("/calendar/postusersdetails", putUserDetails);
 calendarRouter.get("/calendar/fetchusersdetails/:eventname", getUserDetails);
+calendarRouter.post("/calendar/addAnnouncementImage", addAnnouncementImage);
 
 module.exports = calendarRouter;

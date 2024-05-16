@@ -43,11 +43,23 @@ const AddAnnouncementSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
+  eventEndDate: {
+    type: Date,
+    required: true,
+  },
   type: {
     type: String,
     required: true,
   },
   image: {
+    type: String,
+    required: true,
+  },
+  startTime: {
+    type: String,
+    required: true,
+  },
+  endTime: {
     type: String,
     required: true,
   },
