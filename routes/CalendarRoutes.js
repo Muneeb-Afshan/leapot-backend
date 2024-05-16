@@ -16,6 +16,7 @@ const {
   getAnnouncementInfo,
   putUserDetails,
   getEventsByTags,
+  cancelAnnouncement,
 } = require("../controller/calendar/CalendarDetailsController");
 
 const {
@@ -38,6 +39,8 @@ calendarRouter.get(
   "/calendar/fetchannouncementDetails",
   getannouncementDetails
 );
+calendarRouter.put("/calendar/cancelannouncement/:id", cancelAnnouncement);
+
 calendarRouter.post("/calendar/addannouncements", addAnnouncements);
 calendarRouter.get(
   "/calendar/fetchannouncementinfo/:annNo",

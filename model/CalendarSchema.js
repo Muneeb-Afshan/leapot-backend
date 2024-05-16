@@ -63,6 +63,7 @@ const AddAnnouncementSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  active: { type: Boolean, default: true },
 });
 
 //user statistics schema

@@ -124,6 +124,26 @@ exports.getannouncementDetails = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+//Controller to cancel the announcement
+exports.cancelAnnouncement = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const cancelannouncement = await AddAnnouncements.findByIdAndUpdate(
+      id,
+      { active: false },
+      { new: true }
+    );
+
+    if (!cancelannouncement) {
+      return res.status(404).json({ message: "Announcement not found" });
+    }
+
+    return res.status(200).json(cancelannouncement);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 exports.addAnnouncements = async (req, res) => {
   try {
@@ -136,6 +156,7 @@ exports.addAnnouncements = async (req, res) => {
       image,
       startTime,
       endTime,
+      active,
     } = req.body;
     const newAnnouncement = await AddAnnouncements.create({
       announcementNo,
@@ -146,6 +167,7 @@ exports.addAnnouncements = async (req, res) => {
       image,
       startTime,
       endTime,
+      active,
     });
     return res.status(200).send({
       newAnnouncement: newAnnouncement,
