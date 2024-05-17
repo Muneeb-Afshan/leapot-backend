@@ -8,6 +8,8 @@ const swaggerDocument = YAML.load("./swagger.yaml");
 require("dotenv").config();
 //config Database
 require("./config/Database").connect();
+//import and initialize cron jobs
+require("./utilities/cronJobs");
 //routes added here
 const router = require("./routes/AuthenticationRoutes");
 const routerTeam = require("./routes/TeamRoutes");
