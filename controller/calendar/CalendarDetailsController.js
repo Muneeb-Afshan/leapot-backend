@@ -1,3 +1,4 @@
+const cron = require("node-cron");
 const {
   TagsDetails,
   UserStats,
@@ -124,16 +125,63 @@ exports.getannouncementDetails = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+// Schedule a task to run every day at midnight
+cron.schedule("0 0 * * *", async () => {
+  try {
+    const now = new Date();
+    await AddAnnouncements.updateMany(
+      { eventEndDate: { $lt: now }, active: true },
+      { active: false }
+    );
+    console.log("Archived expired announcements");
+  } catch (error) {
+    console.error("Error archiving announcements:", error);
+  }
+});
+//Controller to cancel the announcement
+exports.cancelAnnouncement = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const cancelannouncement = await AddAnnouncements.findByIdAndUpdate(
+      id,
+      { active: false },
+      { new: true }
+    );
+
+    if (!cancelannouncement) {
+      return res.status(404).json({ message: "Announcement not found" });
+    }
+
+    return res.status(200).json(cancelannouncement);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 exports.addAnnouncements = async (req, res) => {
   try {
-    const { announcementNo, eventName, eventDate, type, image } = req.body;
+    const {
+      announcementNo,
+      eventName,
+      eventDate,
+      eventEndDate,
+      type,
+      image,
+      startTime,
+      endTime,
+      active,
+    } = req.body;
     const newAnnouncement = await AddAnnouncements.create({
       announcementNo,
       eventName,
       eventDate,
+      eventEndDate,
       type,
       image,
+      startTime,
+      endTime,
+      active,
     });
     return res.status(200).send({
       newAnnouncement: newAnnouncement,

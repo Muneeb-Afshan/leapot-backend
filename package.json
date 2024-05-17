@@ -23,7 +23,7 @@
   "homepage": "https://github.com/Muneeb-leapot/leapot-lms-backend#readme",
   "dependencies": {
     "apicache": "^1.6.3",
-    "aws-sdk": "^2.1620.0",
+    "aws-sdk": "^2.1618.0",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "csv-writer": "^1.6.0",
@@ -33,11 +33,13 @@
     "i": "^0.3.7",
     "mongoose": "^8.1.1",
     "morgan": "^1.10.0",
+    "node-cron": "^3.0.3",
     "nodemailer": "^6.9.13",
     "nodemon": "^3.0.3",
     "npm": "^10.4.0",
     "swagger-ui-express": "^5.0.0",
     "uuid": "^9.0.1",
+    "uuidv4": "^6.2.13",
     "yamljs": "^0.3.0"
   }
 }
