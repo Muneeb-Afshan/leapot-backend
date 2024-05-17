@@ -141,6 +141,16 @@ exports.getNotifications = async (req, res) => {
   }
 };
 
+exports.singlefetchnotifications = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const notify = await SendNotification.find({ _id: id });
+    return res.status(200).json(notify);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 // Controller method to search notifications
 exports.searchNotifications = async (req, res) => {
   try {
