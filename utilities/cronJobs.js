@@ -1,6 +1,6 @@
 const cron = require("node-cron");
 const mongoose = require("mongoose");
-const AddAnnouncements = require("../models/AddAnnouncement");
+const AddAnnouncements = require("../model/CalendarSchema");
 
 // Cron job to set active:false for past events
 cron.schedule("0 0 * * *", async () => {
