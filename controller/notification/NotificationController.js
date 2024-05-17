@@ -1,8 +1,10 @@
+const { sendEmail } = require('../emailUtility/SendEmailFunction')
 const {
   CreateNotification,
   SendNotification,
   NotificationSettings,
 } = require("../../model/NotificationSchema");
+
 //controller to post notifications
 exports.createNotification = async (req, res) => {
   try {
@@ -104,11 +106,23 @@ exports.sendNotifications = async (req, res) => {
     const individualnotification = await SendNotification.create({
       email_Type,
       cc,
-      bcc,
+      // bcc,
       email_Subject,
       email_Body,
       user_recipients,
     });
+
+    const emailOptions = {
+      from: '"Leapot Technologies" <hr.leapot@gmail.com>',
+      to: user_recipients,
+      cc: cc,
+      // bcc: bcc,
+      subject: email_Subject,
+      text: email_Body,
+      html: `<p>${email_Body}</p>`,
+    };
+
+    await sendEmail(emailOptions);
 
     return res.status(200).json(individualnotification);
   } catch (error) {
@@ -122,6 +136,16 @@ exports.getNotifications = async (req, res) => {
   try {
     const notifications = await SendNotification.find({});
     return res.status(200).json(notifications);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.singlefetchnotifications = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const notify = await SendNotification.find({ _id: id });
+    return res.status(200).json(notify);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

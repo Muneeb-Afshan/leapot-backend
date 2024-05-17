@@ -8,6 +8,7 @@ const {
   logicalDeleteNotification,
   sendNotifications,
   getNotifications,
+  singlefetchnotifications,
   searchNotifications,
   createNotificationSettings,
   getAllNotifications,
@@ -31,6 +32,7 @@ notificationRouter.put(
 );
 notificationRouter.post("/notification/sendnotifications", sendNotifications);
 notificationRouter.get("/notification/fetchnotifications", getNotifications);
+notificationRouter.get("/notification/singlefetchnotifications/:id", singlefetchnotifications);
 notificationRouter.get("/notification/search", searchNotifications);
 notificationRouter.post(
   "/notification/notificationsettings",
