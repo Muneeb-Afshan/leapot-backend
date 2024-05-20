@@ -17,13 +17,13 @@ const {
   putUserDetails,
   getEventsByTags,
   cancelAnnouncement,
+  enrollUsersforEvent,
+  getEnrolledUsers,
 } = require("../controller/calendar/CalendarDetailsController");
 
 const {
   addAnnouncementImage,
 } = require("../controller/calendar/UploadImageController");
-
-const { AddAnnouncements } = require("../model/CalendarSchema");
 
 calendarRouter.post("/calendar/postTags", putAllTags);
 calendarRouter.get("/calendar/fetchTags", getAllTags);
@@ -59,5 +59,13 @@ calendarRouter.get(
 calendarRouter.post("/calendar/postusersdetails", putUserDetails);
 calendarRouter.get("/calendar/fetchusersdetails/:eventname", getUserDetails);
 calendarRouter.post("/calendar/addAnnouncementImage", addAnnouncementImage);
+calendarRouter.post(
+  "/calendar/manualenrollusers/:eventName",
+  enrollUsersforEvent
+);
+calendarRouter.get(
+  "/calendar/enrolledUsersforEvent/:eventName",
+  getEnrolledUsers
+);
 
 module.exports = calendarRouter;

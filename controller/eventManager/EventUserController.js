@@ -12,9 +12,10 @@ const InstructorModel = require("../../model/Instructor");
 const User = require("../../model/UserSchema");
 const UserDetails = require("../../model/UserDetailsSchema");
 //All Authentications rest API are list here
-const {sendEmail} = require('../emailUtility/SendEmailFunction')
-const firebase = require('firebase-admin');
-const nodemailer = require('nodemailer');
+const { sendEmail } = require("../emailUtility/SendEmailFunction");
+const firebase = require("firebase-admin");
+const nodemailer = require("nodemailer");
+const transporter = require("../emailUtility/SendEmailFunction");
 
 // Initialize Nodemailer transporter
 // Create transporter
@@ -29,19 +30,17 @@ const nodemailer = require('nodemailer');
 //   return password;
 // }
 
-
-exports.emailTest = async (req, res) =>{
+exports.emailTest = async (req, res) => {
   const { email } = req.body;
-  console.log("email", req.body)
-  console.log("email", email)
-  const name  = "Ganesh"
+  console.log("email", req.body);
+  console.log("email", email);
+  const name = "Ganesh";
 
-  try{
-
+  try {
     const emailOptions = {
       from: '"Leapot Technologies" <contact@leapot.in>',
       to: email,
-      subject: 'Custom Subject',
+      subject: "Custom Subject",
       html: `<p><span style="font-size:11pt;">Dear ${name},</span></p>
       <p><br></p>
       <p><span style="font-size:11pt;">Greetings of the day! We wanted to take a moment to express our gratitude for your recent application for the&nbsp;</span><span style="background-color:#ffff00;font-size:11pt;">[Position Title]</span><span style="font-size:11pt;">&nbsp;role here at Leapot Technologies. We appreciate the time and effort you&apos;ve invested in applying for the position.</span></p>
@@ -56,47 +55,47 @@ exports.emailTest = async (req, res) =>{
       <p><br></p>
       <p><span style="font-size:11pt;">HR</span></p>
       <p><span style="font-size:11pt;">Leapot Technologies</span></p>
-      <p><a href="mailto:hr@leapot.in"><u><span style="color:#1155cc;font-size:11pt;">hr@leapot.in</span></u></a></p>`
+      <p><a href="mailto:hr@leapot.in"><u><span style="color:#1155cc;font-size:11pt;">hr@leapot.in</span></u></a></p>`,
     };
-    
+
     // Call the sendEmail function with the email options
     sendEmail(emailOptions);
- 
-res.json({ success: true });
-  } catch(e){
-    console.log(e.message)
+
+    res.json({ success: true });
+  } catch (e) {
+    console.log(e.message);
     res.json({ success: false });
   }
-}
+};
 
-
-exports.passwordResetLink = async (req, res) =>{
+exports.passwordResetLink = async (req, res) => {
   const { email } = req.body;
-  console.log("email", req.body)
-  console.log("email", email)
+  console.log("email", req.body);
+  console.log("email", email);
 
-  try{
-  const passwordResetLink = await firebase.auth().generatePasswordResetLink(email);
-  console.log('passwordResetLink email :', passwordResetLink);
+  try {
+    const passwordResetLink = await firebase
+      .auth()
+      .generatePasswordResetLink(email);
+    console.log("passwordResetLink email :", passwordResetLink);
 
- // Send email with password reset link
- await transporter.sendMail({
-  from: 'intern.lpt@gmail.com',
-  to: email,
-  subject: 'Password Reset',
-  html: `
+    // Send email with password reset link
+    await transporter.sendMail({
+      from: "intern.lpt@gmail.com",
+      to: email,
+      subject: "Password Reset",
+      html: `
   <p>You are receiving this email because a request was made to reset the password for your account.</p>
   <p>Please follow these steps to reset your password:</p>
   <p><a href="${passwordResetLink}" style="background-color: green; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Reset Password</a></p>
-`
-}); 
-res.json({ success: true });
-  } catch(e){
-    console.log(e.message)
+`,
+    });
+    res.json({ success: true });
+  } catch (e) {
+    console.log(e.message);
     res.json({ success: false });
   }
-}
-
+};
 
 // To add user, admin will add the user
 exports.createUser = async (req, res) => {
@@ -115,32 +114,35 @@ exports.createUser = async (req, res) => {
     });
   }
 
-  
   // const password = generateRandomPassword(6)
   const userRecord = await firebase.auth().createUser({
     email,
-    password
-  })
-  await firebase.auth().generateEmailVerificationLink(email)
-  .then((link) => {
-    console.log('Verification email link:', link);
-    // You can send this link to the user via email
+    password,
   });
+  await firebase
+    .auth()
+    .generateEmailVerificationLink(email)
+    .then((link) => {
+      console.log("Verification email link:", link);
+      // You can send this link to the user via email
+    });
 
-  const passwordResetLink = await firebase .auth().generatePasswordResetLink(email);
-  console.log('passwordResetLink email link:', passwordResetLink);
+  const passwordResetLink = await firebase
+    .auth()
+    .generatePasswordResetLink(email);
+  console.log("passwordResetLink email link:", passwordResetLink);
 
-//  Send email with password reset link
- await transporter.sendMail({
-  from: 'contact@leapot.in',
-  to: email,
-  subject: 'Password Reset Link For Acoount',
-  html: `
+  //  Send email with password reset link
+  await transporter.sendMail({
+    from: "contact@leapot.in",
+    to: email,
+    subject: "Password Reset Link For Acoount",
+    html: `
   <p>You are receiving this email because a request was made to reset the password for your account.</p>
 
   <p><a href="${passwordResetLink}" style="background-color: green; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Reset Password</a></p>
-`
-});
+`,
+  });
 
   const NewUser = new User({
     firstname: firstname,
@@ -159,18 +161,15 @@ exports.createUser = async (req, res) => {
   });
   NewUserDetails.save();
 
-if(role === 'Instructor'){
-  
-  const addInstructor = new InstructorModel({
-    email: email,
-    userid:NewUser._id,
-    firstname:firstname,
-    lastname:lastname,
-
-  });
-  addInstructor.save();
-
-}
+  if (role === "Instructor") {
+    const addInstructor = new InstructorModel({
+      email: email,
+      userid: NewUser._id,
+      firstname: firstname,
+      lastname: lastname,
+    });
+    addInstructor.save();
+  }
 
   return res.status(201).json({
     data: NewUser,
@@ -190,7 +189,7 @@ exports.createUsersByCSV = async (req, res) => {
   const insertUserDetials = [];
 
   for (let i = 0; i < users.length; i++) {
-    const {firstname,lastname, email, role, password} = users[i];
+    const { firstname, lastname, email, role, password } = users[i];
 
     console.log(users[i]);
     if (!(email && role)) {
@@ -214,8 +213,8 @@ exports.createUsersByCSV = async (req, res) => {
     console.log("create", userRecord.email);
 
     const NewUser = new User({
-      firstname:firstname,
-      lastname:lastname,
+      firstname: firstname,
+      lastname: lastname,
       email: userRecord.email,
       role: role,
 
