@@ -76,16 +76,14 @@ exports.logicalDeleteCourse = async (req, res) => {
 // Controller function to add a new course as well as update a new course 
 exports.addCourseDetails = async (req, res) => {
   try {
-    const { course_id, modules } = req.body;
+    const { courseId, modules } = req.body;
+    console.log(courseId)
+
 
     // Check if the course_id already exists
-    const existingCourse = await CourseDetails.findOne({ course_id });
-    // if (!existingCourse) {
-    //   return res.status(400).json({ error: 'Course not exists' });
-    // }
 
     // Check if the course exists in the database
-    let course = await CourseDetails.findOne({ course_id });
+    let course = await CourseDetails.findOne({ courseId });
 
     // If the course exists, update it; otherwise, create a new course
     if (course) {
@@ -93,7 +91,7 @@ exports.addCourseDetails = async (req, res) => {
       course.modules = modules;
     } else {
       // Create a new course instance
-      course = new CourseDetails({ course_id, modules });
+      course = new CourseDetails({ courseId, modules });
     }
     // Save the course to the database
     const savedCourse = await course.save();
@@ -107,6 +105,37 @@ exports.addCourseDetails = async (req, res) => {
     res.status(500).json({ error: error });
   }
 };
+
+
+// Controller function to get all courses
+exports.fetchCoursesWithDetails = async (req, res) => {
+  console.log(req.query, "fetchCoursesWithDetails id");
+  try {
+    // Extract id from query parameters
+    const { id } = req.query;
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "Course ID is required",
+        statusCode: 400,
+      });
+    }
+
+    // Retrieve course details from the database
+    const courses = await CourseDetails.findOne({ courseId: id });
+    res.status(200).json({
+      success: true,
+      data: courses,
+      message: "Course fetched successfully",
+      statusCode: 200,
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 
 // Controller function to get all courses
 exports.fetchAllCoursesWithDetails = async (req, res) => {
