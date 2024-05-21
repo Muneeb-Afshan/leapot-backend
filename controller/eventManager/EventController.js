@@ -8,7 +8,10 @@ const fs = require('fs');
  exports.createEvent =  async (req, res) => {
     try {
       // Create a new instance of EventModel
-      const newEvent = new EventModel(req.body);
+      const newEvent = new EventModel({
+        ...req.body,
+        dynamicFields: req.body.dynamicFields, // Ensure this part is correctly passed
+      });
       
       // Save the new event
       const event = await newEvent.save();
@@ -41,12 +44,13 @@ const fs = require('fs');
   const id = req.params.id;
   // EventModel.findByIdAndUpdate(id, req.body, { new: true })
   EventModel.findByIdAndUpdate({_id: id}, {
-      Name: req.body.Name,
+      EventName: req.body.EventName,
       OrgName: req.body.OrgName,
-      SDate: req.body.Date,
-      EDate: req.body.Date,
+      SDate: req.body.SDate,
+      EDate: req.body.EDate,
       STime: req.body.STime,
       ETime: req.body.ETime,
+      ExpiryDate: req.body.ExpiryDate,
       Duration: req.body.Duration,
       Role: req.body.Role,
       Criteria: req.body.Criteria,
@@ -61,6 +65,7 @@ const fs = require('fs');
       Exam: req.body.Exam,
       EventId: req.body.EventId,
       OrgId: req.body.OrgId,
+      CourseAvailable : req.body.CourseAvailable,
       EventDesp: req.body.EventDesp,
       SchoolId: req.body.SchoolId,
       SponsorName: req.body.SponsorName,
@@ -72,11 +77,24 @@ const fs = require('fs');
       CourseAffilation: req.body.CourseAffilation,
       EventAccess: req.body.EventAccess,
       OutlookCal: req.body.OutlookCal,
-      Tags: req.body.Tags,
+      CourseFees: req.body.CourseFees,
+      Credits: req.body.Credits,
+      SponsorLink: req.body.SponsorLink,
+      ExamLink: req.body.ExamLink,
+      State1ElectiveCore: req.body.State1ElectiveCore,
+      State2ElectiveCore: req.body.State2ElectiveCore,
+      ExpireAfter: req.body.ExpireAfter,
+      CoursePrototype: req.body.CoursePrototype,
+      EventSummary: req.body.EventSummary,
+      ClassName: req.body.ClassName,
+      ClassId: req.body.ClassId,
+      AffiliationCategory: req.body.AffiliationCategory,
+      tags: Array.isArray(req.body.tags) ? req.body.tags : [],
       CancelPolicy: req.body.CancelPolicy,
       OptOut: req.body.OptOut,
       Certificate: req.body.Certificate,
       tagsInput: req.body.tagsInput,
+      dynamicFields: Array.isArray(req.body.dynamicFields) ? req.body.dynamicFields : [],
       updatedBy: req.body.updatedBy 
     }, { new: true })
   .then(event => res.json (event)) 

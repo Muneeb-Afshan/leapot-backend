@@ -2,6 +2,19 @@ const mongoose = require("mongoose");
 
 //create notification schema
 const CreateNotificationSchema = new mongoose.Schema({
+  role: {
+    type: String,
+    enum: [
+      "SuperAdmin",
+      "Admin",
+      "Learner",
+      "Instructor",
+      "Course Reviewer",
+      "Course Developer",
+      "Select All",
+    ],
+    required: true,
+  },
   notificationType: {
     type: String,
     required: true,
@@ -115,6 +128,7 @@ const NotificationSettingsSchema = new mongoose.Schema({
         role: {
           type: String,
           enum: [
+            "SuperAdmin",
             "Admin",
             "Learner",
             "Instructor",

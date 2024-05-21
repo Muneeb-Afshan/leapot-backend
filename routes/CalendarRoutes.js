@@ -15,10 +15,20 @@ const {
   addAnnouncements,
   getAnnouncementInfo,
   putUserDetails,
+  getEventsByTags,
+  cancelAnnouncement,
+  enrollUsersforEvent,
+  getEnrolledUsers,
 } = require("../controller/calendar/CalendarDetailsController");
+
+const {
+  addAnnouncementImage,
+} = require("../controller/calendar/UploadImageController");
 
 calendarRouter.post("/calendar/postTags", putAllTags);
 calendarRouter.get("/calendar/fetchTags", getAllTags);
+calendarRouter.get("/calendar/fetchEventsbyTags/:tag", getEventsByTags);
+
 calendarRouter.get("/calendar/fetchAllEvents", getAllEvents);
 calendarRouter.get(
   "/calendar/fetchEventByStartDate/:startDate",
@@ -29,6 +39,8 @@ calendarRouter.get(
   "/calendar/fetchannouncementDetails",
   getannouncementDetails
 );
+calendarRouter.put("/calendar/cancelannouncement/:id", cancelAnnouncement);
+
 calendarRouter.post("/calendar/addannouncements", addAnnouncements);
 calendarRouter.get(
   "/calendar/fetchannouncementinfo/:annNo",
@@ -46,5 +58,14 @@ calendarRouter.get(
 );
 calendarRouter.post("/calendar/postusersdetails", putUserDetails);
 calendarRouter.get("/calendar/fetchusersdetails/:eventname", getUserDetails);
+calendarRouter.post("/calendar/addAnnouncementImage", addAnnouncementImage);
+calendarRouter.post(
+  "/calendar/manualenrollusers/:eventName",
+  enrollUsersforEvent
+);
+calendarRouter.get(
+  "/calendar/enrolledUsersforEvent/:eventName",
+  getEnrolledUsers
+);
 
 module.exports = calendarRouter;

@@ -19,6 +19,8 @@ const UserSchema = new Schema(
     picture: { type: String },
     deleteStatus: { type: Boolean, default: false },
     blacklisted: { type: Boolean, default: false },
+    // events: [{ type: mongoose.Schema.Types.ObjectId, ref: "events" }], // Reference to eventsSchema
+    events: [{ type: String }],
   },
   {
     timestamps: true,

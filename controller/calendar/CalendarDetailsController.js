@@ -1,3 +1,4 @@
+const cron = require("node-cron");
 const {
   TagsDetails,
   UserStats,
@@ -6,7 +7,8 @@ const {
   EventUsersDetails,
   AddAnnouncements,
 } = require("../../model/CalendarSchema");
-const EventModule = require("../../model/Events");
+const EventModel = require("../../model/Events");
+const User = require("../../model/UserSchema");
 
 // Controller to handle POST request to add tags to the database
 exports.putAllTags = async (req, res) => {
@@ -28,20 +30,46 @@ exports.putAllTags = async (req, res) => {
     res.st;
   }
 };
+
+// Controller to fetch events by tag
+exports.getEventsByTags = async (req, res) => {
+  try {
+    const { tag } = req.params;
+    // Query events based on the provided tag
+    const events = await EventModel.find({ tags: tag });
+    res.status(200).json({ events: events });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 //Controller to fetch tags
+// exports.getAllTags = async (req, res) => {
+//   try {
+//     const tags = await TagsDetails.find({});
+//     return res.status(200).json(tags);
+//   } catch (err) {
+//     res.status(500).json({ message: err.message });
+//   }
+// };
 exports.getAllTags = async (req, res) => {
   try {
-    const tags = await TagsDetails.find({});
-    return res.status(200).json(tags);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+    const allEvents = await EventModel.find({ isDeleted: false }, "tags");
+    let allTags = [];
+    allEvents.forEach((event) => {
+      allTags = allTags.concat(event.tags);
+    });
+    // Remove duplicate tags
+    const uniqueTags = [...new Set(allTags)];
+    return res.status(200).send(uniqueTags);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
 
 // Controller to fetch all events
 exports.getAllEvents = async (req, res) => {
   try {
-    const events = await EventModule.find({});
+    const events = await EventModel.find({});
     return res.status(200).json(events);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -52,10 +80,7 @@ exports.getAllEvents = async (req, res) => {
 exports.getEventDetails = async (req, res) => {
   try {
     const { eventname } = req.params;
-    const eventdetails = await EventModule.findOne(
-      { EventName: eventname },
-      "EventName EventDesp InstName EventId Duration CourseType SDate CourseFees Tags tagsInput CourseLearningOutcomes "
-    );
+    const eventdetails = await EventModel.findOne({ EventName: eventname });
     if (!eventdetails) {
       return res.status(404).json({ message: "Event not found" });
     }
@@ -73,7 +98,7 @@ exports.getEventDetails = async (req, res) => {
 exports.getEventByStartDate = async (req, res) => {
   try {
     const { startDate } = req.params;
-    const event = await EventModule.find(
+    const event = await EventModel.find(
       { SDate: startDate },
       "STime EventName CourseType EventDesp"
     );
@@ -102,15 +127,50 @@ exports.getannouncementDetails = async (req, res) => {
   }
 };
 
+//Controller to cancel the announcement
+exports.cancelAnnouncement = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const cancelannouncement = await AddAnnouncements.findByIdAndUpdate(
+      id,
+      { active: false },
+      { new: true }
+    );
+
+    if (!cancelannouncement) {
+      return res.status(404).json({ message: "Announcement not found" });
+    }
+
+    return res.status(200).json(cancelannouncement);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 exports.addAnnouncements = async (req, res) => {
   try {
-    const { announcementNo, eventName, eventDate, type, image } = req.body;
+    const {
+      announcementNo,
+      eventName,
+      eventDate,
+      eventEndDate,
+      type,
+      image,
+      startTime,
+      endTime,
+      active,
+    } = req.body;
     const newAnnouncement = await AddAnnouncements.create({
       announcementNo,
       eventName,
       eventDate,
+      eventEndDate,
       type,
       image,
+      startTime,
+      endTime,
+      active,
     });
     return res.status(200).send({
       newAnnouncement: newAnnouncement,
@@ -249,5 +309,57 @@ exports.getUserDetails = async (req, res) => {
     return res.status(200).json(userdetails);
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+//controller to enroll user for a event
+exports.enrollUsersforEvent = async (req, res) => {
+  console.log("Enroll users endpoint hit"); // Debugging log
+
+  const { eventName } = req.params; // Assuming you pass eventName as a parameter
+  const { emails } = req.body; // An array of emails to enroll
+
+  try {
+    console.log(`Finding event: ${eventName}`); // Debugging log
+
+    // Find event by eventName
+    const event = await EventModel.findOne({ EventName: eventName });
+    if (!event) {
+      return res.status(404).json({ message: "Event not found" });
+    }
+    console.log("Event found:", event); // Debugging log
+    // Find users by email and enroll them in the event
+    const users = await User.find({ email: { $in: emails } });
+
+    // Add event to user's events array
+    users.forEach(async (user) => {
+      if (!user.events.includes(eventName)) {
+        user.events.push(eventName);
+        await user.save();
+      }
+    });
+
+    res.status(200).json({ message: "Users enrolled successfully", users });
+  } catch (error) {
+    console.error("Error enrolling users:", error);
+    res
+      .status(500)
+      .json({ message: "Error enrolling users", error: error.message });
+  }
+};
+//controller to fetch users based on event Name
+exports.getEnrolledUsers = async (req, res) => {
+  try {
+    const { eventName } = req.params;
+    // Find users who have the event name in their events array
+    const users = await User.find({ events: { $in: [eventName] } });
+    // Log found users for debugging
+    console.log("Found users:", users);
+    res.status(200).json(users);
+  } catch (error) {
+    console.error("Error fetching enrolled users:", error);
+    res
+      .status(500)
+      .json({ message: "Error fetching enrolled users", error: error.message });
   }
 };

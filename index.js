@@ -8,13 +8,14 @@ const swaggerDocument = YAML.load("./swagger.yaml");
 require("dotenv").config();
 //config Database
 require("./config/Database").connect();
+//import and initialize cron jobs
+require("./utilities/cronJobs");
 //routes added here
 const router = require("./routes/AuthenticationRoutes");
 const routerTeam = require("./routes/TeamRoutes");
 const userDetail = require("./routes/UserDetailsRoutes");
 const utilityRoutes = require("./routes/UtilityRoutes");
 const EventManagerRoute = require("./routes/EventManagerRoute");
-
 
 const notificationRoute = require("./routes/NotificationRoutes");
 const courseRouter = require("./routes/CourseRoutes");
@@ -23,8 +24,7 @@ const routerTestimonial = require("./routes/TestimonialsRoutes");
 
 const calendarRoute = require("./routes/CalendarRoutes");
 const certificateRoute = require("./routes/CertificateRoutes");
-const routerJob = require('./routes/JobRoutes')
-
+const routerJob = require("./routes/JobRoutes");
 
 //middleWares
 const bodyParser = require("body-parser");
@@ -51,12 +51,11 @@ app.use("/api", notificationRoute);
 
 app.use("/api", calendarRoute);
 
-
 app.use("/api", courseRouter);
 app.use("/api", utilityRoutes);
 app.use("/api", routerBlog);
 app.use("/api", routerTestimonial);
-app.use("/api",routerJob)
+app.use("/api", routerJob);
 
 // api document
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
