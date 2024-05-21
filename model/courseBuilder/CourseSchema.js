@@ -13,7 +13,7 @@ const courseSchema = new Schema({
         type: String,
         required: true
     },
-    thumbnail: {
+    bannerImage: {
         type: String,
         // required: true
     },
@@ -47,8 +47,11 @@ const courseSchema = new Schema({
     },
     createdBy:{
         type: String,
-        required: true
-    }
+        // required: true
+    },
+    
+}, {
+    timestamps: true, 
 });
 
 // Create Course model
@@ -85,30 +88,34 @@ const Course = mongoose.model('Course', courseSchema);
 
 // Define the Topic schema
 const topicSchema = new Schema({
+    moduleId : {type: Number, required: true},
+    lessonId : {type: Number, required: true},
+    id:{type: Number, required: true},
   title: { type: String, required: true },
-  content: { type: String, required: true },
-  contentType: { type: String, required: true },
+  textDescription: { type: String, required: true },
+  contentType: { type: String},
   downloadble : {type:Boolean, default:false }
 
 });
 
 // Define the Chapter schema
 const chapterSchema = new Schema({
-  chapter_id: { type: String, required: true },
-  chapter_name: { type: String, required: true }, // Add chapter_name field
-  topics: [topicSchema] // Array of topics
+  moduleId:{type: Number, required: true},
+  id: { type: Number, required: true },
+  title: { type: String, required: true }, // Add chapter_name field
+  items: [topicSchema] // Array of topics
 });
 
 // Define the Module schema
 const moduleSchema = new Schema({
-  module_id: { type: String, required: true },
-  module_title: { type: String, required: true }, // Add module_title field
-  chapters: [chapterSchema] // Array of chapters
+  id: { type: Number, required: true },
+ title: { type: String, required: true }, // Add module_title field
+  lessons: [chapterSchema] // Array of chapters
 });
 
 // Define the Course schema
 const courseDetailsSchema = new Schema({
-  course_id: {  type: Schema.Types.ObjectId, ref:'Course', required: true },
+  courseId: {  type: Schema.Types.ObjectId, ref:'Course', required: true },
 //   userid: { type: Schema.Types.ObjectId, ref:'User', unique: true }, // Corrected to ObjectId
 
   modules: [moduleSchema] // Array of modules
