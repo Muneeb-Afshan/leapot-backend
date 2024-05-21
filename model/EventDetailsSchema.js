@@ -16,6 +16,7 @@ const EventDetailsSchema = new mongoose.Schema({
   price: { type: Number }, // This field is optional and can store the price of the event if it is not free.
   priceDiscount: { type: Number }, // This field is optional and can store the discount offered on the event price.
   deadline: { type: Date }, // This field is optional and can store the deadline for registering for the event.
+  langCode:{type: String, required: true , default : "en"},
 });
 
 module.exports = mongoose.model('EventDetails', EventDetailsSchema);

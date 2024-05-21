@@ -10,6 +10,7 @@ const SubmissionDetailsSchema = new mongoose.Schema({
   evaluationStatus: { type: String }, // This is the evaluation status of the submission (e.g., passed, failed, needs review).
   markPerQuestion: [Number], // This is an array of the marks for each question (may be empty if not graded yet).
   submissionDate: { type: Date, required: true }, // This is the date and time the submission was made.
+  langCode:{type: String, required: true , default : "en"},
 });
 
 module.exports = mongoose.model('AssessSubmissionDetails', SubmissionDetailsSchema);

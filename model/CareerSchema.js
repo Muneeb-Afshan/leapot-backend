@@ -14,7 +14,8 @@ const applicationSchema = new mongoose.Schema({
     jobExpectations: { type: String, required: true },
     willingToWorkWithoutPay: { type: Boolean, required: true },
     availabilityInDays: { type: Number, required: true },
-    employmentType: { type: String, enum: ['full-time', 'part-time'], required: true }
+    employmentType: { type: String, enum: ['full-time', 'part-time'], required: true },
+    langCode:{type: String, required: true , default : "en"}
 });
 
 const Application = mongoose.model('Application', applicationSchema);

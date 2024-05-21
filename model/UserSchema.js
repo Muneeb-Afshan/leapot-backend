@@ -21,6 +21,7 @@ const UserSchema = new Schema(
     blacklisted: { type: Boolean, default: false },
     // events: [{ type: mongoose.Schema.Types.ObjectId, ref: "events" }], // Reference to eventsSchema
     events: [{ type: String }],
+    langCode:{type: String, required: true , default : "en"},
   },
   {
     timestamps: true,

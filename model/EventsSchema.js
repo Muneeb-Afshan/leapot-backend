@@ -7,6 +7,7 @@ const EventSchema = new mongoose.Schema({
   description: { type: String }, // This is a detailed description of the event.
   instructorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // This field is optional and can be a reference to the User model for the instructor.
   coverImageUrl: { type: String }, // This field can store the URL of the event cover image.
+  langCode:{type: String, required: true , default : "en"},
 });
 
 module.exports= mongoose.model('Event', EventSchema);
