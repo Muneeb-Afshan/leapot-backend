@@ -23,7 +23,8 @@ const blacklistedUserSchema = new Schema({
   createdAt: {
     type: Date,
     default: Date.now
-  }
+  },
+  langCode:{type: String, required: true , default : "en"}
 });
 
 module.exports = mongoose.model('BlacklistedUser', blacklistedUserSchema);

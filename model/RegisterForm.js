@@ -3,7 +3,8 @@ const mongoose = require("mongoose");
 const RegisterSchema = new mongoose.Schema({
   username: { type: String},
   email: {type: String},
-  password: { type: String}
+  password: { type: String},
+  langCode:{type: String, required: true , default : "en"},
   
 })
 

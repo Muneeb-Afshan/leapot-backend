@@ -11,6 +11,7 @@ const UserDetailsSchema = new Schema({
   state: { type: String },
   city: { type: String },
   address: { type: String },
+  langCode:{type: String, required: true , default : "en"},
 });
 
 module.exports = mongoose.model('EventManagerUserDetails', UserDetailsSchema);

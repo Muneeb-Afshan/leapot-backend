@@ -49,6 +49,7 @@ const courseSchema = new Schema({
         type: String,
         // required: true
     },
+    langCode:{type: String, required: true , default : "en"},
     
 }, {
     timestamps: true, 
@@ -94,7 +95,8 @@ const topicSchema = new Schema({
   title: { type: String, required: true },
   textDescription: { type: String, required: true },
   contentType: { type: String},
-  downloadble : {type:Boolean, default:false }
+  downloadble : {type:Boolean, default:false },
+  langCode:{type: String, required: true , default : "en"}
 
 });
 
@@ -103,14 +105,16 @@ const chapterSchema = new Schema({
   moduleId:{type: Number, required: true},
   id: { type: Number, required: true },
   title: { type: String, required: true }, // Add chapter_name field
-  items: [topicSchema] // Array of topics
+  items: [topicSchema], // Array of topics
+  langCode:{type: String, required: true , default : "en"}
 });
 
 // Define the Module schema
 const moduleSchema = new Schema({
   id: { type: Number, required: true },
  title: { type: String, required: true }, // Add module_title field
-  lessons: [chapterSchema] // Array of chapters
+  lessons: [chapterSchema], // Array of chapters
+  langCode:{type: String, required: true , default : "en"}
 });
 
 // Define the Course schema
@@ -118,7 +122,8 @@ const courseDetailsSchema = new Schema({
   courseId: {  type: Schema.Types.ObjectId, ref:'Course', required: true },
 //   userid: { type: Schema.Types.ObjectId, ref:'User', unique: true }, // Corrected to ObjectId
 
-  modules: [moduleSchema] // Array of modules
+  modules: [moduleSchema], // Array of modules
+  langCode:{type: String, required: true , default : "en"}
 });
 
 // Create models for each schema

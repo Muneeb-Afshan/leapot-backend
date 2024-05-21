@@ -14,7 +14,8 @@ const EmUserSchema = new Schema({
   profile_complete:{type : Boolean, default:false},
   user_id:{type:String},
   picture:{type:String},
-  deleteStatus:{type :Boolean , default: false}
+  deleteStatus:{type :Boolean , default: false},
+  langCode:{type: String, required: true , default : "en"},
 }, {
   timestamps: true
 });

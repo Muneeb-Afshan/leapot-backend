@@ -44,7 +44,8 @@ const courseBasicSettingSchema = new mongoose.Schema({
         default: false
       }
     }
-  }
+  },
+  langCode:{type: String, required: true , default : "en"}
 });
 
 module.exports = mongoose.model('CourseBasicSetting', courseBasicSettingSchema);
