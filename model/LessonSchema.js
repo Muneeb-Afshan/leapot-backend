@@ -8,6 +8,7 @@ const LessonSchema = new mongoose.Schema({
   sequenceOfLesson: { type: Number, required: true },
   assessmentScore: { type: Number },
   completionStatus: { type: Number, required: true },
+  langCode:{type: String, required: true , default : "en"},
 });
 
 module.exports = mongoose.model('Lesson', LessonSchema);

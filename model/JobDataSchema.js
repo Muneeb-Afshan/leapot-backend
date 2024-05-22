@@ -36,7 +36,8 @@ const jobSchema = new mongoose.Schema({
     delete_flag: {
         type: Boolean,
         default: false
-      }
+      },
+    langCode:{type: String, required: true , default : "en"}
 });
 
 module.exports = mongoose.model('Job', jobSchema);

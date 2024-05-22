@@ -5,6 +5,7 @@ const EventModulesSchema = new mongoose.Schema({
   title: { type: String, required: true },
   order: { type: Number, required: true },
   sequence: { type: Number, required: true },
+  langCode:{type: String, required: true , default : "en"},
 });
 
 module.exports = mongoose.model('EventModules', EventModulesSchema);

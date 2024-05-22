@@ -12,7 +12,8 @@ const roleSchema = new Schema({
   description: {
     type: String,
     required: true
-  }
+  },
+  langCode:{type: String, required: true , default : "en"}
 });
 
 module.exports = mongoose.model('Role', roleSchema);
