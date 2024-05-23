@@ -1,34 +1,9 @@
-const http = require("http");
 const express = require("express");
 const app = express();
 const morgan = require("morgan");
 const swaggerUi = require("swagger-ui-express");
 const YAML = require("yamljs");
 const swaggerDocument = YAML.load("./swagger.yaml");
-const {Server} = require('socket.io');
-
-const server = http.createServer(app);
-
-const io = new Server (server, {
-  cors: {
-    origin: "http://localhost:3000",
-    methods : ["GET", "POST"]
-  },
-});
-
-io.on('connection', (socket) => {
-  console.log(`User Connected : ${socket.id}`);
-
-  socket.on('sendMessage', (message) => {
-    // console.log('Message received:', message);
-    io.emit('receivedMessage', message);
-  });
-
-  socket.on('disconnect', () => {
-    console.log('Client disconnected');
-  });
-});
-
 //config .env file
 require("dotenv").config();
 //config Database
@@ -86,6 +61,6 @@ app.use("/api", routerJob);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 //server listen
-server.listen(process.env.PORT, () => {
+app.listen(process.env.PORT, () => {
   console.log(`server is started ${process.env.PORT}`);
 });
