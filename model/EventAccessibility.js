@@ -7,6 +7,7 @@ const eventAccessibilitySchema = new Schema({
     required: true,
     unique: true
   },
+  langCode:{type: String, required: true , default : "en"},
 });
 
 module.exports = mongoose.model('EventAccessibility', eventAccessibilitySchema);

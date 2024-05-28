@@ -16,7 +16,8 @@ const AppearanceSettingSchema = new mongoose.Schema({
   },
   font: {
     type: String
-  }
+  },
+  langCode:{type: String, required: true , default : "en"}
 });
 
 module.exports = mongoose.model('CourseAppearanceSetting', AppearanceSettingSchema);

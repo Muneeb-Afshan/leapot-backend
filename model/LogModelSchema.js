@@ -6,7 +6,8 @@ const logSchema = new mongoose.Schema({
   method: String,
   url: String,
   status: Number,
-  responseBody: Object // Store response body as an object
+  responseBody: Object, // Store response body as an object
+  langCode:{type: String, required: true , default : "en"},
 });
 
 const Log = mongoose.model('Log', logSchema);

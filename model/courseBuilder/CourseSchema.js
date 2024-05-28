@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 
 
 // Define course schema
+
 // const courseSchema = new Schema({
 //     courseid: String,
 //     title: {
@@ -49,6 +50,7 @@ const Schema = mongoose.Schema;
 //         type: String,
 //         // required: true
 //     },
+
     
 // }, {
 //     timestamps: true, 
@@ -121,31 +123,43 @@ const topicSchema = new Schema({
   id: { type: Number, required: true },
   title: { type: String, required: true },
   textDescription: { type: String, required: true },
-  contentType: { type: String },
-  downloadable: { type: Boolean, default: false }
+  contentType: { type: String},
+  downloadble : {type:Boolean, default:false },
+  langCode:{type: String, required: true , default : "en"}
 });
 
 // Define the Chapter schema
 const chapterSchema = new Schema({
   moduleId: { type: Number },
   id: { type: Number, required: true },
+
   title: { type: String, required: true },
   items: [topicSchema]
+
+  langCode:{type: String, required: true , default : "en"}
+
 });
 
 // Define the Module schema
 const moduleSchema = new Schema({
   id: { type: Number, required: true },
+
   title: { type: String, required: true },
-  lessons: [chapterSchema]
+  lessons: [chapterSchema],
+  langCode:{type: String, required: true , default : "en"}
+
 });
 
 // Define the CourseDetails schema
 const courseDetailsSchema = new Schema({
+
   courseId: { type: Schema.Types.ObjectId, ref: 'Course', required: true },
   courseStructure: { type: String, enum: ['CMLT', 'CLT'], required: true },
   modules: [moduleSchema],
   lessons: [chapterSchema]
+
+  langCode:{type: String, required: true , default : "en"}
+
 });
 
 // Create models for each schema

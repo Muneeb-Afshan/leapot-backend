@@ -6,6 +6,7 @@ const InstructorSchema = new mongoose.Schema({
   lastname: { type : String},
   Code: { type: String},
   user_id:{type:String},
+  langCode:{type: String, required: true , default : "en"},
 
   
 })
