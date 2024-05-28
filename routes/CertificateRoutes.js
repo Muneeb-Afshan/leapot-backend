@@ -1,12 +1,14 @@
 const express = require('express');
 const certificateRouter = express.Router();
+const verifyToken = require('../middleware/TokenVerifyMiddleware');
+
 const {createCertificateSetting , updateCertificateSetting} = require('../controller/certificate/CourseSettingController');
 const {addTemplate , logicalDeleteTemplate ,  useTemplate , editCertificate , logicalDeleteCertificate , getAllTemplates , getAllCertificate,getSingleCertificate, getOriantation , singleIssue , bulkIssue, fetchIssueCertificate ,fetchSetting,fetchSingleSetting, DeleteSettingOfEvent ,blacklistUsers ,getBlacklistedUsers} = require('../controller/certificate/CertificateDesign')
 // Route to save a new certificate setting
 certificateRouter.post('/certificate/certificateSettings',createCertificateSetting); //
 certificateRouter.put('/certificate/updateCertificateSetting/:id',updateCertificateSetting); //
 
-certificateRouter.post('/certificate/addTemplate',addTemplate); //
+certificateRouter.post('/certificate/addTemplate',verifyToken , addTemplate); //
 certificateRouter.put('/certificate/deleteTemplate/:id',logicalDeleteTemplate); //
 certificateRouter.post('/certificate/useTemplate',useTemplate); //
 certificateRouter.put('/certificate/editCertificate/:id',editCertificate); //
