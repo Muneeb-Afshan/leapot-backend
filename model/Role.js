@@ -12,6 +12,11 @@ const roleSchema = new Schema({
   description: {
     type: String,
     required: true
+  } ,
+  langCode : {
+    type: String,
+    // required: true,
+    default : 'en'
   }
 });
 

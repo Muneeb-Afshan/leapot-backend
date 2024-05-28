@@ -9,17 +9,40 @@ const Event = require("../../model/Events");
 const BlacklistedUser = require("../../model/BlacklistedUser");
 const RegisterLearner = require("../../model/RegistrationSchema");
 // const RegistrationSchema = require("../../model/RegistrationSchema");
+const nodeHtmlToImage = require('node-html-to-image')
+
+// Adjust the import according to your project structure
+
+
 
 exports.addTemplate = async (req, res) => {
   try {
-    const templateData = req.body;
+    console.log(req.body, "addTemplate");
+
+    const { certificateBody, certificateName , langCode } = req.user;
+ console.log(langCode)
+    const imageBuffer = await nodeHtmlToImage({
+      html: certificateBody,
+      encoding: 'buffer' // Ensures the output is a buffer
+    });
+    const base64Image = imageBuffer.toString('base64');
+    const imageSrc = `data:image/png;base64,${base64Image}`;
+    // console.log(imageSrc , "imageSrc")
+    const templateData = {
+      certificateName: certificateName,
+      certificateBody: certificateBody,
+      certificateImage: imageSrc, // Store the image buffer
+      langCode : langCode
+    };
     const certificate = await Templates.create(templateData);
+
     return res.status(201).json({
       body: certificate,
       statusCode: 200,
-      message: "certificate Added successfully",
+      message: "Certificate added successfully"
     });
   } catch (error) {
+    console.log(error.message);
     return res.status(500).json("Unable to POST Template");
   }
 };
@@ -124,6 +147,7 @@ exports.logicalDeleteCertificate = async (req, res) => {
 exports.getAllTemplates = async (req, res) => {
   try {
     const templates = await Templates.find({ isDeleted: false });
+  
     return res.status(200).send({
       templates: templates,
       statusCode: 200,
