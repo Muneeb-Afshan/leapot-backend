@@ -96,10 +96,10 @@ const loginWithEmail = async (req, res) => {
 };
 
 const logout = async (req, res) => {
-  const { userId } = req.body;
+  const { email } = req.body; // Ensure the email is being sent in the request body
 
   try {
-    const user = await User.findById(userId);
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ message: "User not found." });
     }
