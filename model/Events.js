@@ -57,6 +57,7 @@ const EventSchema = new mongoose.Schema(
     createdBy: { type: String, default: "purvadhopade@gmail.com" },
     updatedBy: { type: String },
     isDeleted: { type: Boolean, default: false },
+    langCode:{type: String, required: true , default : "en"},
   },
   { timestamps: true }
 );

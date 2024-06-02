@@ -44,7 +44,8 @@ const ProgressAndCompletion = new mongoose.Schema({
       type: Boolean,
       default: false
     }
-  }
+  },
+  langCode:{type: String, required: true , default : "en"}
 });
 
 module.exports = mongoose.model('CourseProgressAndCompletion', ProgressAndCompletion);

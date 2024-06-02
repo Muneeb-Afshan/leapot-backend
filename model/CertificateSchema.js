@@ -65,6 +65,7 @@ const certificateSettingSchema = new mongoose.Schema({
     // required: true,
   },
   isDeleted: { type: Boolean, default: false },
+  langCode:{type: String, required: true , default : "en"},
 });
 
 const TemplateSchema = new mongoose.Schema({
@@ -80,7 +81,14 @@ const TemplateSchema = new mongoose.Schema({
     type: String,
     require: true,
   },
+  langCode : {
+    type: String,
+    // required: true,
+    default : 'en'
+  },
+  certificateImage:{  type: String, required: true } ,
   isDeleted: { type: Boolean, default: false },
+  langCode:{type: String, required: true , default : "en"},
 });
 
 const issueCertificateSchema = new mongoose.Schema({
@@ -103,6 +111,7 @@ const issueCertificateSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
+  langCode:{type: String, required: true , default : "en"},
   // status: {
   //   type: String,
   //   required: true
@@ -121,6 +130,7 @@ const TemplateCertificateSchema = new mongoose.Schema({
     type: String,
   },
   isDeleted: { type: Boolean, default: false },
+  langCode:{type: String, required: true , default : "en"},
 });
 
 module.exports = {

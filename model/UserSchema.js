@@ -30,8 +30,12 @@ const UserSchema = new Schema(
     deleteStatus: { type: Boolean, default: false },
     blacklisted: { type: Boolean, default: false },
     events: [{ type: String }],
+
     lastSignOut: { type: Date },
     learnerDetails: { type: LearnerDetailsSchema, default: () => ({}) },
+
+    langCode:{type: String, required: true , default : "en"},
+
   },
   {
     timestamps: true,

@@ -11,6 +11,7 @@ const AssessmentSchema = new mongoose.Schema({
   startDate: { type: Date, required: true }, // This is the start date and time of the assessment.
   endDate: { type: Date, required: true }, // This is the end date and time of the assessment.
   duration: { type: Number }, // This is the duration of the assessment in minutes.
+  langCode:{type: String, required: true , default : "en"}
 });
 
 module.exports = mongoose.model('Assessment', AssessmentSchema);
