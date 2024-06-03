@@ -12,8 +12,8 @@ exports.createCertificateSetting = async (req, res) => {
   console.log(req.body);
 
   try {
-    let certificateSettingData = req.body;
-
+    let  { certificateSettingData, langCode} = req.user;
+    console.log(langCode);
     // Construct serialNumberType object based on the provided data
     let serialNumberType;
     if (certificateSettingData.serialNumberType.type === "Random") {

@@ -14,8 +14,8 @@ const verifyTokenForAllUrl = async (req, res, next) => {
     console.log(decodeValue , "decodeValue")
     if (decodeValue) {
 console.log("inside clg")
-      req.user = {...req.body  , langCode : langCode};
-      return next();
+      req.user = {...req.body, langCode: langCode};     // , langCode : langCode here it adding
+       return next();
     }
     return res.json({ message: "Un authorize" });
   } catch (e) {

@@ -19,7 +19,7 @@ const register = async (req, res) => {
   }
 
   
-  
+
 
   const NewUser = new User({
     email: email,

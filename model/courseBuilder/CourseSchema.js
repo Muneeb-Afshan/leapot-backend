@@ -134,9 +134,9 @@ const chapterSchema = new Schema({
   id: { type: Number, required: true },
 
   title: { type: String, required: true },
-  items: [topicSchema]
+  items: [topicSchema],
 
-  langCode:{type: String, required: true , default : "en"}
+  langCode:{type: String, required: true , default : "en"},
 
 });
 
@@ -156,7 +156,7 @@ const courseDetailsSchema = new Schema({
   courseId: { type: Schema.Types.ObjectId, ref: 'Course', required: true },
   courseStructure: { type: String, enum: ['CMLT', 'CLT'], required: true },
   modules: [moduleSchema],
-  lessons: [chapterSchema]
+  lessons: [chapterSchema],
 
   langCode:{type: String, required: true , default : "en"}
 

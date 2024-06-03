@@ -109,8 +109,7 @@ exports.logicalDeleteCourse = async (req, res) => {
 
 exports.addCourseDetails = async (req, res) => {
   try {
-    const { courseId, courseStructure, modules, lessons } = req.body;
-
+    const { courseId, courseStructure, modules, lessons, langCode } = req.user;
     // Validate and prepare data based on courseStructure
     let courseDetailsData;
     if (courseStructure === 'CMLT') {
@@ -119,7 +118,8 @@ exports.addCourseDetails = async (req, res) => {
         courseId: courseId,
         courseStructure: courseStructure,
         modules: modules,
-        lessons: []
+        lessons: [],
+        langCode: langCode
       };
     } else if (courseStructure === 'CLT') {
       // Validate and prepare data for CLT structure
@@ -127,7 +127,8 @@ exports.addCourseDetails = async (req, res) => {
         courseId: courseId,
         courseStructure: courseStructure,
         modules: [],
-        lessons: lessons
+        lessons: lessons,
+        langCode: langCode
       };
     } else {
       return res.status(400).json({ message: "Invalid course structure type" });
