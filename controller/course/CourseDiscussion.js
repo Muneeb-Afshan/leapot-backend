@@ -37,25 +37,29 @@ exports.getMessages = async (req, res) => {
     }
   };
 
-  exports.updateThumbs = async (req, res) => {
-    const { id } = req.params;
-    const { type, increment } = req.body;
-  
+  exports.thumbUp = async (req, res) => {
     try {
-      const message = await Message.findById(id);
-      if (!message) {
-        return res.status(404).json({ error: 'Message not found' });
-      }
+      const message = await Message.findById(req.params.messageId);
+      if (!message) return res.status(404).send('Message not found');
   
-      if (type === 'thumbUps') {
-        increment ? message.thumbUps++ : message.thumbUps--;
-      } else if (type === 'thumbDowns') {
-        increment ? message.thumbDowns++ : message.thumbDowns--;
-      }
-  
+      message.thumbUp += 1;
       await message.save();
-      res.status(200).json(message);
+  
+      res.send(message);
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      res.status(500).send(error.message);
+    }
+  };
+
+  exports.thumbDown = async (req, res) => {    try {
+      const message = await Message.findById(req.params.messageId);
+      if (!message) return res.status(404).send('Message not found');
+  
+      message.thumbDown += 1;
+      await message.save();
+  
+      res.send(message);
+    } catch (error) {
+      res.status(500).send(error.message);
     }
   };
