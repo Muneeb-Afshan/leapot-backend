@@ -5,22 +5,16 @@ const morgan = require("morgan");
 const swaggerUi = require("swagger-ui-express");
 const YAML = require("yamljs");
 const swaggerDocument = YAML.load("./swagger.yaml");
-const {Server} = require('socket.io');
+const socketIo = require('socket.io');
 
 const server = http.createServer(app);
 
-const io = new Server (server, {
-  cors: {
-    origin: "http://localhost:3000",
-    methods : ["GET", "POST"]
-  },
-});
+const io = socketIo(server);
 
 io.on('connection', (socket) => {
   console.log(`User Connected : ${socket.id}`);
 
   socket.on('sendMessage', (message) => {
-    // console.log('Message received:', message);
     io.emit('receivedMessage', message);
   });
 
