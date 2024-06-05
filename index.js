@@ -9,17 +9,22 @@ const socketIo = require('socket.io');
 
 const server = http.createServer(app);
 
-const io = socketIo(server);
+const io = socketIo(server, {
+  cors: {
+    origin: "http://localhost:3000", // Your frontend URL
+    methods: ["GET", "POST"]
+  }
+});
 
 io.on('connection', (socket) => {
-  console.log(`User Connected : ${socket.id}`);
+  console.log('A user connected');
 
-  socket.on('sendMessage', (message) => {
-    io.emit('receivedMessage', message);
+  socket.on('message', (message) => {
+    io.emit('message', message); // Broadcast the message to all clients
   });
 
   socket.on('disconnect', () => {
-    console.log('Client disconnected');
+    console.log('A user disconnected');
   });
 });
 
