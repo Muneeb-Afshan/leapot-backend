@@ -17,8 +17,8 @@ courseRouter.put('/course/logicalDeleteCourse/:id',logicalDeleteCourse);
 
 courseRouter.post('/course/addMessage',addMessage);
 courseRouter.get('/course/:courseId',getMessages);
-courseRouter.post('/course/thumbDown/:messageId', thumbDown);
-courseRouter.post('/course/thumbUp/:messageId', thumbUp);
+courseRouter.put('/course/messages/:messageId/thumbDown', thumbDown);
+courseRouter.put('/course/messages/:messageId/thumbUp', thumbUp);
 
 
 module.exports = courseRouter;

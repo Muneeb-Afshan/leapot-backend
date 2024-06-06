@@ -2,7 +2,11 @@ const Message = require('../../model/courseBuilder/CourseDiscussionSchema');
 exports.getMessages = async (req, res) => {
     try {
       const { courseId } = req.params;
-      const messages = await Message.find({ course: courseId })
+      const messages = await Message.find({ course: courseId }) .populate({
+        path: "sender",
+        populate: { path: "userid", model: "User" }, // Populate UserDetails.userid with User fields
+      })
+      .exec();
       return res.status(200).json({ success: true, data: messages });
     } catch (error) {
       console.error('Error fetching messages:', error);
@@ -13,7 +17,7 @@ exports.getMessages = async (req, res) => {
   // Add a new message to a course
   exports.addMessage = async (req, res) => {
     try {
-      const { course, sender, text, replyTo, attachments, thumbUps = 0, thumbDowns = 0  } = req.body;
+      const { course, sender, text, replyTo, attachments } = req.body;
   
       // Create a new message
       const newMessage = new Message({
@@ -22,8 +26,6 @@ exports.getMessages = async (req, res) => {
         text,
         replyTo,
         attachments,
-        thumbUps,
-        thumbDowns,
       });
   
       // Save the message to the database
@@ -39,10 +41,24 @@ exports.getMessages = async (req, res) => {
 
   exports.thumbUp = async (req, res) => {
     try {
+      const { userId } = req.body;
       const message = await Message.findById(req.params.messageId);
       if (!message) return res.status(404).send('Message not found');
   
-      message.thumbUp += 1;
+      if (message.usersVoted.thumbUps.includes(userId)) {
+        return res.status(400).send('User has already voted thumb up');
+      }
+  
+      message.thumbUps += 1;
+      message.usersVoted.thumbUps.push(userId);
+  
+      // Remove user from thumbDowns if they had voted thumb down
+      const thumbDownIndex = message.usersVoted.thumbDowns.indexOf(userId);
+      if (thumbDownIndex !== -1) {
+        message.thumbDowns -= 1;
+        message.usersVoted.thumbDowns.splice(thumbDownIndex, 1);
+      }
+  
       await message.save();
   
       res.send(message);
@@ -50,12 +66,27 @@ exports.getMessages = async (req, res) => {
       res.status(500).send(error.message);
     }
   };
-
-  exports.thumbDown = async (req, res) => {    try {
+  
+  exports.thumbDown = async (req, res) => {
+    try {
+      const { userId } = req.body;
       const message = await Message.findById(req.params.messageId);
       if (!message) return res.status(404).send('Message not found');
   
-      message.thumbDown += 1;
+      if (message.usersVoted.thumbDowns.includes(userId)) {
+        return res.status(400).send('User has already voted thumb down');
+      }
+  
+      message.thumbDowns += 1;
+      message.usersVoted.thumbDowns.push(userId);
+  
+      // Remove user from thumbUps if they had voted thumb up
+      const thumbUpIndex = message.usersVoted.thumbUps.indexOf(userId);
+      if (thumbUpIndex !== -1) {
+        message.thumbUps -= 1;
+        message.usersVoted.thumbUps.splice(thumbUpIndex, 1);
+      }
+  
       await message.save();
   
       res.send(message);

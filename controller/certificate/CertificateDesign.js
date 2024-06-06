@@ -233,15 +233,15 @@ exports.singleIssue = async (req, res) => {
     }
 
     // Check if the user is registered for the event
-    const registrationData = await RegisterLearner.findOne({
-      email: issueData.email,
-      eventid: eventData._id,
-    }).populate("userid");
-    if (!registrationData) {
-      return res
-        .status(400)
-        .json({ message: "User is not registered for the event" });
-    }
+      const registrationData = await RegisterLearner.findOne({
+        email: issueData.email,
+        eventid: eventData._id,
+      }).populate("userid");
+      if (!registrationData) {
+        return res
+          .status(400)
+          .json({ message: "User is not registered for the event" });
+      }
 
     const certificateSetting = await CertificateSetting.findOne({
       eventId: eventData._id,
