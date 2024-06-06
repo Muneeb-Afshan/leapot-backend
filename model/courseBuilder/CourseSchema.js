@@ -93,16 +93,16 @@ const courseSchema = new mongoose.Schema({
     startTime: { type: String },
     endTime: { type: String },
     maximumEnrollment: { type: Number },
-    accessPermissions: { type: String, enum: ['Public', 'Private', 'Institution-specific'] },
+    accessPermissions: { type: String},
     certificateAvailability: { type: Boolean },
     certificateRequirements: { type: String },
   },
   progressTracking: {
-    progressIndicators: { type: String },
+    progressIndicators: { type: Boolean },
     enforceSequentialLearningPath: { type: Boolean },
-    assessmentMethods: [{ type: String }],
-    gradingPolicy: { type: String },
-    completionCriteria: { type: String },
+    assessmentMethods: [{ type: Boolean }],
+    gradingPolicy: { type: Boolean },
+    completionCriteria: { type: Boolean },
   },
 }, { timestamps: true });
 
