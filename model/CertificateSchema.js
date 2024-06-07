@@ -102,7 +102,7 @@ const issueCertificateSchema = new mongoose.Schema({
   },
   eventName: {
     type: String,
-    required: true,
+    // required: true,
   },
   username: {
     type: String,

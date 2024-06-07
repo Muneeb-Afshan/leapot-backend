@@ -3,7 +3,7 @@ const admin = require("../config/firebase-config");
 const verifyTokenForAllUrl = async (req, res, next) => {
   console.log("geloo from middelware")
   console.log(req.body , "verifyTokenForAllUrl")
-  console.log(req.headers);
+  console.log(req.headers , "headers");
   // Extract the token from the request headers
   const token = req.headers.authorization.split(" ")[1];
   console.log(token , "token")

@@ -9,11 +9,14 @@ function generateRandomValue() {
 
 // Controller function to save a new certificate setting
 exports.createCertificateSetting = async (req, res) => {
-  console.log(req.body);
+
 
   try {
-    let  { certificateSettingData, langCode} = req.user;
-    console.log(langCode);
+  const  certificateSettingData =  req.user;
+    console.log(certificateSettingData , "certificateSettingData");
+    console.log(req.user , "certificateSettingData");
+    
+
     // Construct serialNumberType object based on the provided data
     let serialNumberType;
     if (certificateSettingData.serialNumberType.type === "Random") {
