@@ -595,7 +595,7 @@ exports.blacklistUsers = async (req, res) => {
     const { email, reason, status } = req.body; // Array of user objects to blacklist
     // Extract user IDs from the array of user objects
 
-    const { data, langCode } = await BlacklistedUser.create(req.user);
+    const data= await BlacklistedUser.create(req.user);
 
     return res.status(200).json({
       success: true,
