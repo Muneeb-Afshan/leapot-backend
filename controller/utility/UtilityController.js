@@ -121,8 +121,8 @@ exports.getAllFAQs = async (req, res) => {
 exports.addRole = async (req, res) => {
   console.log(req.body , req.user , "addRole" )
   try {
-    const { name, description , langCode  } = req.user;
-
+    const { name, description, langCode } = req.user;              //here we want to add langCode...
+ 
     // Check if the role with the same name already exists
     const existingRole = await Role.findOne({ name });
     if (existingRole) {
@@ -133,7 +133,7 @@ exports.addRole = async (req, res) => {
     }
 
     // Create a new role
-    const role = new Role({ name, description , langCode});
+    const role = new Role({ name, description, langCode});   //here we want to add langCode...
     await role.save();
 
     return res

@@ -17,7 +17,7 @@ const register = async (req, res) => {
       success: false,
     });
   }
-
+  
   const NewUser = new User({
     email: email,
     role: role,

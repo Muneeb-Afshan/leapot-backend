@@ -160,7 +160,8 @@ exports.addAnnouncements = async (req, res) => {
       startTime,
       endTime,
       active,
-    } = req.body;
+      langCode,
+    } = req.user;
     const newAnnouncement = await AddAnnouncements.create({
       announcementNo,
       eventName,
@@ -171,7 +172,9 @@ exports.addAnnouncements = async (req, res) => {
       startTime,
       endTime,
       active,
+      langCode,
     });
+    console.log(langCode);
     return res.status(200).send({
       newAnnouncement: newAnnouncement,
       statusCode: 200,
@@ -317,7 +320,7 @@ exports.enrollUsersforEvent = async (req, res) => {
   console.log("Enroll users endpoint hit"); // Debugging log
 
   const { eventName } = req.params; // Assuming you pass eventName as a parameter
-  const { emails } = req.body; // An array of emails to enroll
+  const { emails, langCode } = req.user; // An array of emails to enroll
 
   try {
     console.log(`Finding event: ${eventName}`); // Debugging log

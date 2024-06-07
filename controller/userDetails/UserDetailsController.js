@@ -2,7 +2,7 @@
 const UserDetails = require('../../model/UserDetailsSchema')
 const User = require('../../model/UserSchema');
   exports.GetUserProfileByEmail = async (req, res) =>{
-    const {email , firstname, lastname, dateofbirth,bio,country,state ,city,address1,address2,phoneNo,picture } = req.body;
+    const {email , firstname, lastname, dateofbirth,bio,country,state ,city,address1,address2,phoneNo,picture, langCode } = req.user;
 
     try {
          
@@ -22,12 +22,13 @@ const User = require('../../model/UserSchema');
 
             oldDetails.address1 = address1 ?? oldDetails?.address1
             oldDetails.address2 = address2 ?? oldDetails?.address2
-
+            oldDetails.langCode=langCode ?? oldDetails ?. langCode
 
             await oldDetails.save();
             await oldDetails.userid.save();
             return  res.status(200).json({ user:oldDetails  , message:"user profile update successfully" , statusCode:200});
         }
+        console.log(langCode);
 
     } catch (err) {
      return res.status(500).json({ message: err.message });
