@@ -1,6 +1,16 @@
 const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
+// Nested schema for learner-specific fields
+const LearnerDetailsSchema = new Schema(
+  {
+    amountSpent: { type: Number, default: 0 },
+    lastSignIn: { type: Date },
+    referredBy: { type: String },
+    signInCount: { type: Number, default: 0 },
+  },
+  { _id: false }
+);
 
 const UserSchema = new Schema(
   {
@@ -19,13 +29,31 @@ const UserSchema = new Schema(
     picture: { type: String },
     deleteStatus: { type: Boolean, default: false },
     blacklisted: { type: Boolean, default: false },
-    // events: [{ type: mongoose.Schema.Types.ObjectId, ref: "events" }], // Reference to eventsSchema
     events: [{ type: String }],
+
+    lastSignOut: { type: Date },
+    learnerDetails: { type: LearnerDetailsSchema, default: () => ({}) },
+
     langCode:{type: String, required: true , default : "en"},
+
   },
   {
     timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   }
 );
+// Define the virtual field for activeEnrollments
+UserSchema.virtual("learnerDetails.activeEnrollments").get(function () {
+  return this.events ? this.events.length : 0;
+});
+
+// Middleware to conditionally include learnerDetails only for "Learner" role
+UserSchema.pre("save", function (next) {
+  if (this.role !== "Learner") {
+    this.learnerDetails = undefined;
+  }
+  next();
+});
 
 module.exports = mongoose.model("User", UserSchema);
