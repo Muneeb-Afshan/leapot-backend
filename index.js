@@ -49,7 +49,7 @@ const routerTestimonial = require("./routes/TestimonialsRoutes");
 const calendarRoute = require("./routes/CalendarRoutes");
 const certificateRoute = require("./routes/CertificateRoutes");
 const routerJob = require("./routes/JobRoutes");
-
+const usermoduleRoute = require("./routes/UserModuleRoutes");
 //middleWares
 const bodyParser = require("body-parser");
 const cors = require("cors"); //to handle cors origin error we use cors
@@ -80,6 +80,7 @@ app.use("/api", utilityRoutes);
 app.use("/api", routerBlog);
 app.use("/api", routerTestimonial);
 app.use("/api", routerJob);
+app.use("/api", usermoduleRoute);
 
 // api document
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));

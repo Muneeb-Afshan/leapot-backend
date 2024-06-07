@@ -81,6 +81,12 @@ const TemplateSchema = new mongoose.Schema({
     type: String,
     require: true,
   },
+  langCode : {
+    type: String,
+    // required: true,
+    default : 'en'
+  },
+  certificateImage:{  type: String, required: true } ,
   isDeleted: { type: Boolean, default: false },
   langCode:{type: String, required: true , default : "en"},
 });
@@ -96,7 +102,7 @@ const issueCertificateSchema = new mongoose.Schema({
   },
   eventName: {
     type: String,
-    required: true,
+    // required: true,
   },
   username: {
     type: String,
