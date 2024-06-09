@@ -1,7 +1,8 @@
 const routerUserDetails = require("express").Router();
 const { GetUserProfileByEmail ,FindUsersDetails, updateUserStatusByEmail ,updateDeleteStatusByEmail} = require('../controller/userDetails/UserDetailsController')
 const {getAllStatuses , createStatus} = require('../controller/userDetails/BlaclistedStatusTypeController')
-routerUserDetails.post("/userProfile",GetUserProfileByEmail);
+const verifyToken = require('../middleware/TokenVerifyMiddleware');
+routerUserDetails.post("/userProfile",verifyToken,GetUserProfileByEmail);
 routerUserDetails.put('/updateUserstatus', updateUserStatusByEmail);
 routerUserDetails.put('/updateDeleteStatus', updateDeleteStatusByEmail);
 routerUserDetails.get("/FindUserDetails",FindUsersDetails);
