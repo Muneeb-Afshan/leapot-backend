@@ -66,6 +66,9 @@ exports.addProfileImage =
     };
     try {
       const preSignedUrl = await s3.getSignedUrlPromise("putObject", params);
+      // Save the URL to the user's profile in the database
+      const imageUrl = `https://${bucketName}.s3.${region}.amazonaws.com/website/profiles/${fileName}`;
+      await User.findByIdAndUpdate(userId, { picture: imageUrl });
       res.json({ url: preSignedUrl });
     } catch (error) {
       console.error("Error generating pre-signed URL:", error);
