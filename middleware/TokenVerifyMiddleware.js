@@ -17,7 +17,7 @@ console.log("inside clg")
       req.user = {...req.body, langCode: langCode};     // , langCode : langCode here it adding
        return next();
     }
-    return res.json({ message: "Un authorize" });
+    return res.json({ message: "Un authorize user" });
   } catch (e) {
     console.log(e.message)
     return res.json({ message: "Internal Error" });

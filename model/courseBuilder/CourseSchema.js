@@ -122,7 +122,15 @@ const topicSchema = new Schema({
   lessonId: { type: Number, required: true },
   id: { type: Number, required: true },
   title: { type: String, required: true },
-  textDescription: { type: String, required: true },
+  textDescription: { 
+    type: String, 
+    required: function() { return this.contentType === 'text'; } 
+  },
+  link: { 
+    type: String, 
+    required: function() { return this.contentType !== 'text' }
+
+  },
   contentType: { type: String},
   downloadble : {type:Boolean, default:false },
   langCode:{type: String, required: true , default : "en"}

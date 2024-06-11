@@ -25,11 +25,10 @@
 // }
 
 
+
 const User = require("../../model/UserSchema");
 const UserDetails = require('../../model/UserDetailsSchema')
 //All Authentications rest API are list here
-
-
 // To add user, admin will add the user
 const eventManagerSignUp = async (req, res) => {
   const { email, role ,password , username } = req.body;
@@ -96,7 +95,6 @@ const eventManagerSign = async (req, res) => {
       oldUser.userid.picture = oldUser.userid.picture ?? picture;
       oldUser.userid.email_verified = email_verified;
       oldUser.userid.user_id = user_id;
-
       // Save the updated user document
       await oldUser.save();
       return res.status(200).json({
