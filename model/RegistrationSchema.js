@@ -10,6 +10,7 @@ const LearnerToCourseRegistration = new mongoose.Schema({
   cancellationReason: { type: mongoose.Schema.Types.ObjectId, required: false }, // This field may not be required if a registration is not cancelled.
   registrationStatus: { type: Boolean, required: true },
   paymentid: { type: mongoose.Schema.Types.ObjectId, required: true }, // This field should be a reference to the Payment model.
+  langCode:{type: String, required: true , default : "en"},
 });
 
 module.exports = mongoose.model('Registration',LearnerToCourseRegistration);

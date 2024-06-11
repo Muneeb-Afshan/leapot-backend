@@ -12,6 +12,7 @@ const UserDetailsSchema = new Schema({
   city: { type: String },
   address1: { type: String },
   address2: { type: String },
+  langCode:{type: String, required: true , default : "en"},
 
 });
 

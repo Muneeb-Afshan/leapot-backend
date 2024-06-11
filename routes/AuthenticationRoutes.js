@@ -1,15 +1,20 @@
-// importing all controller 
-const {register , login , loginWithEmail} = require('../controller/authentication/AuthController')
-const auth = require('../middleware/AuthMiddleware');
+// importing all controller
+const {
+  register,
+  login,
+  loginWithEmail,
+  logout,
+} = require("../controller/authentication/AuthController");
+const auth = require("../middleware/AuthMiddleware");
 // const LoggingMiddleware = require('../middleware/LoggingMiddleware');
-const apicache = require('apicache');
+const apicache = require("apicache");
 const cache = apicache.middleware;
-// Initialise router 
+// Initialise router
 const router = require("express").Router();
 //router with endpoint and controller
-router.get("/login",auth,login);
-router.post("/register",register);
-router.post("/loginWithEmail",auth,loginWithEmail);
-
+router.get("/login", auth, login);
+router.post("/register", register);
+router.post("/loginWithEmail", auth, loginWithEmail);
+router.post("/logout", logout);
 
 module.exports = router;

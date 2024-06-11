@@ -59,7 +59,8 @@ const jobApplicationSchema = new mongoose.Schema({
     type: String,
     enum: ['new', 'in progress', 'resolved'],
     default: 'new'
-  }
+  },
+  langCode:{type: String, required: true , default : "en"},
 },
 {
     timestamps: true

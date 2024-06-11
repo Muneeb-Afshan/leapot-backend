@@ -13,6 +13,7 @@ const {
 
 exports.createCourse = async (req, res) => {
   try {
+    console.log(req.body)
     const course = new Course(req.body);
     await course.save();
     res
@@ -74,39 +75,121 @@ exports.logicalDeleteCourse = async (req, res) => {
 };
 
 // Controller function to add a new course as well as update a new course 
+// exports.addCourseDetails = async (req, res) => {
+//   try {
+//     const { courseId, modules } = req.body;
+//     console.log(courseId)
+
+
+//     // Check if the course_id already exists
+
+//     // Check if the course exists in the database
+//     let course = await CourseDetails.findOne({ courseId });
+
+//     // If the course exists, update it; otherwise, create a new course
+//     if (course) {
+//       // Update the existing course with the new data
+//       course.modules = modules;
+//     } else {
+//       // Create a new course instance
+//       course = new CourseDetails({ courseId, modules });
+//     }
+//     // Save the course to the database
+//     const savedCourse = await course.save();
+//     res.status(201).json({
+//       success: true,
+//       data: savedCourse,
+//       message: "Course saved Sucessfully",
+//       statusCode: 200,
+//     });
+//   } catch (error) {
+//     res.status(500).json({ error: error });
+//   }
+// };
+
+
 exports.addCourseDetails = async (req, res) => {
   try {
-    const { course_id, modules } = req.body;
-
-    // Check if the course_id already exists
-    const existingCourse = await CourseDetails.findOne({ course_id });
-    // if (!existingCourse) {
-    //   return res.status(400).json({ error: 'Course not exists' });
-    // }
+    const { courseId, courseStructure, modules, lessons, langCode } = req.user;
+    // Validate and prepare data based on courseStructure
+    let courseDetailsData;
+    if (courseStructure === 'CMLT') {
+      // Validate and prepare data for CMLT structure
+      courseDetailsData = {
+        courseId: courseId,
+        courseStructure: courseStructure,
+        modules: modules,
+        lessons: [],
+        langCode: langCode
+      };
+    } else if (courseStructure === 'CLT') {
+      // Validate and prepare data for CLT structure
+      courseDetailsData = {
+        courseId: courseId,
+        courseStructure: courseStructure,
+        modules: [],
+        lessons: lessons,
+        langCode: langCode
+      };
+    } else {
+      return res.status(400).json({ message: "Invalid course structure type" });
+    }
 
     // Check if the course exists in the database
-    let course = await CourseDetails.findOne({ course_id });
+    let courseDetails = await CourseDetails.findOne({ courseId });
 
-    // If the course exists, update it; otherwise, create a new course
-    if (course) {
-      // Update the existing course with the new data
-      course.modules = modules;
+    if (courseDetails) {
+      // If the course exists, update it with the new data
+      courseDetails.modules = courseDetailsData.modules;
+      courseDetails.lessons = courseDetailsData.lessons;
+      courseDetails.courseStructure = courseStructure;
     } else {
-      // Create a new course instance
-      course = new CourseDetails({ course_id, modules });
+      // Create a new course details instance
+      courseDetails = new CourseDetails(courseDetailsData);
     }
-    // Save the course to the database
-    const savedCourse = await course.save();
+
+    // Save the course details to the database
+    const savedCourseDetails = await courseDetails.save();
     res.status(201).json({
       success: true,
-      data: savedCourse,
-      message: "Course saved Sucessfully",
+      data: savedCourseDetails,
+      message: "Course details saved successfully",
       statusCode: 200,
     });
   } catch (error) {
-    res.status(500).json({ error: error });
+    res.status(500).json({ error: error.message });
   }
 };
+
+// Controller function to get all courses
+exports.fetchCoursesWithDetails = async (req, res) => {
+  console.log(req.query, "fetchCoursesWithDetails id");
+  try {
+    // Extract id from query parameters
+    const { id } = req.query;
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "Course ID is required",
+        statusCode: 400,
+      });
+    }
+
+    // Retrieve course details from the database
+    const courses = await CourseDetails.findOne({ courseId: id });
+    res.status(200).json({
+      success: true,
+      data: courses,
+      message: "Course fetched successfully",
+      statusCode: 200,
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 
 // Controller function to get all courses
 exports.fetchAllCoursesWithDetails = async (req, res) => {

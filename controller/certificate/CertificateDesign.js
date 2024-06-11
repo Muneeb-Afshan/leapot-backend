@@ -9,17 +9,40 @@ const Event = require("../../model/Events");
 const BlacklistedUser = require("../../model/BlacklistedUser");
 const RegisterLearner = require("../../model/RegistrationSchema");
 // const RegistrationSchema = require("../../model/RegistrationSchema");
+const nodeHtmlToImage = require('node-html-to-image')
+
+// Adjust the import according to your project structure
+
+
 
 exports.addTemplate = async (req, res) => {
   try {
-    const templateData = req.body;
+    console.log(req.body, "addTemplate");
+
+    const { certificateBody, certificateName , langCode } = req.user;
+    console.log(langCode)
+    const imageBuffer = await nodeHtmlToImage({
+      html: certificateBody,
+      encoding: 'buffer' // Ensures the output is a buffer
+    });
+    const base64Image = imageBuffer.toString('base64');
+    const imageSrc = `data:image/png;base64,${base64Image}`;
+    // console.log(imageSrc , "imageSrc")
+    const templateData = {
+      certificateName: certificateName,
+      certificateBody: certificateBody,
+      certificateImage: imageSrc, // Store the image buffer
+      langCode : langCode
+    };
     const certificate = await Templates.create(templateData);
+
     return res.status(201).json({
       body: certificate,
       statusCode: 200,
-      message: "certificate Added successfully",
+      message: "Certificate added successfully"
     });
   } catch (error) {
+    console.log(error.message);
     return res.status(500).json("Unable to POST Template");
   }
 };
@@ -54,8 +77,10 @@ exports.logicalDeleteTemplate = async (req, res) => {
 
 exports.useTemplate = async (req, res) => {
   try {
-    const templateData = req.body;
-    const eventcertificate = await Certificates.create(templateData);
+    const { templateData, langCode } = req.user;
+    console.log(langCode);
+    console.log(templateData ,"useTemplate" )
+    const eventcertificate = await Certificates.create(req.user);
     return res.status(201).json({
       body: eventcertificate,
       statusCode: 200,
@@ -124,6 +149,7 @@ exports.logicalDeleteCertificate = async (req, res) => {
 exports.getAllTemplates = async (req, res) => {
   try {
     const templates = await Templates.find({ isDeleted: false });
+  
     return res.status(200).send({
       templates: templates,
       statusCode: 200,
@@ -224,8 +250,9 @@ function generateNextBumber(certificateSetting) {
 
 exports.singleIssue = async (req, res) => {
   try {
-    const issueData = req.body;
-
+    // const { issueData, langCode } = req.user;
+    const issueData = req.user 
+    console.log(issueData)
     // Fetch event data
     const eventData = await Event.findOne({ EventName: issueData.eventName });
     if (!eventData) {
@@ -233,15 +260,15 @@ exports.singleIssue = async (req, res) => {
     }
 
     // Check if the user is registered for the event
-    const registrationData = await RegisterLearner.findOne({
-      email: issueData.email,
-      eventid: eventData._id,
-    }).populate("userid");
-    if (!registrationData) {
-      return res
-        .status(400)
-        .json({ message: "User is not registered for the event" });
-    }
+      const registrationData = await RegisterLearner.findOne({
+        email: issueData.email,
+        eventid: eventData._id,
+      }).populate("userid");
+      if (!registrationData) {
+        return res
+          .status(400)
+          .json({ message: "User is not registered for the event" });
+      }
 
     const certificateSetting = await CertificateSetting.findOne({
       eventId: eventData._id,
@@ -329,8 +356,10 @@ exports.singleIssue = async (req, res) => {
 exports.bulkIssue = async (req, res) => {
   try {
     // const issueDataList = []; // Assuming req.body contains an array of issue data
-    const data = req.body;
-   console.log("req.body" ,data )
+    // const { data, langCode } = req.user;
+    const data  = req.user;
+    console.log("req.user" ,data )
+
     const successfulIssues = [];
     const failedIssues = [];
  
@@ -566,7 +595,7 @@ exports.blacklistUsers = async (req, res) => {
     const { email, reason, status } = req.body; // Array of user objects to blacklist
     // Extract user IDs from the array of user objects
 
-    const data = await BlacklistedUser.create(req.body);
+    const data= await BlacklistedUser.create(req.user);
 
     return res.status(200).json({
       success: true,

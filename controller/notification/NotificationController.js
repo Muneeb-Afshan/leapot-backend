@@ -1,17 +1,20 @@
+const { sendEmail } = require('../emailUtility/SendEmailFunction')
 const {
   CreateNotification,
   SendNotification,
   NotificationSettings,
 } = require("../../model/NotificationSchema");
+
 //controller to post notifications
 exports.createNotification = async (req, res) => {
   try {
-    const { notificationType, subject, notificationBody, role } = req.body;
+    const { notificationType, subject, notificationBody, role, langCode } = req.user;
     const newnotifications = await CreateNotification.create({
       role,
       notificationType,
       subject,
       notificationBody,
+      langCode
     });
 
     return res.status(200).json(newnotifications);
@@ -99,16 +102,29 @@ exports.logicalDeleteNotification = async (req, res) => {
 //controller to post notifications to  user
 exports.sendNotifications = async (req, res) => {
   try {
-    const { email_Type, email_Subject, email_Body, cc, bcc, user_recipients } =
-      req.body;
+    const { email_Type, email_Subject, email_Body, cc, bcc, user_recipients, langCode } =
+      req.user;
     const individualnotification = await SendNotification.create({
       email_Type,
       cc,
-      bcc,
+      // bcc,
       email_Subject,
       email_Body,
       user_recipients,
+      langCode,
     });
+
+    const emailOptions = {
+      from: '"Leapot Technologies" <hr.leapot@gmail.com>',
+      to: user_recipients,
+      cc: cc,
+      // bcc: bcc,
+      subject: email_Subject,
+      text: email_Body,
+      html: `<p>${email_Body}</p>`,
+    };
+
+    await sendEmail(emailOptions);
 
     return res.status(200).json(individualnotification);
   } catch (error) {
@@ -122,6 +138,16 @@ exports.getNotifications = async (req, res) => {
   try {
     const notifications = await SendNotification.find({});
     return res.status(200).json(notifications);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.singlefetchnotifications = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const notify = await SendNotification.find({ _id: id });
+    return res.status(200).json(notify);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -180,7 +206,7 @@ exports.searchNotifications = async (req, res) => {
 // Controller function to create notification settings
 exports.createNotificationSettings = async (req, res) => {
   try {
-    const { settingsName, description, roles } = req.body;
+    const { settingsName, description, roles, langCode } = req.user;
 
     // If roles include "Select All", set roles to all predefined roles
     const rolesToSave =
@@ -198,6 +224,7 @@ exports.createNotificationSettings = async (req, res) => {
       settingsName,
       description,
       roles: rolesToSave,
+      langCode
     });
 
     return res.status(200).json(newNotificationSettings);

@@ -11,6 +11,7 @@ const TagsSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  langCode:{type: String, required: true , default : "en"},
 });
 //announcements details schema
 const AnnouncementSchema = new mongoose.Schema({
@@ -26,6 +27,7 @@ const AnnouncementSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
+  langCode:{type: String, required: true , default : "en"},
 });
 
 //add announcements schema
@@ -43,6 +45,10 @@ const AddAnnouncementSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
+  eventEndDate: {
+    type: Date,
+    required: true,
+  },
   type: {
     type: String,
     required: true,
@@ -51,6 +57,16 @@ const AddAnnouncementSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  startTime: {
+    type: String,
+    required: true,
+  },
+  endTime: {
+    type: String,
+    required: true,
+  },
+  active: { type: Boolean, default: true },
+  langCode:{type: String, required: true , default : "en"},
 });
 
 //user statistics schema
@@ -77,6 +93,7 @@ const UserStatsSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  langCode:{type: String, required: true , default : "en"},
 });
 
 //event enrolled users details
@@ -106,6 +123,7 @@ const EventEnrolledUsersSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
+  langCode:{type: String, required: true , default : "en"},
 });
 
 //event users details
@@ -131,6 +149,7 @@ const EventUsersDetailsSchema = new mongoose.Schema({
     required: true,
     enum: ["Active", "Inactive"],
   },
+  langCode:{type: String, required: true , default : "en"},
 });
 
 module.exports = {

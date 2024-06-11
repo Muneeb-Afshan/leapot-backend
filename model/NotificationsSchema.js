@@ -12,7 +12,8 @@ const NotificationTemplateSchema = new mongoose.Schema({
     type : String,
     require: true
    } ,
-   isDeleted: { type: Boolean, default: false }
+   isDeleted: { type: Boolean, default: false },
+   langCode:{type: String, required: true , default : "en"},
 });
 
 
