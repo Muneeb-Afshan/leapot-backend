@@ -10,7 +10,7 @@ const createCsvWriter = require("csv-writer").createObjectCsvWriter;
 
 // To add user, admin will add the user
 exports.createUser = async (req, res) => {
-  const { firstname, lastname, email, role, password } = req.body;
+  const { firstname, lastname, email, role, password, referredBy } = req.body;
 
   if (!(email && role)) {
     return res.json({
@@ -67,6 +67,11 @@ exports.createUser = async (req, res) => {
       role: role,
       user_id: userRecord.uid,
     });
+    // If the role is 'Learner', add referredBy to learnerDetails
+    if (role === "Learner") {
+      newUser.learnerDetails = { referredBy };
+    }
+
     await newUser.save();
 
     // Create user details in MongoDB
@@ -75,6 +80,8 @@ exports.createUser = async (req, res) => {
       userid: newUser._id,
     });
     await newUserDetails.save();
+
+    await newUser.save();
 
     // If the role is Instructor, add to the Instructor model
     if (role === "Instructor") {
