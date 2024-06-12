@@ -81,6 +81,12 @@ const TemplateSchema = new mongoose.Schema({
     type: String,
     require: true,
   },
+  langCode : {
+    type: String,
+    // required: true,
+    default : 'en'
+  },
+  certificateImage:{  type: String, required: true } ,
   isDeleted: { type: Boolean, default: false },
   langCode:{type: String, required: true , default : "en"},
 });

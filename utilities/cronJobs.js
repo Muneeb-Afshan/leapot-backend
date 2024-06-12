@@ -3,8 +3,9 @@ const mongoose = require("mongoose");
 const { AddAnnouncements } = require("../model/CalendarSchema");
 
 //npm install node-cron
-//cron.schedule("0 0 * * *", async () => {        // Runs every day at midnight
-cron.schedule("*/30 * * * * *", async () => {
+cron.schedule("0 0 * * *", async () => {
+  // Runs every day at midnight
+  // cron.schedule("*/30 * * * * *", async () => {
   // Runs every 30 seconds
   try {
     const currentDate = new Date();
