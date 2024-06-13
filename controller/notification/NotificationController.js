@@ -8,12 +8,13 @@ const {
 //controller to post notifications
 exports.createNotification = async (req, res) => {
   try {
-    const { notificationType, subject, notificationBody, role } = req.body;
+    const { notificationType, subject, notificationBody, role, langCode } = req.user;
     const newnotifications = await CreateNotification.create({
       role,
       notificationType,
       subject,
       notificationBody,
+      langCode
     });
 
     return res.status(200).json(newnotifications);
@@ -101,8 +102,8 @@ exports.logicalDeleteNotification = async (req, res) => {
 //controller to post notifications to  user
 exports.sendNotifications = async (req, res) => {
   try {
-    const { email_Type, email_Subject, email_Body, cc, bcc, user_recipients } =
-      req.body;
+    const { email_Type, email_Subject, email_Body, cc, bcc, user_recipients, langCode } =
+      req.user;
     const individualnotification = await SendNotification.create({
       email_Type,
       cc,
@@ -110,6 +111,7 @@ exports.sendNotifications = async (req, res) => {
       email_Subject,
       email_Body,
       user_recipients,
+      langCode,
     });
 
     const emailOptions = {
@@ -204,7 +206,7 @@ exports.searchNotifications = async (req, res) => {
 // Controller function to create notification settings
 exports.createNotificationSettings = async (req, res) => {
   try {
-    const { settingsName, description, roles } = req.body;
+    const { settingsName, description, roles, langCode } = req.user;
 
     // If roles include "Select All", set roles to all predefined roles
     const rolesToSave =
@@ -222,6 +224,7 @@ exports.createNotificationSettings = async (req, res) => {
       settingsName,
       description,
       roles: rolesToSave,
+      langCode
     });
 
     return res.status(200).json(newNotificationSettings);

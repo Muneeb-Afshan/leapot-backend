@@ -17,7 +17,7 @@ const register = async (req, res) => {
       success: false,
     });
   }
-
+  
   const NewUser = new User({
     email: email,
     role: role,
@@ -84,7 +84,7 @@ const loginWithEmail = async (req, res) => {
       });
     } else {
       return res.json({
-        message: "User not exit said admin to add you",
+        message: "User doesn't exist !  Contact Admit for account creation",
       });
     }
   } catch (error) {

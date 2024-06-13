@@ -10,7 +10,7 @@ const createCsvWriter = require("csv-writer").createObjectCsvWriter;
 
 // To add user, admin will add the user
 exports.createUser = async (req, res) => {
-  const { firstname, lastname, email, role, password } = req.body;
+  const { firstname, lastname, email, role, password, referredBy } = req.body;
 
   if (!(email && role)) {
     return res.json({
@@ -67,6 +67,11 @@ exports.createUser = async (req, res) => {
       role: role,
       user_id: userRecord.uid,
     });
+    // If the role is 'Learner', add referredBy to learnerDetails
+    if (role === "Learner") {
+      newUser.learnerDetails = { referredBy };
+    }
+
     await newUser.save();
 
     // Create user details in MongoDB
@@ -75,6 +80,8 @@ exports.createUser = async (req, res) => {
       userid: newUser._id,
     });
     await newUserDetails.save();
+
+    await newUser.save();
 
     // If the role is Instructor, add to the Instructor model
     if (role === "Instructor") {
@@ -168,6 +175,41 @@ exports.passwordResetLink = async (req, res) => {
 };
 
 //controller to update user profile
+// exports.updateUserProfile = async (req, res) => {
+//   const { id } = req.params;
+//   const { firstname, lastname, phoneNo, picture, role } = req.body;
+
+//   try {
+//     // Find the user by ID
+//     const user = await User.findById(id);
+
+//     if (!user) {
+//       return res
+//         .status(404)
+//         .json({ message: "User not found", success: false });
+//     }
+
+//     // Update fields only if new data is provided
+//     user.firstname = firstname ?? user.firstname;
+//     user.lastname = lastname ?? user.lastname;
+//     user.phoneNo = phoneNo ?? user.phoneNo;
+//     user.picture = picture ?? user.picture;
+//     user.role = role ?? user.role;
+
+//     // Save the updated user
+//     await user.save();
+
+//     return res.status(200).json({
+//       user,
+//       message: "User profile updated successfully",
+//       success: true,
+//     });
+//   } catch (err) {
+//     return res.status(500).json({ message: err.message, success: false });
+//   }
+// };
+
+
 exports.updateUserProfile = async (req, res) => {
   const { id } = req.params;
   const { firstname, lastname, phoneNo, picture, role } = req.body;
@@ -183,24 +225,27 @@ exports.updateUserProfile = async (req, res) => {
     }
 
     // Update fields only if new data is provided
-    user.firstname = firstname ?? user.firstname;
-    user.lastname = lastname ?? user.lastname;
-    user.phoneNo = phoneNo ?? user.phoneNo;
-    user.picture = picture ?? user.picture;
-    user.role = role ?? user.role;
+    if (firstname !== undefined) user.firstname = firstname;
+    if (lastname !== undefined) user.lastname = lastname;
+    if (phoneNo !== undefined) user.phoneNo = phoneNo;
+    if (picture !== undefined) user.picture = picture;
+    if (role !== undefined) user.role = role;
 
     // Save the updated user
-    await user.save();
+    const updatedUser = await user.save();
 
     return res.status(200).json({
-      user,
+      user: updatedUser,
       message: "User profile updated successfully",
       success: true,
     });
   } catch (err) {
-    return res.status(500).json({ message: err.message, success: false });
+    console.error("Error updating user profile:", err.message);
+    return res.status(500).json({ message: "Internal Server Error", success: false });
   }
 };
+
+
 //controller to logically delete user
 exports.logicalUserDelete = async (req, res) => {
   try {

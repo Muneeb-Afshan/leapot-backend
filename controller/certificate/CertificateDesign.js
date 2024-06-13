@@ -20,7 +20,7 @@ exports.addTemplate = async (req, res) => {
     console.log(req.body, "addTemplate");
 
     const { certificateBody, certificateName , langCode } = req.user;
- console.log(langCode)
+    console.log(langCode)
     const imageBuffer = await nodeHtmlToImage({
       html: certificateBody,
       encoding: 'buffer' // Ensures the output is a buffer
@@ -77,8 +77,10 @@ exports.logicalDeleteTemplate = async (req, res) => {
 
 exports.useTemplate = async (req, res) => {
   try {
-    const templateData = req.body;
-    const eventcertificate = await Certificates.create(templateData);
+    const { templateData, langCode } = req.user;
+    console.log(langCode);
+    console.log(templateData ,"useTemplate" )
+    const eventcertificate = await Certificates.create(req.user);
     return res.status(201).json({
       body: eventcertificate,
       statusCode: 200,
@@ -248,8 +250,9 @@ function generateNextBumber(certificateSetting) {
 
 exports.singleIssue = async (req, res) => {
   try {
-    const issueData = req.body;
-
+    // const { issueData, langCode } = req.user;
+    const issueData = req.user 
+    console.log(issueData)
     // Fetch event data
     const eventData = await Event.findOne({ EventName: issueData.eventName });
     if (!eventData) {
@@ -353,8 +356,10 @@ exports.singleIssue = async (req, res) => {
 exports.bulkIssue = async (req, res) => {
   try {
     // const issueDataList = []; // Assuming req.body contains an array of issue data
-    const data = req.body;
-   console.log("req.body" ,data )
+    // const { data, langCode } = req.user;
+    const data  = req.user;
+    console.log("req.user" ,data )
+
     const successfulIssues = [];
     const failedIssues = [];
  
@@ -590,7 +595,7 @@ exports.blacklistUsers = async (req, res) => {
     const { email, reason, status } = req.body; // Array of user objects to blacklist
     // Extract user IDs from the array of user objects
 
-    const data = await BlacklistedUser.create(req.body);
+    const data= await BlacklistedUser.create(req.user);
 
     return res.status(200).json({
       success: true,

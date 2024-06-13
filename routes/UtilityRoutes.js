@@ -12,7 +12,8 @@ const {
   uploadImages,
   uploadResume,
   uploadAttachments,
-  uploadscrom
+  uploadscrom,
+  uploadUserImages
 } = require("../controller/fileUpload/uploadFileController");
 
 // const {
@@ -23,13 +24,17 @@ UtilityRoutes.post("/addContactUs",ContactForm);
 UtilityRoutes.post("/addFAQ",createFAQ);
 UtilityRoutes.get("/FAQ",getAllFAQs); 
 UtilityRoutes.post('/role',verifyToken, addRole);
+UtilityRoutes.post('/role',verifyToken, addRole);
 UtilityRoutes.get('/fetchRole', fetchRole);
 UtilityRoutes.post('/upload',uploadImages );
 UtilityRoutes.post('/uploadResume',uploadResume );
 UtilityRoutes.post('/uploadAttachments',uploadAttachments );
+UtilityRoutes.post('/uploadUserImages',uploadUserImages );
 UtilityRoutes.post('/uploadscrom',uploadscrom );
 
 
 
 module.exports = UtilityRoutes;
+
+
 

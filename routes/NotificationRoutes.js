@@ -14,8 +14,9 @@ const {
   getAllNotifications,
   toggleNotificationSettings,
 } = require("../controller/notification/NotificationController");
+const verifyToken = require('../middleware/TokenVerifyMiddleware');
 
-notificationRouter.post("/notification/postnotification", createNotification);
+notificationRouter.post("/notification/postnotification",verifyToken, createNotification);
 notificationRouter.get("/notification/getnotifications", fetchNotification);
 notificationRouter.get(
   "/notification/getSingleNotification/:id",
@@ -30,12 +31,12 @@ notificationRouter.put(
   "/notification/deleteNotification/:id",
   logicalDeleteNotification
 );
-notificationRouter.post("/notification/sendnotifications", sendNotifications);
+notificationRouter.post("/notification/sendnotifications",verifyToken, sendNotifications);
 notificationRouter.get("/notification/fetchnotifications", getNotifications);
 notificationRouter.get("/notification/singlefetchnotifications/:id", singlefetchnotifications);
 notificationRouter.get("/notification/search", searchNotifications);
 notificationRouter.post(
-  "/notification/notificationsettings",
+  "/notification/notificationsettings",verifyToken,
   createNotificationSettings
 );
 notificationRouter.get("/notification/fetchAllSettings", getAllNotifications);
