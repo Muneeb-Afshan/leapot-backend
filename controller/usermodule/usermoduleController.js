@@ -244,28 +244,6 @@ exports.fetchUserById = async (req, res) => {
     .catch((err) => res.json(err));
 };
 //controller to add user using csv file
-// exports.csvCreateUser = async (req, res) => {
-//   try {
-//     console.log(req.body);
-
-//     const headers = Object.keys(req.body[0]);
-
-//     const csvWriter = createCsvWriter({
-//       path: "output.csv",
-//       header: headers,
-//       append: true,
-//     });
-
-//     await csvWriter.writeRecords(req.body);
-
-//     await User.insertMany(req.body);
-
-//     res.status(200).json({ message: "CSV data processed successfully." });
-//   } catch (error) {
-//     console.error("Error processing CSV data:", error);
-//     res.status(500).json({ error: "Internal server error." });
-//   }
-// };
 
 // exports.csvCreateUser = async (req, res) => {
 //   try {
@@ -382,6 +360,212 @@ exports.fetchUserById = async (req, res) => {
 //     res.status(500).json({ error: "Internal server error" });
 //   }
 // };
+// exports.csvCreateUser = async (req, res) => {
+//   try {
+//     const users = req.body.data;
+//     console.log("Received users data:", users);
+
+//     if (!Array.isArray(users) || users.length === 0) {
+//       return res.status(400).json({ message: "No user data provided" });
+//     }
+
+//     const insertUser = [];
+//     const insertUserDetails = [];
+
+//     for (let i = 0; i < users.length; i++) {
+//       const { firstname, lastname, email, role } = users[i];
+//       const password = "defaultPassword123";
+
+//       if (!(firstname && lastname && email && role)) {
+//         console.error(`Invalid user data at index ${i}:`, users[i]);
+//         return res.status(400).json({
+//           message: `Invalid data at index ${i}: All fields are required`,
+//         });
+//       }
+
+//       const oldUser = await User.findOne({ email });
+//       if (oldUser) {
+//         console.error(`User with email ${email} already exists`);
+//         return res
+//           .status(400)
+//           .json({ message: `User with email ${email} already exists` });
+//       }
+
+//       const userRecord = await firebase.auth().createUser({ email, password });
+//       const passwordResetLink = await firebase
+//         .auth()
+//         .generatePasswordResetLink(email);
+
+//       await transporter.sendEmail({
+//         from: "intern.lpt@gmail.com",
+//         to: email,
+//         subject: "Password Reset",
+//         html: `
+//           <p>You are receiving this email because a request was made to reset the password for your account.</p>
+//           <p>Please follow these steps to reset your password:</p>
+//           <p><a href="${passwordResetLink}" style="background-color: green; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Reset Password</a></p>
+//         `,
+//       });
+
+//       const newUser = new User({
+//         firstname,
+//         lastname,
+//         email: userRecord.email,
+//         role,
+//         user_id: userRecord.uid,
+//       });
+//       const savedUser = await newUser.save();
+//       insertUser.push(savedUser);
+
+//       const newUserDetails = new UserDetails({ email, userid: savedUser._id });
+//       const savedUserDetails = await newUserDetails.save();
+//       insertUserDetails.push(savedUserDetails);
+//     }
+
+//     res.status(201).json({
+//       message: "Users added successfully",
+//       success: true,
+//       users: insertUser,
+//       userDetails: insertUserDetails,
+//     });
+//   } catch (error) {
+//     console.error("Error processing CSV data:", error);
+//     res.status(500).json({ error: "Internal server error" });
+//   }
+// };
+const UserAction = require("../../model/UserActionSchema");
+const UserHistory = require("../../model/UserHistorySchema");
+
+// exports.csvCreateUser = async (req, res) => {
+//   try {
+//     const users = req.body.data;
+//     console.log("Received users data:", users);
+
+//     if (!Array.isArray(users) || users.length === 0) {
+//       return res.status(400).json({ message: "No user data provided" });
+//     }
+
+//     const insertUser = [];
+//     const insertUserDetails = [];
+//     const successfulRecords = [];
+//     const failedRecords = [];
+
+//     const successCsvWriter = createCsvWriter({
+//       path: "successfulUserRecords.csv",
+//       header: [
+//         { id: "firstname", title: "First Name" },
+//         { id: "lastname", title: "Last Name" },
+//         { id: "email", title: "Email" },
+//         { id: "role", title: "Role" },
+//       ],
+//       append: true,
+//     });
+
+//     const failureCsvWriter = createCsvWriter({
+//       path: "failureUserRecords.csv",
+//       header: [
+//         { id: "firstname", title: "First Name" },
+//         { id: "lastname", title: "Last Name" },
+//         { id: "email", title: "Email" },
+//         { id: "role", title: "Role" },
+//         { id: "error", title: "Error" },
+//       ],
+//       append: true,
+//     });
+
+//     for (let i = 0; i < users.length; i++) {
+//       const { firstname, lastname, email, role } = users[i];
+//       const password = "defaultPassword123";
+
+//       if (!(firstname && lastname && email && role)) {
+//         const error = `Invalid data at index ${i}: All fields are required`;
+//         console.error(error);
+//         failedRecords.push({ ...users[i], error });
+//         await new UserAction({
+//           action: "failed records",
+//           remarks: error,
+//         }).save();
+//         continue;
+//       }
+
+//       const oldUser = await User.findOne({ email });
+//       if (oldUser) {
+//         const error = `User with email ${email} already exists`;
+//         console.error(error);
+//         failedRecords.push({ ...users[i], error });
+//         await new UserAction({
+//           action: "failed records",
+//           remarks: error,
+//         }).save();
+//         continue;
+//       }
+
+//       try {
+//         const userRecord = await firebase
+//           .auth()
+//           .createUser({ email, password });
+//         const passwordResetLink = await firebase
+//           .auth()
+//           .generatePasswordResetLink(email);
+
+//         await transporter.sendEmail({
+//           from: "intern.lpt@gmail.com",
+//           to: email,
+//           subject: "Password Reset",
+//           html: `
+//             <p>You are receiving this email because a request was made to reset the password for your account.</p>
+//             <p>Please follow these steps to reset your password:</p>
+//             <p><a href="${passwordResetLink}" style="background-color: green; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Reset Password</a></p>
+//           `,
+//         });
+
+//         const newUser = new User({
+//           firstname,
+//           lastname,
+//           email: userRecord.email,
+//           role,
+//           user_id: userRecord.uid,
+//         });
+//         const savedUser = await newUser.save();
+//         insertUser.push(savedUser);
+
+//         const newUserDetails = new UserDetails({
+//           email,
+//           userid: savedUser._id,
+//         });
+//         const savedUserDetails = await newUserDetails.save();
+//         insertUserDetails.push(savedUserDetails);
+
+//         successfulRecords.push(users[i]);
+//         await new UserAction({
+//           action: "successfully added",
+//           remarks: "added user in database",
+//         }).save();
+//       } catch (error) {
+//         console.error("Error processing user:", error);
+//         failedRecords.push({ ...users[i], error: error.message });
+//         await new UserAction({
+//           action: "failed records",
+//           remarks: error.message,
+//         }).save();
+//       }
+//     }
+
+//     await successCsvWriter.writeRecords(successfulRecords);
+//     await failureCsvWriter.writeRecords(failedRecords);
+
+//     res.status(201).json({
+//       message: "Users added successfully",
+//       success: true,
+//       users: insertUser,
+//       userDetails: insertUserDetails,
+//     });
+//   } catch (error) {
+//     console.error("Error processing CSV data:", error);
+//     res.status(500).json({ error: "Internal server error" });
+//   }
+// };
+
 exports.csvCreateUser = async (req, res) => {
   try {
     const users = req.body.data;
@@ -393,56 +577,125 @@ exports.csvCreateUser = async (req, res) => {
 
     const insertUser = [];
     const insertUserDetails = [];
+    const successfulRecords = [];
+    const failedRecords = [];
+
+    const successCsvWriter = createCsvWriter({
+      path: "successfulUserRecords.csv",
+      header: [
+        { id: "firstname", title: "First Name" },
+        { id: "lastname", title: "Last Name" },
+        { id: "email", title: "Email" },
+        { id: "role", title: "Role" },
+      ],
+      append: true,
+    });
+
+    const failureCsvWriter = createCsvWriter({
+      path: "failureUserRecords.csv",
+      header: [
+        { id: "firstname", title: "First Name" },
+        { id: "lastname", title: "Last Name" },
+        { id: "email", title: "Email" },
+        { id: "role", title: "Role" },
+        { id: "error", title: "Error" },
+      ],
+      append: true,
+    });
 
     for (let i = 0; i < users.length; i++) {
       const { firstname, lastname, email, role } = users[i];
       const password = "defaultPassword123";
 
       if (!(firstname && lastname && email && role)) {
-        console.error(`Invalid user data at index ${i}:`, users[i]);
-        return res.status(400).json({
-          message: `Invalid data at index ${i}: All fields are required`,
-        });
+        const error = `Invalid data at index ${i}: All fields are required`;
+        console.error(error);
+        failedRecords.push({ ...users[i], error });
+        await new UserAction({
+          action: "failed records",
+          remarks: error,
+        }).save();
+        continue;
       }
 
       const oldUser = await User.findOne({ email });
       if (oldUser) {
-        console.error(`User with email ${email} already exists`);
-        return res
-          .status(400)
-          .json({ message: `User with email ${email} already exists` });
+        const error = `User with email ${email} already exists`;
+        console.error(error);
+        failedRecords.push({ ...users[i], error });
+        await new UserAction({
+          action: "failed records",
+          remarks: error,
+        }).save();
+        continue;
       }
 
-      const userRecord = await firebase.auth().createUser({ email, password });
-      const passwordResetLink = await firebase
-        .auth()
-        .generatePasswordResetLink(email);
+      try {
+        const userRecord = await firebase
+          .auth()
+          .createUser({ email, password });
+        const passwordResetLink = await firebase
+          .auth()
+          .generatePasswordResetLink(email);
 
-      await transporter.sendEmail({
-        from: "intern.lpt@gmail.com",
-        to: email,
-        subject: "Password Reset",
-        html: `
-          <p>You are receiving this email because a request was made to reset the password for your account.</p>
-          <p>Please follow these steps to reset your password:</p>
-          <p><a href="${passwordResetLink}" style="background-color: green; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Reset Password</a></p>
-        `,
-      });
+        await transporter.sendEmail({
+          from: "intern.lpt@gmail.com",
+          to: email,
+          subject: "Password Reset",
+          html: `
+            <p>You are receiving this email because a request was made to reset the password for your account.</p>
+            <p>Please follow these steps to reset your password:</p>
+            <p><a href="${passwordResetLink}" style="background-color: green; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Reset Password</a></p>
+          `,
+        });
 
-      const newUser = new User({
-        firstname,
-        lastname,
-        email: userRecord.email,
-        role,
-        user_id: userRecord.uid,
-      });
-      const savedUser = await newUser.save();
-      insertUser.push(savedUser);
+        const newUser = new User({
+          firstname,
+          lastname,
+          email: userRecord.email,
+          role,
+          user_id: userRecord.uid,
+        });
+        const savedUser = await newUser.save();
+        insertUser.push(savedUser);
 
-      const newUserDetails = new UserDetails({ email, userid: savedUser._id });
-      const savedUserDetails = await newUserDetails.save();
-      insertUserDetails.push(savedUserDetails);
+        const newUserDetails = new UserDetails({
+          email,
+          userid: savedUser._id,
+        });
+        const savedUserDetails = await newUserDetails.save();
+        insertUserDetails.push(savedUserDetails);
+
+        successfulRecords.push(users[i]);
+        await new UserAction({
+          action: "successfully added",
+          remarks: "added user in database",
+        }).save();
+      } catch (error) {
+        console.error("Error processing user:", error);
+        failedRecords.push({ ...users[i], error: error.message });
+        await new UserAction({
+          action: "failed records",
+          remarks: error.message,
+        }).save();
+      }
     }
+
+    await successCsvWriter.writeRecords(successfulRecords);
+    await failureCsvWriter.writeRecords(failedRecords);
+
+    // Get the last SrNo and increment it
+    const lastHistory = await UserHistory.findOne().sort({ SrNo: -1 });
+    const SrNo = lastHistory ? lastHistory.SrNo + 1 : 1;
+
+    // Create UserHistory record
+    const userHistory = new UserHistory({
+      SrNo,
+      SuccessfulRecords: successfulRecords.length,
+      FailedRecords: failedRecords.length,
+      TimeofAction: new Date(), // Automatically set by default
+    });
+    await userHistory.save();
 
     res.status(201).json({
       message: "Users added successfully",

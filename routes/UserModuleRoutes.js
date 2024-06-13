@@ -19,6 +19,10 @@ const {
   logAction,
   getUserActions,
 } = require("../controller/usermodule/UserActionController");
+const {
+  getUserHistory,
+  createImportHistory,
+} = require("../controller/usermodule/UserHistoryController");
 
 usermoduleRouter.post("/usermodule/createnewusers", createUser);
 usermoduleRouter.get("/usermodule/getusersdetails", fetchUser);
@@ -31,5 +35,7 @@ usermoduleRouter.put("/usermodule/updateUserProfile/:id", updateUserProfile);
 usermoduleRouter.post("/usermodule/addprofilepicture", addProfileImage);
 usermoduleRouter.post("/usermodule/logAction", logAction);
 usermoduleRouter.get("/usermodule/userActions/:userid", getUserActions);
+usermoduleRouter.post("/usermodule/postuserhistory", createImportHistory);
+usermoduleRouter.get("/usermodule/getuserhistory", getUserHistory);
 
 module.exports = usermoduleRouter;
