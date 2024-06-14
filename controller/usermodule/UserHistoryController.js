@@ -6,7 +6,7 @@ exports.getUserHistory = async (req, res) => {
     const userHistory = await UserHistory.find().sort({ TimeofAction: -1 });
 
     if (!userHistory.length) {
-      return res.status(404).json({ message: "No user history found" });
+      return res.status(404).json({ message: "No users history found" });
     }
 
     res.status(200).json(userHistory);
