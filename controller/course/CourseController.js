@@ -38,7 +38,7 @@ exports.fetchCourses = async (req, res) => {
       .json({
         success: true,
         data: course,
-        message: "Course Fetch Sucessfully",
+        message: "Course Fetch Sucessfully ",
         statusCode: 200,
       });
   } catch (err) {
@@ -50,7 +50,7 @@ exports.fetchCourses = async (req, res) => {
 exports.logicalDeleteCourse = async (req, res) => {
   try {
     const courseId = req.params.id;
-
+    
     // Find the template by ID and update it
     const updatedCourseforDelete = await Course.findOneAndUpdate(
       { _id: courseId },
@@ -110,9 +110,10 @@ exports.logicalDeleteCourse = async (req, res) => {
 
 exports.addCourseDetails = async (req, res) => {
   try {
-    const { courseId, courseStructure, modules, lessons, langCode } = req.user;
+    const { courseId, courseStructure, modules, lessons } = req.body;
     // Validate and prepare data based on courseStructure
     let courseDetailsData;
+    console.log(courseStructure , "courseStructure")
     if (courseStructure === 'CMLT') {
       // Validate and prepare data for CMLT structure
       courseDetailsData = {
@@ -120,7 +121,7 @@ exports.addCourseDetails = async (req, res) => {
         courseStructure: courseStructure,
         modules: modules,
         lessons: [],
-        langCode: langCode
+        // langCode: langCode
       };
     } else if (courseStructure === 'CLT') {
       // Validate and prepare data for CLT structure
@@ -129,7 +130,7 @@ exports.addCourseDetails = async (req, res) => {
         courseStructure: courseStructure,
         modules: [],
         lessons: lessons,
-        langCode: langCode
+        // langCode: langCode
       };
     } else {
       return res.status(400).json({ message: "Invalid course structure type" });
