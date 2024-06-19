@@ -5,11 +5,6 @@ const UserHistorySchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  // userid: {
-  //   type: mongoose.Schema.Types.ObjectId,
-  //   ref: "User",
-  //   required: true,
-  // },
   SuccessfulRecords: {
     type: Number,
     required: true,
@@ -18,10 +13,16 @@ const UserHistorySchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  TotalRecords: {
+    type: Number,
+    required: true,
+  },
   TimeofAction: {
     type: Date,
     default: Date.now,
   },
+  SuccessFilePath: String,
+  FailureFilePath: String,
 });
 
 module.exports = mongoose.model("UserHistory", UserHistorySchema);
