@@ -149,11 +149,13 @@ exports.addRole = async (req, res) => {
 
 exports.fetchRole = async (req, res) => {
   try {
+    console.log(req.user , "fetch role")
+    const langCode = req.user.langCode;
     // Check if the role with the same name already exists
-    const role = await Role.find();
+    const role = await Role.find({langCode});
     return res
       .status(201)
-      .json({ success: true, message: "Role fetch successfully", data: role });
+      .json({ success: true, message: "Role fetch successfully 1", data: role });
   } catch (error) {
     console.error("Error adding role:", error);
     return res
@@ -162,15 +164,15 @@ exports.fetchRole = async (req, res) => {
   }
 };
 
-exports.fetchRole = async (req, res) => {
-  try {
+// exports.fetchRole = async (req, res) => {
+//   try {
    
-
-    // Check if the role with the same name already exists
-    const role = await Role.find();
-    return res.status(201).json({ success: true, message: 'Role fetch successfully', data: role });
-  } catch (error) {
-    console.error('Error adding role:', error);
-    return res.status(500).json({ success: false, message: 'Failed to fetch role' });
-  }
-};
+// console.log(req.user)
+//     // Check if the role with the same name already exists
+//     const role = await Role.find();
+//     return res.status(201).json({ success: true, message: 'Role fetch successfully', data: role });
+//   } catch (error) {
+//     console.error('Error adding role:', error);
+//     return res.status(500).json({ success: false, message: 'Failed to fetch role' });
+//   }
+// };
