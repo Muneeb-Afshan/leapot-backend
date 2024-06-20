@@ -1,7 +1,7 @@
 const express = require('express');
 const upload = require('../controller/course/FileUpload');
 const courseRouter = express.Router();
-const {createCourse ,fetchCourses , addCourseDetails , fetchCoursesWithDetails , fetchAllCoursesWithDetails , logicalDeleteCourse} = require('../controller/course/CourseController');
+const {createCourse ,fetchCourses , addCourseDetails , fetchCoursesWithDetails , fetchAllCoursesWithDetails , logicalDeleteCourse , createCourseById} = require('../controller/course/CourseController');
 const {addMessage, getMessages, thumbUp, thumbDown} = require('../controller/course/CourseDiscussion');
 const {registerLearner} = require('../controller/course/RegistrationController');
 const {uploadVideo} =require('../controller/fileUpload/uploadFileController')
@@ -12,6 +12,7 @@ const verifyToken = require('../middleware/TokenVerifyMiddleware');
 
 courseRouter.post('/event/eventRegistration',registerLearner);
 courseRouter.post('/course/createCourse',createCourse);
+courseRouter.post('/course/createCourseById',createCourseById);
 courseRouter.post('/course/addCourseDetails',addCourseDetails);
 courseRouter.get('/course/fetchCourses',fetchCourses);
 courseRouter.get('/course/fetchCoursesWithDetails',fetchCoursesWithDetails);

@@ -132,6 +132,7 @@ const topicSchema = new Schema({
 
   },
   contentType: { type: String},
+  fileName: {type: String} ,
   downloadble : {type:Boolean, default:false },
   langCode:{type: String, required: true , default : "en"}
 });
