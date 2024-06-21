@@ -124,14 +124,17 @@ const topicSchema = new Schema({
   title: { type: String, required: true },
   textDescription: { 
     type: String, 
-    required: function() { return this.contentType === 'text'; } 
+    required: function() { return this.contentType === 'Text'; } 
   },
   link: { 
     type: String, 
-    required: function() { return this.contentType !== 'text' }
+    required: function() { return this.contentType !== 'Text' &&  this.contentType !== 'Download' }
 
   },
+  links: [String],
   contentType: { type: String},
+  fileName: {type: String} ,
+  fileNames: [String] ,
   downloadble : {type:Boolean, default:false },
   langCode:{type: String, required: true , default : "en"}
 });

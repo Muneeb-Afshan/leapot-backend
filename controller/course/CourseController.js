@@ -29,6 +29,41 @@ exports.createCourse = async (req, res) => {
   }
 };
 
+exports.createCourseById = async (req, res) => {
+  try {
+    console.log(req.body);
+    const originalCourse = await Course.findById({_id :req.body.id});
+
+    if (!originalCourse) {
+      return res.status(404).json({ success: false, message: "Course not found" });
+    }
+
+    // Create a new course object without the _id
+    const newCourseData = originalCourse.toObject();
+   
+    delete newCourseData._id;
+    delete newCourseData.createdAt;
+    delete newCourseData.updatedAt;
+
+    // Modify the title
+    newCourseData.generalInformation.title = "Copied " + newCourseData.generalInformation.title;
+
+    const newCourse = new Course(newCourseData);
+    await newCourse.save();
+    console.log(newCourse , "newCourse");
+
+    res.status(201).json({
+      success: true,
+      data: newCourse,
+      message: "Course copied successfully",
+      statusCode: 201,
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+};
+
+
 exports.fetchCourses = async (req, res) => {
   try {
     const course = await Course.find({});
@@ -112,6 +147,7 @@ exports.addCourseDetails = async (req, res) => {
   try {
     const { courseId, courseStructure, modules, lessons } = req.body;
     // Validate and prepare data based on courseStructure
+    // console.log(req.body , )
     let courseDetailsData;
     console.log(courseStructure , "courseStructure")
     if (courseStructure === 'CMLT') {
