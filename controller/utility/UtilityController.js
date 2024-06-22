@@ -4,15 +4,14 @@
 const Role = require("../../model/Role");
 
 const ContactForm = require("../../model/ContactForm");
-const nodemailer = require('nodemailer');
-
+const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
-  service: 'Gmail',
+  service: "Gmail",
   auth: {
-    user: 'hr.leapot@gmail.com',
-    pass: 'tlnb zajb dnqz katg'
-  }
+    user: "hr.leapot@gmail.com",
+    pass: "tlnb zajb dnqz katg",
+  },
 });
 
 exports.ContactForm = async (req, res) => {
@@ -28,11 +27,10 @@ exports.ContactForm = async (req, res) => {
 
     await contactForm.save();
 
-
     await transporter.sendMail({
-      from: 'hr@leapot.in',
+      from: "hr@leapot.in",
       to: email,
-      subject: 'Thank You for Your Inquiry!',
+      subject: "Thank You for Your Inquiry!",
       html: `
         <p>Dear ${name},</p>
         <p>Thank you for reaching out to us! We have received your inquiry and are excited to assist you. Our team will review your message carefully and get back to you as soon as possible.</p>
@@ -40,14 +38,14 @@ exports.ContactForm = async (req, res) => {
         <p>Thank you for considering Leapot Technologies!</p>
         <p>Best regards,</p>
         <p>Leapot Technologies</p>
-      `
+      `,
     });
 
     // owner
     await transporter.sendMail({
       from: email,
-      to: 'contact@leapot.in', 
-      subject: 'New Inquiry Received',
+      to: "contact@leapot.in",
+      subject: "New Inquiry Received",
       html: `
         <p>Hi,</p>        
         <p>You've got a new inquiry! A user has submitted a message via our website. Please find the details below:</p>        
@@ -62,35 +60,41 @@ exports.ContactForm = async (req, res) => {
         <p>Best regards,</p>        
         <p>Leapot Technologies</p>        
 
-      `
+      `,
     });
 
     res.status(201).json({
-      message: 'Contact form submitted successfully',
+      message: "Contact form submitted successfully",
       ContactInfo: contactForm,
     });
   } catch (error) {
-    console.error('Error submitting contact form:', error);
-    res.status(500).json({ message: 'An error occurred while processing your request' });
+    console.error("Error submitting contact form:", error);
+    res
+      .status(500)
+      .json({ message: "An error occurred while processing your request" });
   }
 };
 
-
-
-const Application = require('../../model/CareerSchema');
+const Application = require("../../model/CareerSchema");
 
 exports.createApplication = async (req, res) => {
-    try {
-        const application = await Application.create(req.body);
-        res.status(201).json({ message: 'Contact form submitted successfully', data :application , statusCode:200 })
-    } catch (err) {
-        res.status(400).json({ message: err.message });
-    }
+  try {
+    const application = await Application.create(req.body);
+    res
+      .status(201)
+      .json({
+        message: "Contact form submitted successfully",
+        data: application,
+        statusCode: 200,
+      });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 };
 
-// to Add store FAQ 
-const FAQ = require('../../model/FAQ');
-const { create } = require('../../model/Instructor');
+// to Add store FAQ
+const FAQ = require("../../model/FAQ");
+const { create } = require("../../model/Instructor");
 
 // Create a new FAQ
 exports.createFAQ = async (req, res) => {
@@ -119,10 +123,10 @@ exports.getAllFAQs = async (req, res) => {
 // controllers/roleController.js
 
 exports.addRole = async (req, res) => {
-  console.log(req.body , req.user , "addRole" )
+  console.log(req.body, req.user, "addRole");
   try {
-    const { name, description, langCode } = req.user;              //here we want to add langCode...
- 
+    const { name, description, langCode } = req.user; //here we want to add langCode...
+
     // Check if the role with the same name already exists
     const existingRole = await Role.findOne({ name });
     if (existingRole) {
@@ -133,7 +137,7 @@ exports.addRole = async (req, res) => {
     }
 
     // Create a new role
-    const role = new Role({ name, description, langCode});   //here we want to add langCode...
+    const role = new Role({ name, description, langCode }); //here we want to add langCode...
     await role.save();
 
     return res
@@ -149,13 +153,17 @@ exports.addRole = async (req, res) => {
 
 exports.fetchRole = async (req, res) => {
   try {
-    console.log(req.user , "fetch role")
-    const langCode = req.user.langCode;
+    console.log(req.body, "fetch role");
+    // const langCode = req.user.langCode;
     // Check if the role with the same name already exists
-    const role = await Role.find({langCode});
+    const role = await Role.find({});
     return res
       .status(201)
-      .json({ success: true, message: "Role fetch successfully 1", data: role });
+      .json({
+        success: true,
+        message: "Role fetch successfully 1",
+        data: role,
+      });
   } catch (error) {
     console.error("Error adding role:", error);
     return res
@@ -166,7 +174,7 @@ exports.fetchRole = async (req, res) => {
 
 // exports.fetchRole = async (req, res) => {
 //   try {
-   
+
 // console.log(req.user)
 //     // Check if the role with the same name already exists
 //     const role = await Role.find();

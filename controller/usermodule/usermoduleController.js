@@ -255,11 +255,186 @@ exports.fetchUserById = async (req, res) => {
 const UserAction = require("../../model/UserActionSchema");
 const UserHistory = require("../../model/UserHistorySchema");
 const moment = require("moment");
+const fs = require("fs");
+const AWS = require("aws-sdk");
+const { v4: uuidv4 } = require("uuid"); // Import UUID generator
+// const bucketName = process.env.AWS_BUCKETNAME;
+const path = require("path");
 
+// Configure AWS S3
+const s3 = new AWS.S3({
+  region: process.env.AWS_REGION,
+  accessKeyId: process.env.AWS_ACCESSKEYID,
+  secretAccessKey: process.env.AWS_SECRETACCESSKEY,
+  signatureVersion: "v4",
+});
+
+async function uploadToS3(filePath, bucketName) {
+  const fileContent = fs.readFileSync(filePath);
+  const params = {
+    Bucket: bucketName,
+    Key: `lms/userModule/${uuidv4()}-${path.basename(filePath)}`,
+    Body: fileContent,
+  };
+  return s3.upload(params).promise();
+}
+
+// exports.csvCreateUser = async (req, res) => {
+//   try {
+//     const users = req.body.data;
+//     console.log("Received users data:", users);
+
+//     if (!Array.isArray(users) || users.length === 0) {
+//       return res.status(400).json({ message: "No user data provided" });
+//     }
+
+//     const insertUser = [];
+//     const insertUserDetails = [];
+//     const successfulRecords = [];
+//     const failedRecords = [];
+
+//     const timestamp = moment().format("YYYYMMDD_HHmmss");
+//     // const timestamp = moment().format("MM-DD-YYYY_HH:mm:ss"); //this format does not work for windows file system
+
+//     const successCsvFilePath = `successfulUserRecords_${timestamp}.csv`;
+//     const failureCsvFilePath = `failureUserRecords_${timestamp}.csv`;
+
+//     console.log("Success CSV File Path:", successCsvFilePath);
+//     console.log("Failure CSV File Path:", failureCsvFilePath);
+
+//     const successCsvWriter = createCsvWriter({
+//       path: successCsvFilePath,
+//       header: [
+//         { id: "firstname", title: "First Name" },
+//         { id: "lastname", title: "Last Name" },
+//         { id: "email", title: "Email" },
+//         { id: "role", title: "Role" },
+//       ],
+//     });
+
+//     const failureCsvWriter = createCsvWriter({
+//       path: failureCsvFilePath,
+//       header: [
+//         { id: "firstname", title: "First Name" },
+//         { id: "lastname", title: "Last Name" },
+//         { id: "email", title: "Email" },
+//         { id: "role", title: "Role" },
+//         { id: "error", title: "Error" },
+//       ],
+//     });
+//     for (let i = 0; i < users.length; i++) {
+//       const { firstname, lastname, email, role } = users[i];
+//       const password = "defaultPassword123";
+
+//       if (!(firstname && lastname && email && role)) {
+//         const error = `Invalid data at index ${i}: All fields are required`;
+//         console.error(error);
+//         failedRecords.push({ ...users[i], error });
+//         await new UserAction({
+//           action: "failed records",
+//           remarks: error,
+//         }).save();
+//         continue;
+//       }
+
+//       const oldUser = await User.findOne({ email });
+//       if (oldUser) {
+//         const error = `User with email ${email} already exists`;
+//         console.error(error);
+//         failedRecords.push({ ...users[i], error });
+//         await new UserAction({
+//           action: "failed records",
+//           remarks: error,
+//         }).save();
+//         continue;
+//       }
+
+//       try {
+//         const userRecord = await firebase
+//           .auth()
+//           .createUser({ email, password });
+//         const passwordResetLink = await firebase
+//           .auth()
+//           .generatePasswordResetLink(email);
+
+//         await transporter.sendEmail({
+//           from: "intern.lpt@gmail.com",
+//           to: email,
+//           subject: "Password Reset",
+//           html: `
+//             <p>You are receiving this email because a request was made to reset the password for your account.</p>
+//             <p>Please follow these steps to reset your password:</p>
+//             <p><a href="${passwordResetLink}" style="background-color: green; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Reset Password</a></p>
+//           `,
+//         });
+
+//         const newUser = new User({
+//           firstname,
+//           lastname,
+//           email: userRecord.email,
+//           role,
+//           user_id: userRecord.uid,
+//         });
+//         const savedUser = await newUser.save();
+//         insertUser.push(savedUser);
+
+//         const newUserDetails = new UserDetails({
+//           email,
+//           userid: savedUser._id,
+//         });
+//         const savedUserDetails = await newUserDetails.save();
+//         insertUserDetails.push(savedUserDetails);
+
+//         successfulRecords.push(users[i]);
+//         await new UserAction({
+//           action: "successfully added",
+//           remarks: "added user in database",
+//         }).save();
+//       } catch (error) {
+//         console.error("Error processing user:", error);
+//         failedRecords.push({ ...users[i], error: error.message });
+//         await new UserAction({
+//           action: "failed records",
+//           remarks: error.message,
+//         }).save();
+//       }
+//     }
+
+//     await successCsvWriter.writeRecords(successfulRecords);
+//     await failureCsvWriter.writeRecords(failedRecords);
+
+//     // Get the last SrNo and increment it
+//     const lastHistory = await UserHistory.findOne().sort({ SrNo: -1 });
+//     const SrNo = lastHistory ? lastHistory.SrNo + 1 : 1;
+//     // Calculate total records
+//     const totalRecords = successfulRecords.length + failedRecords.length;
+
+//     // Create UserHistory record
+//     const userHistory = new UserHistory({
+//       SrNo,
+//       SuccessfulRecords: successfulRecords.length,
+//       FailedRecords: failedRecords.length,
+//       TotalRecords: totalRecords,
+//       TimeofAction: new Date(),
+//       SuccessFilePath: successCsvFilePath.replace(__dirname, ""),
+//       FailureFilePath: failureCsvFilePath.replace(__dirname, ""),
+//     });
+//     await userHistory.save();
+
+//     res.status(201).json({
+//       message: "Users added successfully",
+//       success: true,
+//       users: insertUser,
+//       userDetails: insertUserDetails,
+//     });
+//   } catch (error) {
+//     console.error("Error processing CSV data:", error);
+//     res.status(500).json({ error: "Internal server error" });
+//   }
+// };
 exports.csvCreateUser = async (req, res) => {
   try {
     const users = req.body.data;
-    console.log("Received users data:", users);
 
     if (!Array.isArray(users) || users.length === 0) {
       return res.status(400).json({ message: "No user data provided" });
@@ -271,13 +446,9 @@ exports.csvCreateUser = async (req, res) => {
     const failedRecords = [];
 
     const timestamp = moment().format("YYYYMMDD_HHmmss");
-    // const timestamp = moment().format("MM-DD-YYYY_HH:mm:ss"); //this format does not work for windows file system
 
     const successCsvFilePath = `successfulUserRecords_${timestamp}.csv`;
     const failureCsvFilePath = `failureUserRecords_${timestamp}.csv`;
-
-    console.log("Success CSV File Path:", successCsvFilePath);
-    console.log("Failure CSV File Path:", failureCsvFilePath);
 
     const successCsvWriter = createCsvWriter({
       path: successCsvFilePath,
@@ -299,6 +470,7 @@ exports.csvCreateUser = async (req, res) => {
         { id: "error", title: "Error" },
       ],
     });
+
     for (let i = 0; i < users.length; i++) {
       const { firstname, lastname, email, role } = users[i];
       const password = "defaultPassword123";
@@ -380,21 +552,42 @@ exports.csvCreateUser = async (req, res) => {
     await successCsvWriter.writeRecords(successfulRecords);
     await failureCsvWriter.writeRecords(failedRecords);
 
-    // Get the last SrNo and increment it
+    const successFileUrl = (
+      await uploadToS3(successCsvFilePath, process.env.AWS_BUCKETNAME)
+    ).Location;
+    const failureFileUrl = (
+      await uploadToS3(failureCsvFilePath, process.env.AWS_BUCKETNAME)
+    ).Location;
+
+    // Delete local files
+    fs.unlink(successCsvFilePath, (err) => {
+      if (err) {
+        console.error(`Error deleting success CSV file: ${err}`);
+      } else {
+        console.log("Success CSV file deleted");
+      }
+    });
+
+    fs.unlink(failureCsvFilePath, (err) => {
+      if (err) {
+        console.error(`Error deleting failure CSV file: ${err}`);
+      } else {
+        console.log("Failure CSV file deleted");
+      }
+    });
+
     const lastHistory = await UserHistory.findOne().sort({ SrNo: -1 });
     const SrNo = lastHistory ? lastHistory.SrNo + 1 : 1;
-    // Calculate total records
     const totalRecords = successfulRecords.length + failedRecords.length;
 
-    // Create UserHistory record
     const userHistory = new UserHistory({
       SrNo,
       SuccessfulRecords: successfulRecords.length,
       FailedRecords: failedRecords.length,
       TotalRecords: totalRecords,
       TimeofAction: new Date(),
-      SuccessFilePath: successCsvFilePath.replace(__dirname, ""),
-      FailureFilePath: failureCsvFilePath.replace(__dirname, ""),
+      SuccessFilePath: successFileUrl,
+      FailureFilePath: failureFileUrl,
     });
     await userHistory.save();
 
