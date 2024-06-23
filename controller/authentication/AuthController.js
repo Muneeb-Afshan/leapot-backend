@@ -17,7 +17,7 @@ const register = async (req, res) => {
       success: false,
     });
   }
-  
+
   const NewUser = new User({
     email: email,
     role: role,
@@ -61,8 +61,9 @@ const login = async (req, res) => {
       });
     }
   } catch (error) {
+    console.log("errorrrrrrrrrrrrrrrrrrrrrrrr  ", error.message);
     return res.json({
-      message: "Error Occurr During Login  ",
+      message: "Error occured while login with gmail.",
       error: error,
     });
   }
@@ -89,7 +90,7 @@ const loginWithEmail = async (req, res) => {
     }
   } catch (error) {
     return res.json({
-      message: "Error Occurr During Login  ",
+      message: "Error occured during Login.",
       error: error,
     });
   }
