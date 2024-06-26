@@ -1,18 +1,27 @@
 const UserHistory = require("../../model/UserHistorySchema");
 const User = require("../../model/UserSchema");
 
+// exports.getUserHistory = async (req, res) => {
+//   try {
+//     const userHistory = await UserHistory.find().sort({ TimeofAction: -1 });
+
+//     if (!userHistory.length) {
+//       return res.status(404).json({ message: "No users history found" });
+//     }
+
+//     res.status(200).json(userHistory);
+//   } catch (error) {
+//     console.error("Error fetching user history:", error);
+//     res.status(500).json({ error: "Internal server error" });
+//   }
+// };
+
 exports.getUserHistory = async (req, res) => {
   try {
-    const userHistory = await UserHistory.find().sort({ TimeofAction: -1 });
-
-    if (!userHistory.length) {
-      return res.status(404).json({ message: "No users history found" });
-    }
-
-    res.status(200).json(userHistory);
+    const userHistory = await UserHistory.find({}).sort({ SrNo: -1 });
+    res.json(userHistory);
   } catch (error) {
-    console.error("Error fetching user history:", error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Error fetching user history" });
   }
 };
 

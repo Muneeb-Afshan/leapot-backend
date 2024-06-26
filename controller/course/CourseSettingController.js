@@ -5,15 +5,16 @@ const CourseProgressAndCompletion = require('../../model/courseBuilder/ProgressA
 // Controller function to save or update course basic setting data
 exports.saveOrUpdateCourseBasicSetting = async (req, res) => {
   try {
-    const { name } = req.body;
+    const { courseId } = req.body;
+  console.log(courseId , "courseId")
 
-    // Check if course basic setting data with the given name already exists
-    let courseBasicSetting = await CourseBasicSetting.findOne({ name });
+    // Check if course basic setting data with the givenid name already exists
+    let courseBasicSetting = await CourseBasicSetting.findOne({ courseId :courseId });
 
-    // If course basic setting data exists, update it; otherwise, create a new one
+    // If course basic setting data exists update it otherwise create a new one
     if (courseBasicSetting) {
       // Update the existing course basic setting data
-      courseBasicSetting = await CourseBasicSetting.findOneAndUpdate({ name }, req.body, { new: true });
+      courseBasicSetting = await CourseBasicSetting.findOneAndUpdate({ courseId:courseId }, req.body, { new: true });
     } else {
       // Create a new instance of CourseBasicSetting model
       courseBasicSetting = new CourseBasicSetting(req.body);
@@ -31,15 +32,16 @@ exports.saveOrUpdateCourseBasicSetting = async (req, res) => {
 // Controller function to save or update appearance setting data
 exports.saveOrUpdateCourseAppearanceSetting = async (req, res) => {
   try {
-    const { name } = req.body;
+    const { courseId } = req.body;
+  console.log(courseId , "courseId")
 
     // Check if appearance setting data with the given name already exists
-    let appearanceSetting = await CourseAppearanceSetting.findOne({ name });
+    let appearanceSetting = await CourseAppearanceSetting.findOne({ courseId: courseId  });
 
     // If appearance setting data exists, update it; otherwise, create a new one
     if (appearanceSetting) {
       // Update the existing appearance setting data
-      appearanceSetting = await CourseAppearanceSetting.findOneAndUpdate({ name }, req.body, { new: true });
+      appearanceSetting = await CourseAppearanceSetting.findOneAndUpdate({ courseId:courseId }, req.body, { new: true });
     } else {
       // Create a new instance of CourseAppearanceSetting model
       appearanceSetting = new CourseAppearanceSetting(req.body);
