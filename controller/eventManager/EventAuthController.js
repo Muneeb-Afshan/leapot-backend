@@ -116,12 +116,12 @@ const eventManagerSign = async (req, res) => {
         userAction.actionTime = new Date();
       } else {
         // Create a new UserAction document if it doesn't exist
-        // userAction = new UserAction({
-        //   userid: oldUser.userid._id,
-        //   action: "login",
-        //   remarks: "Successful login",
-        //   actionTime: new Date(),
-        // });
+        userAction = new UserAction({
+          userid: oldUser.userid._id,
+          action: "login",
+          remarks: "Successful login",
+          actionTime: new Date(),
+        });
       }
 
       // Save the UserAction document
@@ -139,8 +139,9 @@ const eventManagerSign = async (req, res) => {
       });
     }
   } catch (error) {
+    console.log("errorrrrrrrrrrrrrrrrrrrrrrrr  ", error.message);
     return res.json({
-      message: "Error Occurr During Login  ",
+      message: "Error occured during login.",
       error: error,
     });
   }
