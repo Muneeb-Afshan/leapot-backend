@@ -1,7 +1,7 @@
 const express = require('express');
 const AWS = require('aws-sdk');
 
-const upload = multer({ storage: multer.memoryStorage() });
+// const upload = multer({ storage: multer.memoryStorage() });
 
 exports.uploadImages =
   ("/upload",
