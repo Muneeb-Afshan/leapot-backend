@@ -11,6 +11,10 @@ const {
   Course,
 } = require("../../model/courseBuilder/CourseSchema");
 
+const nodeHtmlToImage = require("node-html-to-image");
+
+const CoursePageBuilder = require('../../model/courseBuilder/CoursePageBuilderSchema')
+
 exports.createCourse = async (req, res) => {
   try {
     console.log(req.body)
@@ -208,3 +212,153 @@ exports.fetchAllCoursesWithDetails = async (req, res) => {
 };
 
 
+exports.addCoursePage = async (req, res) => {
+  try {
+    const {
+      courseId,
+      pageName,
+      title,
+      pageTemplate,
+      htmlTemplate,
+      cssTemplate,
+      userName,
+    } = req.body;
+
+    // Generate image from the HTML and CSS content
+    const imageBuffer = await nodeHtmlToImage({
+      html: `<html>
+               <head>
+                 <style>
+                   ${cssTemplate}
+                 </style>
+                 <style>
+                   @tailwind base;
+                   @tailwind components;
+                   @tailwind utilities;
+                 </style>
+                 <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
+               </head>
+               <body>
+                 ${htmlTemplate}
+               </body>
+             </html>`,
+      encoding: "buffer",
+    });
+
+    const base64Image = imageBuffer.toString("base64");
+    const imageSrc = `data:image/png;base64,${base64Image}`;
+
+    let CoursePage = await CoursePageBuilder.findOne({ courseId: courseId  });
+
+    if (CoursePage){
+      CoursePage = await CoursePageBuilder.findOneAndUpdate({ courseId:courseId }, {
+        courseId,
+        pageName,
+        title,
+        pageTemplate,
+        htmlTemplate,
+        cssTemplate,
+        userName,
+        // netlifyLink,
+        previewImage: imageSrc,
+      }, { new: true });
+    }
+    else{
+
+    // Create a new template in the UserSavedPages category
+    const CoursePage = new CoursePageBuilder({
+      courseId,
+      pageName,
+      title,
+      pageTemplate,
+      htmlTemplate,
+      cssTemplate,
+      userName,
+      // netlifyLink,
+      previewImage: imageSrc,
+    });
+
+    await CoursePage.save();
+  }
+
+    res.status(201).json({
+      message: "User saved template added successfully",
+      template: CoursePage,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+exports.getAllCourseBuilderPages = async (req, res) => {
+  console.log("h0")
+  try {
+    console.log('Fetching course pages...');
+    const templates = await CoursePageBuilder.find({});
+    // console.log('Course pages fetched:', templates);
+    res.status(200).json({
+      success: true,
+      data: templates,
+      message: "Templates fetched successfully",
+      statusCode: 200,
+    });
+  } catch (error) {
+    console.log(error.message, "hi");
+    console.error('Error fetching course pages:', error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+
+// Add this new function in your controller
+// exports.getTemplatesByCourseId = async (req, res) => {
+//   console.log('hello!');
+//   const { courseId } = req.params; // Get courseId from request parameters
+//   console.log("Fetching course pages for courseId:", courseId);
+
+//   try {
+//     const templates = await CoursePageBuilder.find({ courseId }); // Fetch templates where courseId matches
+//     console.log('Course pages fetched:', templates);
+
+//     res.status(200).json({
+//       success: true,
+//       data: templates,
+//       message: "Templates fetched successfully",
+//       statusCode: 200,
+//     });
+//   } catch (error) {
+//     console.error('Error fetching course pages:', error);
+//     res.status(500).json({ error: "Internal Server Error" });
+//   }
+// };
+
+
+exports.getTemplatesByCourseId = async (req, res) => {
+  console.log('hello!');
+  const { courseId } = req.params; // Get courseId from request parameters
+  console.log("Fetching course pages for courseId:", courseId);
+
+  try {
+    // Log the entire request parameters
+    console.log('Request Params:', req.params);
+
+    // Log a message before querying the database
+    console.log('Querying database for courseId:', courseId);
+
+    const templates = await CoursePageBuilder.find({ courseId }); // Fetch templates where courseId matches
+
+    // Log the result of the database query
+    console.log('Course pages fetched:', templates);
+
+    res.status(200).json({
+      success: true,
+      data: templates,
+      message: "Templates fetched successfully",
+      statusCode: 200,
+    });
+  } catch (error) {
+    console.error('Error fetching course pages:', error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
