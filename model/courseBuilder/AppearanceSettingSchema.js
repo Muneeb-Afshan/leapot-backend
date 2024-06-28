@@ -7,7 +7,7 @@ const AppearanceSettingSchema = new mongoose.Schema({
   },
   theme: {
     type: {
-      default: 'light',
+     
       enum: ['light', 'dark']
     }
   },
