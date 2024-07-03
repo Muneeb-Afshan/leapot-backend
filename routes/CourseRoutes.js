@@ -2,7 +2,8 @@ const express = require("express");
 const upload = require("../controller/course/FileUpload");
 const courseRouter = express.Router();
 
-const {createCourse ,fetchCourses , addCourseDetails , fetchCoursesWithDetails , fetchAllCoursesWithDetails , logicalDeleteCourse , createCourseById} = require('../controller/course/CourseController');
+const {createCourse ,fetchCourses , addCourseDetails , fetchCoursesWithDetails , fetchAllCoursesWithDetails , logicalDeleteCourse , createCourseById, addCoursePage, getAllCourseBuilderPages, getTemplatesByCourseId} = require('../controller/course/CourseController');
+
 const {addMessage, getMessages, thumbUp, thumbDown} = require('../controller/course/CourseDiscussion');
 const {saveOrUpdateCourseBasicSetting , saveOrUpdateCourseAppearanceSetting} = require('../controller/course/CourseSettingController');
 
@@ -38,5 +39,9 @@ courseRouter.put('/course/messages/:messageId/thumbUp', thumbUp);
 courseRouter.post('/course/quizzes', createQuiz);
 
 
+courseRouter.post("/course/addcoursepage", addCoursePage);
+
+courseRouter.get("/course/pages/getAllCourseBuilderPages", getAllCourseBuilderPages);
+courseRouter.get("/course/getTemplatesByCourseId/:courseId", getTemplatesByCourseId);
 
 module.exports = courseRouter;
