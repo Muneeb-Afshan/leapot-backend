@@ -5,14 +5,14 @@ const morgan = require("morgan");
 const swaggerUi = require("swagger-ui-express");
 const YAML = require("yamljs");
 const swaggerDocument = YAML.load("./swagger.yaml");
-const socketIo = require('socket.io');
-const cors = require("cors"); 
-const AWS = require('aws-sdk');
-const multer = require('multer');
-const unzipper = require('unzipper');
-const { v4: uuidv4 } = require('uuid');
-const fs = require('fs');
-const path = require('path');
+const socketIo = require("socket.io");
+const cors = require("cors");
+const AWS = require("aws-sdk");
+const multer = require("multer");
+const unzipper = require("unzipper");
+const { v4: uuidv4 } = require("uuid");
+const fs = require("fs");
+const path = require("path");
 const bodyParser = require("body-parser");
 
 const port = 8000;
@@ -24,45 +24,44 @@ const server = http.createServer(app);
 
 const io = socketIo(server, {
   cors: {
-    origin: '*',
+    origin: "*",
   },
 });
 
-
 let messages = [];
 
-io.on('connection', (socket) => {
-  console.log('New client connected', socket.id);
-  
-  socket.on('disconnect', () => {
-    console.log('Client disconnected', socket.id);
+io.on("connection", (socket) => {
+  console.log("New client connected", socket.id);
+
+  socket.on("disconnect", () => {
+    console.log("Client disconnected", socket.id);
   });
 
-  socket.on('message', (newMessage) => {
+  socket.on("message", (newMessage) => {
     messages.push(newMessage);
-    io.emit('message', newMessage); // Broadcast message to all connected clients
+    io.emit("message", newMessage); // Broadcast message to all connected clients
   });
 
   // Handle thumb up
-  socket.on('thumbUp', (messageId) => {
+  socket.on("thumbUp", (messageId) => {
     const messageToUpdate = messages.find((msg) => msg.id === messageId);
     if (messageToUpdate) {
       messageToUpdate.thumbUpCount++;
-      io.emit('messageUpdated', messageToUpdate);
+      io.emit("messageUpdated", messageToUpdate);
     }
   });
 
   // Handle thumb down
-  socket.on('thumbDown', (messageId) => {
+  socket.on("thumbDown", (messageId) => {
     const messageToUpdate = messages.find((msg) => msg.id === messageId);
     if (messageToUpdate) {
       messageToUpdate.thumbDownCount++;
-      io.emit('messageUpdated', messageToUpdate);
+      io.emit("messageUpdated", messageToUpdate);
     }
   });
 
   // Send existing messages to newly connected client
-  socket.emit('initialMessages', messages);
+  socket.emit("initialMessages", messages);
 });
 
 //config .env file
@@ -87,6 +86,9 @@ const calendarRoute = require("./routes/CalendarRoutes");
 const certificateRoute = require("./routes/CertificateRoutes");
 const routerJob = require("./routes/JobRoutes");
 const usermoduleRoute = require("./routes/UserModuleRoutes");
+
+const dashboardModuleRouter = require("./routes/DashboardModuleRoutes");
+
 
 
 const RouterSiteBuilder = require('./routes/SiteBuilderRoutes')
@@ -120,6 +122,9 @@ app.use("/api", routerBlog);
 app.use("/api", routerTestimonial);
 app.use("/api", routerJob);
 app.use("/api", usermoduleRoute);
+
+app.use("/api", dashboardModuleRouter);
+
 
 
 app.use("/api", RouterSiteBuilder);
