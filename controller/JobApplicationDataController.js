@@ -32,7 +32,7 @@ exports.JobApplication = async (req, res) => {
             text: "",
             html: `<p><span style="font-size:11pt;">Dear ${name},</span></p>
             <p><br></p>
-            <p><span style="font-size:11pt;">Greetings of the day! We wanted to take a moment to express our gratitude for your recent application for the&nbsp;</span><span style="background-color:#ffff00;font-size:11pt;">${title}</span><span style="font-size:11pt;">&nbsp;role here at Leapot Technologies. We appreciate the time and effort you&apos;ve invested in applying for the position.</span></p>
+            <p><span style="font-size:11pt;">Greetings of the day! We wanted to take a moment to express our gratitude for your recent application for the&nbsp;</span><span style="font:bold;font-size:11pt;">${title}</span><span style="font-size:11pt;">&nbsp;role here at Leapot Technologies. We appreciate the time and effort you&apos;ve invested in applying for the position.</span></p>
             <p><br></p>
             <p><span style="font-size:11pt;">Your application is important to us, and we are currently reviewing it carefully to assess how your skills, experience, and qualifications align with the requirements of the role. We understand that waiting can be challenging, but please rest assured that we are diligently working through the applications.</span></p>
             <p><br></p>
