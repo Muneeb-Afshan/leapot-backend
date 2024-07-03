@@ -11,23 +11,48 @@ const {
   Course,
 } = require("../../model/courseBuilder/CourseSchema");
 
+// exports.createCourse = async (req, res) => {
+//   try {
+//     console.log(req.body)
+    
+//     const course = new Course(req.body);
+//     await course.save();
+//     res
+//       .status(201)
+//       .json({
+//         success: true,
+//         data: course,
+//         message: "Course added Sucessfully",
+//         statusCode: 200,
+//       });
+//   } catch (err) {
+//     res.status(400).json({ success: false, error: err.message });
+//   }
+// };
+
 exports.createCourse = async (req, res) => {
   try {
-    console.log(req.body)
-    const course = new Course(req.body);
-    await course.save();
-    res
-      .status(201)
-      .json({
-        success: true,
-        data: course,
-        message: "Course added Sucessfully",
-        statusCode: 200,
-      });
+    console.log(req.body);
+    const { _id, ...courseData } = req.body;
+
+    // Upsert: update the course if it exists, otherwise create a new one
+    const course = await Course.findOneAndUpdate(
+      { _id }, // filter by course ID
+      { $set: courseData }, // update with courseData
+      { new: true, upsert: true, setDefaultsOnInsert: true } // options
+    );
+
+    res.status(201).json({
+      success: true,
+      data: course,
+      message: "Course added/updated successfully",
+      statusCode: 200,
+    });
   } catch (err) {
     res.status(400).json({ success: false, error: err.message });
   }
 };
+
 
 exports.createCourseById = async (req, res) => {
   try {
