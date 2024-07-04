@@ -4,7 +4,7 @@ const EventRegistration = require('../../model/RegistrationSchema');
 
 exports.registerLearner = async (req, res) => {
   try {
-    const {email, userid, eventid, registrationDate, registrationStatus, paymentid } = req.body;
+    const {email, userid, eventid, registrationDate, registrationStatus, courseid, paymentid } = req.body;
 
     // Check if the learner is already registered for the event or course
     const existingRegistration = await EventRegistration.findOne({ userid, eventid });
@@ -17,6 +17,7 @@ exports.registerLearner = async (req, res) => {
       email,
       userid,
       eventid,
+      courseid,
       registrationDate,
       registrationStatus,
       paymentid
@@ -36,12 +37,14 @@ exports.registerLearner = async (req, res) => {
 
 
 exports.fetchRegisterLearnerById = async (req, res) => {
+  console.log("fetchRegisterLearnerById", req.query); // Log query parameters
   try {
-    const userId = req.params.userId;
+    const userId = req.query.userid; // Extract userid from query parameters
+    console.log(userId);
 
-    // Find the registrations / entrollment for the user 
+    // Find the registrations / enrollment for the user 
     const registrations = await EventRegistration.find({ userid: userId })
-      .populate('eventid')
+      .populate('courseid')
       .exec();
 
     if (registrations.length === 0) {
@@ -49,7 +52,7 @@ exports.fetchRegisterLearnerById = async (req, res) => {
     }
 
     // Extract events from the registrations
-    const events = registrations.map(registration => registration.eventid);
+    const events = registrations.map(registration => registration.courseid);
 
     res.status(200).json({ success: true, events });
   } catch (error) {
@@ -57,3 +60,4 @@ exports.fetchRegisterLearnerById = async (req, res) => {
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
+

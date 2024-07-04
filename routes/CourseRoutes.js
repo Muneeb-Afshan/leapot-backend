@@ -16,7 +16,7 @@ const verifyToken = require('../middleware/TokenVerifyMiddleware');
 
 
 courseRouter.post('/event/eventRegistration',registerLearner);
-courseRouter.get('/event/fetchRegisterLearnerById/:userId',fetchRegisterLearnerById);
+courseRouter.get('/event/fetchRegisterLearnerById',fetchRegisterLearnerById);
 
 courseRouter.post('/course/createCourse',createCourse);
 courseRouter.post('/course/createCourseById',createCourseById);
