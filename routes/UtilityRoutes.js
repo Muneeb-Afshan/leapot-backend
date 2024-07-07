@@ -7,6 +7,7 @@ const {
   getAllFAQs,
   addRole,
   fetchRole,
+  getInstructors
 } = require("../controller/utility/UtilityController");
 const {
   uploadImages,
@@ -25,6 +26,8 @@ UtilityRoutes.post("/addFAQ", createFAQ);
 UtilityRoutes.get("/FAQ", getAllFAQs);
 UtilityRoutes.post("/role", verifyToken, addRole);
 UtilityRoutes.post("/role", verifyToken, addRole);
+UtilityRoutes.get("/getInstructors" , getInstructors);
+
 UtilityRoutes.get("/fetchRole", fetchRole);
 UtilityRoutes.post("/upload", uploadImages);
 UtilityRoutes.post("/uploadResume", uploadResume);
