@@ -33,26 +33,61 @@ const nodeHtmlToImage = require("node-html-to-image");
 
 const CoursePageBuilder = require('../../model/courseBuilder/CoursePageBuilderSchema')
 
-exports.createCourse = async (req, res) => {
+// exports.createCourse = async (req, res) => {
+//   try {
+//     console.log(req.body);
+//     const { _id, ...courseData } = req.body;
+          
+//     // Upsert: update the course if it exists, otherwise create a new one
+//     const course = await Course.findOneAndUpdate(
+//       { _id }, // Filter
+//       { $set: courseData }, // Update fields
+//       { new: true, upsert: true, setDefaultsOnInsert: true } // Options: return the updated document, create if not exists
+//     );
+
+//     console.log(course , "course")
+
+//     res.status(201).json({
+//       success: true,
+//       data: course,
+//       message: "Course added/updated successfully",
+//       statusCode: 200,
+//     });
+//   } catch (err) {
+//     res.status(400).json({ success: false, error: err.message });
+//   }
+// };
+
+
+exports.upsertCourse = async (req, res) => {
   try {
     console.log(req.body);
     const { _id, ...courseData } = req.body;
 
-    // Upsert: update the course if it exists, otherwise create a new one
-    const course = await Course.findOneAndUpdate(
-      { _id }, // filter by course ID
-      { $set: courseData }, // update with courseData
-      { new: true, upsert: true, setDefaultsOnInsert: true } // options
-    );
+    let course;
 
-    res.status(201).json({
-      success: true,
-      data: course,
-      message: "Course added/updated successfully",
-      statusCode: 200,
-    });
+    if (_id) {
+      // If _id is present, update the existing course
+      console.log(_id , "under id")
+      course = await Course.findOneAndUpdate(
+        { _id }, // Filter
+        { $set: courseData }, // Update fields
+        { new: true, upsert: true, setDefaultsOnInsert: true } // Options: return the updated document, create if not exists
+      );
+    } else {
+      // If _id is not present, create a new course
+      course = new Course(courseData);
+      console.log(_id , "outer id id")
+
+      await course.save();
+    }
+
+    console.log(course ,"course")
+
+    res.status(200).json({ success: true, course });
   } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
+    console.log('Error occurs while upserting course', err);
+    res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
 
@@ -421,5 +456,26 @@ exports.getTemplatesByCourseId = async (req, res) => {
   } catch (error) {
     console.error('Error fetching course pages:', error);
     res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+const mongoose = require('mongoose');
+// Fetch courses by instructor _id
+exports.getCoursesByInstructor = async (req, res) => {
+  const instructorId = req.params.id
+  console.log(instructorId , "instructorId")
+
+  try {
+    const courses = await Course.aggregate([
+      { 
+        $match: { 
+          'generalInformation.instructorName.id': instructorId 
+        } 
+      }
+    ]);
+
+    res.status(200).json(courses);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching courses', error });
   }
 };

@@ -42,6 +42,11 @@ exports.fetchRegisterLearnerById = async (req, res) => {
     const userId = req.query.userid; // Extract userid from query parameters
     console.log(userId);
 
+    // Check if userid is not provided
+    if (!userId) {
+      return res.status(400).json({ success: false, message: 'User ID is required' });
+    }
+
     // Find the registrations / enrollment for the user 
     const registrations = await EventRegistration.find({ userid: userId })
       .populate('courseid')
@@ -52,7 +57,7 @@ exports.fetchRegisterLearnerById = async (req, res) => {
     }
 
     // Extract events from the registrations
-    const events = registrations.map(registration => registration.courseid);
+    const events = registrations?.map(registration => registration?.courseid);
 
     res.status(200).json({ success: true, events });
   } catch (error) {
