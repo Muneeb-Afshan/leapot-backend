@@ -139,8 +139,9 @@ const eventManagerSign = async (req, res) => {
       });
     }
   } catch (error) {
+    console.log("errorrrrrrrrrrrrrrrrrrrrrrrr  ", error.message);
     return res.json({
-      message: "Error Occurr During Login  ",
+      message: "Error occured during login.",
       error: error,
     });
   }

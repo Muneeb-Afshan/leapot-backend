@@ -69,7 +69,9 @@ const courseSchema = new mongoose.Schema({
     language: { type: String },
     instructorName: [{ type: String }],
     bannerImage: { type: String },
-    courseStructure: { type: String, enum: ['CMLT', 'CLT'], required: true },
+    // courseStructure: { type: String, enum: ['CMLT', 'CLT']},
+    courseStructure: { type: String, enum: ['CMLT', 'CLT', 'SCORM']},
+    scormUrl: { type: String },
     isPublished : { type: Boolean, default: false}
   },
   isPaidCourse: { type: Boolean, default: false },
@@ -85,6 +87,7 @@ const courseSchema = new mongoose.Schema({
     // courseSyllabus: { type: String },
     learningObjectives: { type: String },
     estimatedTimeToComplete: { type: String },
+    
   },
   accessAndEnrollment: {
     enrollmentType: { type: String, enum: ['Open', 'Restricted', 'By Invitation'], required: true },
@@ -165,7 +168,8 @@ const moduleSchema = new Schema({
 const courseDetailsSchema = new Schema({
 
   courseId: { type: Schema.Types.ObjectId, ref: 'Course', required: true },
-  courseStructure: { type: String, enum: ['CMLT', 'CLT'], required: true },
+  // courseStructure: { type: String, enum: ['CMLT', 'CLT'] },
+  courseStructure: { type: String, enum: ['CMLT', 'CLT', 'SCORM']},
   modules: [moduleSchema],
   lessons: [chapterSchema],
 
