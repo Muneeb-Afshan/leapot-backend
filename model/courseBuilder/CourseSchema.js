@@ -67,7 +67,7 @@ const courseSchema = new mongoose.Schema({
     courseCategory: { type: String },
     prerequisites: { type: String },
     language: { type: String },
-    instructorName: [{ type: String }],
+    instructorName: [{ }],
     bannerImage: { type: String },
     // courseStructure: { type: String, enum: ['CMLT', 'CLT']},
     courseStructure: { type: String, enum: ['CMLT', 'CLT', 'SCORM']},
