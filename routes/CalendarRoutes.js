@@ -21,7 +21,7 @@ const {
   getEnrolledUsers,
 } = require("../controller/calendar/CalendarDetailsController");
 
-const verifyToken = require('../middleware/TokenVerifyMiddleware');
+const verifyToken = require("../middleware/TokenVerifyMiddleware");
 const {
   addAnnouncementImage,
 } = require("../controller/calendar/UploadImageController");
@@ -42,7 +42,7 @@ calendarRouter.get(
 );
 calendarRouter.put("/calendar/cancelannouncement/:id", cancelAnnouncement);
 
-calendarRouter.post("/calendar/addannouncements",verifyToken, addAnnouncements);
+calendarRouter.post("/calendar/addannouncements", addAnnouncements);
 calendarRouter.get(
   "/calendar/fetchannouncementinfo/:annNo",
   getAnnouncementInfo
