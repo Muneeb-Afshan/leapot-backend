@@ -17,6 +17,7 @@ const {
 const verifyToken = require('../middleware/TokenVerifyMiddleware');
 
 notificationRouter.post("/notification/postnotification",verifyToken, createNotification);
+
 notificationRouter.get("/notification/getnotifications", fetchNotification);
 notificationRouter.get(
   "/notification/getSingleNotification/:id",
@@ -32,6 +33,7 @@ notificationRouter.put(
   logicalDeleteNotification
 );
 notificationRouter.post("/notification/sendnotifications",verifyToken, sendNotifications);
+
 notificationRouter.get("/notification/fetchnotifications", getNotifications);
 notificationRouter.get("/notification/singlefetchnotifications/:id", singlefetchnotifications);
 notificationRouter.get("/notification/search", searchNotifications);

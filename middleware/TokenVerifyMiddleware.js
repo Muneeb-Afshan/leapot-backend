@@ -19,7 +19,7 @@ const verifyTokenForAllUrl = async (req, res, next) => {
     }
     return res.json({ message: "Un authorize user" });
   } catch (e) {
-    console.log(e.message);
+    console.log(e.message,"Error from verify token");
     return res.json({ message: "Internal Error" });
   }
 };
