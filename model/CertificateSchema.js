@@ -89,7 +89,7 @@ const TemplateSchema = new mongoose.Schema({
   certificateImage:{  type: String, required: true } ,
   isDeleted: { type: Boolean, default: false },
   langCode:{type: String, required: true , default : "en"},
-});
+}, { timestamps: true });
 
 const issueCertificateSchema = new mongoose.Schema({
   email: {
@@ -131,7 +131,7 @@ const TemplateCertificateSchema = new mongoose.Schema({
   },
   isDeleted: { type: Boolean, default: false },
   langCode:{type: String, required: true , default : "en"},
-});
+}, { timestamps: true });
 
 module.exports = {
   CertificateSetting: mongoose.model(

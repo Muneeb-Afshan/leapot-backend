@@ -7,7 +7,6 @@ const {addTemplate , logicalDeleteTemplate ,  useTemplate , editCertificate , lo
 // Route to save a new certificate setting
 certificateRouter.post('/certificate/certificateSettings',verifyToken,createCertificateSetting); //
 certificateRouter.put('/certificate/updateCertificateSetting/:id',updateCertificateSetting); //
-
 certificateRouter.post('/certificate/addTemplate',verifyToken, addTemplate); //
 certificateRouter.put('/certificate/deleteTemplate/:id',logicalDeleteTemplate); //
 certificateRouter.post('/certificate/useTemplate',verifyToken,useTemplate); //
@@ -25,13 +24,4 @@ certificateRouter.post('/certificate/bulkIssue',verifyToken,bulkIssue);
 certificateRouter.get('/certificate/fetchIssueCertificate',fetchIssueCertificate); //
 certificateRouter.post('/certificate/blacklist',verifyToken, blacklistUsers); //
 certificateRouter.get('/certificate/getBlacklistedUsers', getBlacklistedUsers); //
-
-
-
-
-
-
-
-
-
 module.exports = certificateRouter;

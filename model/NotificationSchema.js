@@ -34,7 +34,7 @@ const CreateNotificationSchema = new mongoose.Schema({
   },
   isDeleted: { type: Boolean, default: false },
   langCode:{type: String, required: true , default : "en"},
-});
+}, { timestamps: true });
 
 // Method to fetch unique notification types
 

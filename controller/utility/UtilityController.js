@@ -2,7 +2,7 @@
 
 // controllers/contactController.js
 const Role = require("../../model/Role");
-
+const User = require('../../model/UserSchema'); 
 const ContactForm = require("../../model/ContactForm");
 const nodemailer = require("nodemailer");
 
@@ -171,6 +171,22 @@ exports.fetchRole = async (req, res) => {
       .json({ success: false, message: "Failed to fetch role" });
   }
 };
+
+exports.fetchEmail = async (req, res) => {
+  try {
+    const users = await User.find({}, 'firstname lastname email'); // Fetching 'firstname', 'lastname', and 'email' fields
+    const userData = users.map(user => ({
+      firstname: user.firstname,
+      lastname: user.lastname,
+      email: user.email,
+    }));
+    res.json({ users: userData });
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    res.status(500).json({ error: 'Failed to fetch user data' });
+  }
+};
+
 
 // exports.fetchRole = async (req, res) => {
 //   try {

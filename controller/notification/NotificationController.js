@@ -8,13 +8,13 @@ const {
 //controller to post notifications
 exports.createNotification = async (req, res) => {
   try {
-    const { notificationType, subject, notificationBody, role, langCode } = req.user;
+    const { notificationType, subject, notificationBody, role } = req.user;
     const newnotifications = await CreateNotification.create({
       role,
       notificationType,
       subject,
       notificationBody,
-      langCode
+      // langCode
     });
 
     return res.status(200).json(newnotifications);

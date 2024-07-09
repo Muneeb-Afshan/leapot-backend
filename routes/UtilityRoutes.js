@@ -7,6 +7,7 @@ const {
   getAllFAQs,
   addRole,
   fetchRole,
+  fetchEmail
 } = require("../controller/utility/UtilityController");
 const {
   uploadImages,
@@ -31,5 +32,6 @@ UtilityRoutes.post("/uploadResume", uploadResume);
 UtilityRoutes.post("/uploadAttachments", uploadAttachments);
 UtilityRoutes.post("/uploadUserImages", uploadUserImages);
 UtilityRoutes.post("/uploadscrom", uploadscrom);
+UtilityRoutes.get("/fetchEmail", fetchEmail);
 
 module.exports = UtilityRoutes;
