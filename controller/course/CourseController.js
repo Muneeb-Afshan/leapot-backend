@@ -473,6 +473,7 @@ exports.getCoursesByInstructor = async (req, res) => {
         } 
       }
     ]);
+    
 
    return res.status(200).json(courses);
   } catch (error) {
