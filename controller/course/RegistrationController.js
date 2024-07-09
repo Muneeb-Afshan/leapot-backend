@@ -59,10 +59,10 @@ exports.fetchRegisterLearnerById = async (req, res) => {
     // Extract events from the registrations
     const events = registrations?.map(registration => registration?.courseid);
 
-    res.status(200).json({ success: true, events });
+   return res.status(200).json({ success: true, events });
   } catch (error) {
     console.error('Error fetching registered events:', error);
-    res.status(500).json({ success: false, message: 'Internal server error' });
+   return  res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
 
