@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 const LearnerToCourseRegistration = new mongoose.Schema({
   email:{type:String} ,
   userid: { type: mongoose.Schema.Types.ObjectId, ref:'User', required: true }, // This field should be a reference to the User model.
-  eventid: { type: mongoose.Schema.Types.ObjectId,ref:'events', required: true }, // This field should be a reference to the Event model.
+  eventid: { type: mongoose.Schema.Types.ObjectId,ref:'events'}, // This field should be a reference to the Event model.
+  courseid: { type: mongoose.Schema.Types.ObjectId,ref:'Course'},
   registrationDate: { type: Date, required: true },
   cancelled: { type: Boolean, default: false },
   cancellationDate: Date,

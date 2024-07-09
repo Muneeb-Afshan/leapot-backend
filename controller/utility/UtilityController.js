@@ -200,3 +200,14 @@ exports.fetchEmail = async (req, res) => {
 //     return res.status(500).json({ success: false, message: 'Failed to fetch role' });
 //   }
 // };
+
+const User = require('../../model/UserSchema'); // Adjust the path as needed
+
+exports.getInstructors = async (req, res) => {
+  try {
+    const instructors = await User.find({ role: 'Instructor' }, 'firstname lastname _id role').exec();
+    res.status(200).json({data :instructors , success:true ,message:"Role Fetch Successfully" });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching instructors', error , success:false });
+  }
+};

@@ -11,23 +11,86 @@ const {
   Course,
 } = require("../../model/courseBuilder/CourseSchema");
 
-exports.createCourse = async (req, res) => {
+// exports.createCourse = async (req, res) => {
+//   try {
+//     console.log(req.body)
+    
+//     const course = new Course(req.body);
+//     await course.save();
+//     res
+//       .status(201)
+//       .json({
+//         success: true,
+//         data: course,
+//         message: "Course added Sucessfully",
+//         statusCode: 200,
+//       });
+//   } catch (err) {
+//     res.status(400).json({ success: false, error: err.message });
+//   }
+// };
+const nodeHtmlToImage = require("node-html-to-image");
+
+const CoursePageBuilder = require('../../model/courseBuilder/CoursePageBuilderSchema')
+
+// exports.createCourse = async (req, res) => {
+//   try {
+//     console.log(req.body);
+//     const { _id, ...courseData } = req.body;
+          
+//     // Upsert: update the course if it exists, otherwise create a new one
+//     const course = await Course.findOneAndUpdate(
+//       { _id }, // Filter
+//       { $set: courseData }, // Update fields
+//       { new: true, upsert: true, setDefaultsOnInsert: true } // Options: return the updated document, create if not exists
+//     );
+
+//     console.log(course , "course")
+
+//     res.status(201).json({
+//       success: true,
+//       data: course,
+//       message: "Course added/updated successfully",
+//       statusCode: 200,
+//     });
+//   } catch (err) {
+//     res.status(400).json({ success: false, error: err.message });
+//   }
+// };
+
+
+exports.upsertCourse = async (req, res) => {
   try {
-    console.log(req.body)
-    const course = new Course(req.body);
-    await course.save();
-    res
-      .status(201)
-      .json({
-        success: true,
-        data: course,
-        message: "Course added Sucessfully",
-        statusCode: 200,
-      });
+    console.log(req.body);
+    const { _id, ...courseData } = req.body;
+
+    let course;
+
+    if (_id) {
+      // If _id is present, update the existing course
+      console.log(_id , "under id")
+      course = await Course.findOneAndUpdate(
+        { _id }, // Filter
+        { $set: courseData }, // Update fields
+        { new: true, upsert: true, setDefaultsOnInsert: true } // Options: return the updated document, create if not exists
+      );
+    } else {
+      // If _id is not present, create a new course
+      course = new Course(courseData);
+      console.log(_id , "outer id id")
+
+      await course.save();
+    }
+
+    console.log(course ,"course")
+
+    res.status(200).json({ success: true, course });
   } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
+    console.log('Error occurs while upserting course', err);
+    res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
+
 
 exports.createCourseById = async (req, res) => {
   try {
@@ -245,3 +308,174 @@ exports.fetchAllCoursesWithDetails = async (req, res) => {
 };
 
 
+exports.addCoursePage = async (req, res) => {
+  try {
+    const {
+      courseId,
+      pageName,
+      title,
+      pageTemplate,
+      htmlTemplate,
+      cssTemplate,
+      userName,
+    } = req.body;
+
+    // Generate image from the HTML and CSS content
+    const imageBuffer = await nodeHtmlToImage({
+      html: `<html>
+               <head>
+                 <style>
+                   ${cssTemplate}
+                 </style>
+                 <style>
+                   @tailwind base;
+                   @tailwind components;
+                   @tailwind utilities;
+                 </style>
+                 <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
+               </head>
+               <body>
+                 ${htmlTemplate}
+               </body>
+             </html>`,
+      encoding: "buffer",
+    });
+
+    const base64Image = imageBuffer.toString("base64");
+    const imageSrc = `data:image/png;base64,${base64Image}`;
+
+    let CoursePage = await CoursePageBuilder.findOne({ courseId: courseId  });
+
+    if (CoursePage){
+      CoursePage = await CoursePageBuilder.findOneAndUpdate({ courseId:courseId }, {
+        courseId,
+        pageName,
+        title,
+        pageTemplate,
+        htmlTemplate,
+        cssTemplate,
+        userName,
+        // netlifyLink,
+        previewImage: imageSrc,
+      }, { new: true });
+    }
+    else{
+
+    // Create a new template in the UserSavedPages category
+    const CoursePage = new CoursePageBuilder({
+      courseId,
+      pageName,
+      title,
+      pageTemplate,
+      htmlTemplate,
+      cssTemplate,
+      userName,
+      // netlifyLink,
+      previewImage: imageSrc,
+    });
+
+    await CoursePage.save();
+  }
+
+    res.status(201).json({
+      message: "User saved template added successfully",
+      template: CoursePage,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+exports.getAllCourseBuilderPages = async (req, res) => {
+  console.log("h0")
+  try {
+    console.log('Fetching course pages...');
+    const templates = await CoursePageBuilder.find({});
+    // console.log('Course pages fetched:', templates);
+    res.status(200).json({
+      success: true,
+      data: templates,
+      message: "Templates fetched successfully",
+      statusCode: 200,
+    });
+  } catch (error) {
+    console.log(error.message, "hi");
+    console.error('Error fetching course pages:', error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+
+// Add this new function in your controller
+// exports.getTemplatesByCourseId = async (req, res) => {
+//   console.log('hello!');
+//   const { courseId } = req.params; // Get courseId from request parameters
+//   console.log("Fetching course pages for courseId:", courseId);
+
+//   try {
+//     const templates = await CoursePageBuilder.find({ courseId }); // Fetch templates where courseId matches
+//     console.log('Course pages fetched:', templates);
+
+//     res.status(200).json({
+//       success: true,
+//       data: templates,
+//       message: "Templates fetched successfully",
+//       statusCode: 200,
+//     });
+//   } catch (error) {
+//     console.error('Error fetching course pages:', error);
+//     res.status(500).json({ error: "Internal Server Error" });
+//   }
+// };
+
+
+exports.getTemplatesByCourseId = async (req, res) => {
+  console.log('hello!');
+  const { courseId } = req.params; // Get courseId from request parameters
+  console.log("Fetching course pages for courseId:", courseId);
+
+  try {
+    // Log the entire request parameters
+    console.log('Request Params:', req.params);
+
+    // Log a message before querying the database
+    console.log('Querying database for courseId:', courseId);
+
+    const templates = await CoursePageBuilder.find({ courseId }); // Fetch templates where courseId matches
+
+    // Log the result of the database query
+    console.log('Course pages fetched:', templates);
+
+    res.status(200).json({
+      success: true,
+      data: templates,
+      message: "Templates fetched successfully",
+      statusCode: 200,
+    });
+  } catch (error) {
+    console.error('Error fetching course pages:', error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+const mongoose = require('mongoose');
+// Fetch courses by instructor _id
+exports.getCoursesByInstructor = async (req, res) => {
+  const instructorId = req.params.id
+  console.log(instructorId , "instructorId")
+
+  try {
+    const courses = await Course.aggregate([
+      { 
+        $match: { 
+          'generalInformation.instructorName.id': instructorId 
+        } 
+      }
+    ]);
+
+    res.status(200).json(courses);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching courses', error });
+  }
+};

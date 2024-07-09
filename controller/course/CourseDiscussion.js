@@ -1,5 +1,6 @@
 const Message = require('../../model/courseBuilder/CourseDiscussionSchema');
 exports.getMessages = async (req, res) => {
+  console.log("hiiii");
     try {
       const { courseId } = req.params;
       const messages = await Message.find({ course: courseId }) .populate({
