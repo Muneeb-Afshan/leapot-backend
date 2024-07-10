@@ -66,7 +66,7 @@ const certificateSettingSchema = new mongoose.Schema({
   },
   isDeleted: { type: Boolean, default: false },
   langCode:{type: String, required: true , default : "en"},
-});
+},{ timestamps: true });
 
 const TemplateSchema = new mongoose.Schema({
   orientationType: {
