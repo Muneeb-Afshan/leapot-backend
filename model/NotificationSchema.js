@@ -5,7 +5,7 @@ const CreateNotificationSchema = new mongoose.Schema({
   role: {
     type: String,
     enum: [
-      "SuperAdmin",
+      "Admin",
       "Admin",
       "Learner",
       "Instructor",
@@ -35,6 +35,7 @@ const CreateNotificationSchema = new mongoose.Schema({
   isDeleted: { type: Boolean, default: false },
   langCode:{type: String, required: true , default : "en"},
 }, { timestamps: true });
+
 
 // Method to fetch unique notification types
 
@@ -75,7 +76,7 @@ const SendNotificationSchema = new mongoose.Schema({
     default: Date.now,
     required: true,
   },
-  langCode:{type: String, required: true , default : "en"},
+  langCode: { type: String, required: true, default: "en" },
 });
 
 // Custom email validation function
@@ -130,7 +131,7 @@ const NotificationSettingsSchema = new mongoose.Schema({
         role: {
           type: String,
           enum: [
-            "SuperAdmin",
+            "Admin",
             "Admin",
             "Learner",
             "Instructor",
@@ -147,7 +148,7 @@ const NotificationSettingsSchema = new mongoose.Schema({
     ],
     required: true,
   },
-  langCode:{type: String, required: true , default : "en"},
+  langCode: { type: String, required: true, default: "en" },
 });
 module.exports = {
   CreateNotification: mongoose.model(
