@@ -41,7 +41,7 @@ notificationRouter.post(
   "/notification/notificationsettings",verifyToken,
   createNotificationSettings
 );
-notificationRouter.get("CreateNotification", getAllNotifications);
+notificationRouter.get("/notification/fetchAllSettings", getAllNotifications);
 notificationRouter.put(
   "/notification/notificationsettings/:id/toggle",
   toggleNotificationSettings

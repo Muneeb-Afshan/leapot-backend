@@ -234,12 +234,21 @@ exports.createNotificationSettings = async (req, res) => {
 };
 
 //controller to fetch all settings
+// exports.getAllNotifications = async (req, res) => {
+//   try {
+//     const notifications = await NotificationSettings.find({});
+//     res.status(200).json(notifications);
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
 exports.getAllNotifications = async (req, res) => {
   try {
     const notifications = await NotificationSettings.find({});
-    res.status(200).json(notifications);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(200).json(notifications);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };
 
