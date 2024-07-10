@@ -201,7 +201,6 @@ exports.fetchEmail = async (req, res) => {
 //   }
 // };
 
-const User = require('../../model/UserSchema'); // Adjust the path as needed
 
 exports.getInstructors = async (req, res) => {
   try {
