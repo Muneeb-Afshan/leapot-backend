@@ -19,7 +19,7 @@ exports.addTemplate = async (req, res) => {
   try {
     console.log(req.body, "addTemplate");
 
-    const { certificateBody, certificateName , langCode } = req.user;
+    const { certificateBody, certificateName , langCode } = req.body;
     console.log(langCode)
     const imageBuffer = await nodeHtmlToImage({
       html: certificateBody,
@@ -77,10 +77,10 @@ exports.logicalDeleteTemplate = async (req, res) => {
 
 exports.useTemplate = async (req, res) => {
   try {
-    const { templateData, langCode } = req.user;
+    const { templateData, langCode } = req.body;
     console.log(langCode);
     console.log(templateData ,"useTemplate" )
-    const eventcertificate = await Certificates.create(req.user);
+    const eventcertificate = await Certificates.create(req.body);
     return res.status(201).json({
       body: eventcertificate,
       statusCode: 200,
@@ -187,27 +187,6 @@ exports.getSingleCertificate = async (req, res) => {
   }
 };
 
-exports.getOriantation = async (req, res) => {
-  try {
-    const { type, orientation } = req.query;
-    if (type || orientation) {
-      const certificate = await Templates.find({
-        type: type,
-        orientation: orientation,
-      });
-      console.log(type);
-      console.log(orientation);
-      return res.status(200).json(certificate);
-    } else {
-      const certificate = await certificateTemplateSchema.find();
-      return res.status(200).json(certificate);
-    }
-  } catch (error) {
-    console.log(error.message);
-    res.status(500).send({ message: error.message });
-  }
-};
-
 // exports.singleIssue = async(req, res)=>{
 //   try {
 //       const issueData = req.body;
@@ -251,7 +230,7 @@ function generateNextBumber(certificateSetting) {
 exports.singleIssue = async (req, res) => {
   try {
     // const { issueData, langCode } = req.user;
-    const issueData = req.user 
+    const issueData = req.body 
     console.log(issueData)
     // Fetch event data
     const eventData = await Event.findOne({ EventName: issueData.eventName });
@@ -357,7 +336,7 @@ exports.bulkIssue = async (req, res) => {
   try {
     // const issueDataList = []; // Assuming req.body contains an array of issue data
     // const { data, langCode } = req.user;
-    const data  = req.user;
+    const data  = req.body;
     console.log("req.user" ,data )
 
     const successfulIssues = [];
@@ -595,7 +574,7 @@ exports.blacklistUsers = async (req, res) => {
     const { email, reason, status } = req.body; // Array of user objects to blacklist
     // Extract user IDs from the array of user objects
 
-    const data= await BlacklistedUser.create(req.user);
+    const data= await BlacklistedUser.create(req.body);
 
     return res.status(200).json({
       success: true,
