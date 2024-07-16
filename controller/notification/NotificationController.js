@@ -206,7 +206,7 @@ exports.searchNotifications = async (req, res) => {
 // Controller function to create notification settings
 exports.createNotificationSettings = async (req, res) => {
   try {
-    const { settingsName, description, roles, langCode } = req.user;
+    const { settingsName, description, roles, langCode } = req.body;
 
     // If roles include "Select All", set roles to all predefined roles
     const rolesToSave =
