@@ -233,7 +233,9 @@ exports.singleIssue = async (req, res) => {
     const issueData = req.body 
     console.log(issueData)
     // Fetch event data
-    const eventData = await Event.findOne({ EventName: issueData.eventName });
+    const eventData = await Event.findOne({ _id: issueData.eventid });
+    console.log("eventDataNew", issueData.eventid);
+    console.log("eventData", eventData);
     if (!eventData) {
       return res.status(404).json({ message: "Event not found" });
     }
