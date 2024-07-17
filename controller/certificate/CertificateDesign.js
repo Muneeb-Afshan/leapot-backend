@@ -43,7 +43,7 @@ exports.addTemplate = async (req, res) => {
     });
   } catch (error) {
     console.log(error.message);
-    return res.status(500).json( {error : error.message , message : "Unable to POST Template") };
+    return res.status(500).json( {error : error.message , message : "Unable to POST Template" } ) ;
   }
 };
 
