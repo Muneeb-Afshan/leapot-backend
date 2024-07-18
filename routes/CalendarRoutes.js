@@ -47,8 +47,8 @@ calendarRouter.get(
   "/calendar/fetchannouncementinfo/:annNo",
   getAnnouncementInfo
 );
-calendarRouter.post("/calendar/postuserstats", putUserStatistics);
-calendarRouter.get("/calendar/fetchuserstats/:eventname", getUserStatistics);
+// calendarRouter.post("/calendar/postuserstats", putUserStatistics);
+// calendarRouter.get("/calendar/fetchuserstats/:eventname", getUserStatistics);
 calendarRouter.post(
   "/calendar/postenrolledusersDetails",
   putEnrolledUsersDetails
@@ -68,5 +68,8 @@ calendarRouter.get(
   "/calendar/enrolledUsersforEvent/:eventName",
   getEnrolledUsers
 );
-
+calendarRouter.get(
+  "/calendar/fetchUserStatistics/:eventName",
+  getUserStatistics
+);
 module.exports = calendarRouter;

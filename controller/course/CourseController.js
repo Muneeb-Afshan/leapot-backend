@@ -92,6 +92,31 @@ exports.upsertCourse = async (req, res) => {
 };
 
 
+
+
+exports.publishCourse = async (req, res) => {
+  const { courseId } = req.body;
+  console.log(courseId , "courseId")
+
+  try {
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+
+    course.generalInformation.isPublished = ! course.generalInformation.isPublished;
+    await course.save();
+
+    res.status(200).json({ message: 'Course published successfully', course });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error });
+  }
+};
+
+
+
+
+
 exports.createCourseById = async (req, res) => {
   try {
     console.log(req.body);
@@ -473,9 +498,10 @@ exports.getCoursesByInstructor = async (req, res) => {
         } 
       }
     ]);
+    
 
-    res.status(200).json(courses);
+   return res.status(200).json(courses);
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching courses', error });
+   return  res.status(500).json({ message: 'Error fetching courses', error });
   }
 };

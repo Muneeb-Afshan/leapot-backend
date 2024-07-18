@@ -8,6 +8,7 @@ const cache = apicache.middleware;
 const {
   createEvent,
   fetchEvent,
+  fetchEventName,
   fetchEventById,
   updateEvent,
   logicalEventDelete,
@@ -49,6 +50,8 @@ eventManagerRouter.get("/eventManager/signIn", auth, eventManagerSign);
 //event related routes
 eventManagerRouter.post("/eventManager/createEvent", createEvent);
 eventManagerRouter.get("/eventManager/getEvents", fetchEvent);
+eventManagerRouter.get("/eventManager/getEventsName", fetchEventName);
+
 eventManagerRouter.get("/eventManager/getEventById/:id", fetchEventById);
 eventManagerRouter.put("/eventManager/updateEvent/:id", updateEvent);
 eventManagerRouter.patch("/eventManager/deleteEvent/:id", logicalEventDelete);

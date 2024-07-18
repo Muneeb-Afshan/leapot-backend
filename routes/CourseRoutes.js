@@ -2,7 +2,7 @@ const express = require("express");
 const upload = require("../controller/course/FileUpload");
 const courseRouter = express.Router();
 
-const {upsertCourse, getCoursesByInstructor ,fetchCourses , addCourseDetails , fetchCoursesWithDetails , fetchAllCoursesWithDetails , logicalDeleteCourse , createCourseById, addCoursePage, getAllCourseBuilderPages, getTemplatesByCourseId} = require('../controller/course/CourseController');
+const {upsertCourse, getCoursesByInstructor ,fetchCourses ,publishCourse , addCourseDetails , fetchCoursesWithDetails , fetchAllCoursesWithDetails , logicalDeleteCourse , createCourseById, addCoursePage, getAllCourseBuilderPages, getTemplatesByCourseId} = require('../controller/course/CourseController');
 
 const {addMessage, getMessages, thumbUp, thumbDown} = require('../controller/course/CourseDiscussion');
 const {saveOrUpdateCourseBasicSetting , saveOrUpdateCourseAppearanceSetting} = require('../controller/course/CourseSettingController');
@@ -24,6 +24,8 @@ courseRouter.post('/course/createCourse',upsertCourse);
 courseRouter.post('/course/createCourseById',createCourseById);
 courseRouter.post('/course/addCourseDetails',addCourseDetails);
 courseRouter.get('/course/fetchCourses',fetchCourses);
+courseRouter.post('/course/publishCourse',publishCourse);
+
 courseRouter.get('/course/fetchCoursesWithDetails',fetchCoursesWithDetails);
 courseRouter.get('/course/fetchAllCoursesWithDetails',fetchAllCoursesWithDetails);
 courseRouter.put('/course/logicalDeleteCourse/:id',logicalDeleteCourse);
