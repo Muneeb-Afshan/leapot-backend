@@ -8,7 +8,7 @@ const {
 //controller to post notifications
 exports.createNotification = async (req, res) => {
   try {
-    const { notificationType, subject, notificationBody, role } = req.user;
+    const { notificationType, subject, notificationBody, role } = req.body;
     const newnotifications = await CreateNotification.create({
       role,
       notificationType,
@@ -103,7 +103,7 @@ exports.logicalDeleteNotification = async (req, res) => {
 exports.sendNotifications = async (req, res) => {
   try {
     const { email_Type, email_Subject, email_Body, cc, bcc, user_recipients, langCode } =
-      req.user;
+      req.body;
     const individualnotification = await SendNotification.create({
       email_Type,
       cc,
@@ -206,7 +206,7 @@ exports.searchNotifications = async (req, res) => {
 // Controller function to create notification settings
 exports.createNotificationSettings = async (req, res) => {
   try {
-    const { settingsName, description, roles, langCode } = req.user;
+    const { settingsName, description, roles, langCode } = req.body;
 
     // If roles include "Select All", set roles to all predefined roles
     const rolesToSave =

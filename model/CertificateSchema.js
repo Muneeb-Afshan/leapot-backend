@@ -116,7 +116,7 @@ const issueCertificateSchema = new mongoose.Schema({
   //   type: String,
   //   required: true
   // }
-});
+}, { timestamps: true });
 
 const TemplateCertificateSchema = new mongoose.Schema({
   certificateName: {

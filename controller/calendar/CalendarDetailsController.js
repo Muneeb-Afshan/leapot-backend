@@ -161,7 +161,7 @@ exports.addAnnouncements = async (req, res) => {
       endTime,
       active,
       langCode,
-    } = req.user;
+    } = req.body;
     const newAnnouncement = await AddAnnouncements.create({
       announcementNo,
       eventName,
@@ -204,42 +204,42 @@ exports.getAnnouncementInfo = async (req, res) => {
 };
 
 // Controller to post all user staticstics in database
-exports.putUserStatistics = async (req, res) => {
-  try {
-    const {
-      EventName,
-      totalRegistrations,
-      activeRegistrations,
-      cancelRegistrations,
-      paymentPending,
-    } = req.body;
-    const newUserStats = await UserStats.create({
-      EventName,
-      totalRegistrations,
-      activeRegistrations,
-      cancelRegistrations,
-      paymentPending,
-    });
+// exports.putUserStatistics = async (req, res) => {
+//   try {
+//     const {
+//       EventName,
+//       totalRegistrations,
+//       activeRegistrations,
+//       cancelRegistrations,
+//       paymentPending,
+//     } = req.body;
+//     const newUserStats = await UserStats.create({
+//       EventName,
+//       totalRegistrations,
+//       activeRegistrations,
+//       cancelRegistrations,
+//       paymentPending,
+//     });
 
-    return res.status(200).json(newUserStats);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+//     return res.status(200).json(newUserStats);
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
 
 // Controller to fetch all user staticstics
-exports.getUserStatistics = async (req, res) => {
-  try {
-    const { eventname } = req.params;
-    const userstats = await UserStats.find({ EventName: eventname });
-    if (!userstats) {
-      return res.status(404).json({ message: "User Staticstics not found" });
-    }
-    return res.status(200).json(userstats);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+// exports.getUserStatistics = async (req, res) => {
+//   try {
+//     const { eventname } = req.params;
+//     const userstats = await UserStats.find({ EventName: eventname });
+//     if (!userstats) {
+//       return res.status(404).json({ message: "User Staticstics not found" });
+//     }
+//     return res.status(200).json(userstats);
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
 
 // Controller to post enrolled users details
 exports.putEnrolledUsersDetails = async (req, res) => {
@@ -320,7 +320,7 @@ exports.enrollUsersforEvent = async (req, res) => {
   console.log("Enroll users endpoint hit"); // Debugging log
 
   const { eventName } = req.params; // Assuming you pass eventName as a parameter
-  const { emails, langCode } = req.user; // An array of emails to enroll
+  const { emails } = req.body; // An array of emails to enroll
 
   try {
     console.log(`Finding event: ${eventName}`); // Debugging log
@@ -364,5 +364,42 @@ exports.getEnrolledUsers = async (req, res) => {
     res
       .status(500)
       .json({ message: "Error fetching enrolled users", error: error.message });
+  }
+};
+
+// Function to get total registrations and active registrations for a course
+exports.getUserStatistics = async (req, res) => {
+  try {
+    console.log("Request received for course:", req.params.eventName);
+    const { eventName } = req.params;
+
+    // Total Registrations: users for whom the course name is present in the events array
+    const totalRegistrations = await User.countDocuments({
+      events: eventName,
+      deleteStatus: false,
+    });
+
+    // Active Registrations: users whose signInCount is greater than 1
+    const activeRegistrations = await User.countDocuments({
+      events: eventName,
+      "learnerDetails.signInCount": { $gt: 1 },
+      deleteStatus: false,
+    });
+    // Calculate inactive registrations
+    const pendingRegistrations = totalRegistrations - activeRegistrations;
+
+    console.log("Total Registrations:", totalRegistrations);
+    console.log("Active Registrations:", activeRegistrations);
+    console.log("Inactive Registrations:", pendingRegistrations);
+    res.status(200).json({
+      totalRegistrations,
+      activeRegistrations,
+      pendingRegistrations,
+    });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while fetching registrations." });
   }
 };

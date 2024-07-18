@@ -1,11 +1,10 @@
 const Message = require('../../model/courseBuilder/CourseDiscussionSchema');
 exports.getMessages = async (req, res) => {
-  console.log("hiiii");
     try {
       const { courseId } = req.params;
       const messages = await Message.find({ course: courseId }) .populate({
         path: "sender",
-        populate: { path: "userid", model: "User" }, // Populate UserDetails.userid with User fields
+        populate: { path: "userid", model: "User" }, 
       })
       .exec();
       return res.status(200).json({ success: true, data: messages });
@@ -20,7 +19,6 @@ exports.getMessages = async (req, res) => {
     try {
       const { course, sender, text, replyTo, attachments } = req.body;
   
-      // Create a new message
       const newMessage = new Message({
         course,
         sender,
@@ -29,10 +27,8 @@ exports.getMessages = async (req, res) => {
         attachments,
       });
   
-      // Save the message to the database
       await newMessage.save();
   
-      // Return success response
       return res.status(201).json({ success: true, message: 'Message added successfully', data: newMessage });
     } catch (error) {
       console.error('Error adding message:', error);
@@ -52,8 +48,6 @@ exports.getMessages = async (req, res) => {
   
       message.thumbUps += 1;
       message.usersVoted.thumbUps.push(userId);
-  
-      // Remove user from thumbDowns if they had voted thumb down
       const thumbDownIndex = message.usersVoted.thumbDowns.indexOf(userId);
       if (thumbDownIndex !== -1) {
         message.thumbDowns -= 1;
@@ -81,7 +75,6 @@ exports.getMessages = async (req, res) => {
       message.thumbDowns += 1;
       message.usersVoted.thumbDowns.push(userId);
   
-      // Remove user from thumbUps if they had voted thumb up
       const thumbUpIndex = message.usersVoted.thumbUps.indexOf(userId);
       if (thumbUpIndex !== -1) {
         message.thumbUps -= 1;

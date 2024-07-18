@@ -31,6 +31,13 @@ const fs = require('fs');
   .catch(err => res.json(err))
 }
 
+exports.fetchEventName = (req, res) => { 
+  EventModel.find({ isDeleted: false }, 'EventName _id ')
+
+  .then(event => res.json (event)) 
+  .catch(err => res.json(err))
+}
+
 
 //UPDATE
  exports.fetchEventById = async (req, res) => {

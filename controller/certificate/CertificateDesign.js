@@ -9,33 +9,77 @@ const Event = require("../../model/Events");
 const BlacklistedUser = require("../../model/BlacklistedUser");
 const RegisterLearner = require("../../model/RegistrationSchema");
 // const RegistrationSchema = require("../../model/RegistrationSchema");
-const nodeHtmlToImage = require('node-html-to-image')
+const puppeteer = require('puppeteer-core');
+const { install } = require('@puppeteer/browsers');
+const nodeHtmlToImage = require('node-html-to-image');
 
-// Adjust the import according to your project structure
+// exports.addTemplate = async (req, res) => {
+//   try {
+//     console.log(req.body, "addTemplate");
 
+//     const { certificateBody, certificateName , langCode } = req.body;
+//     console.log(langCode)
+//     const imageBuffer = await nodeHtmlToImage({
+//       html: certificateBody,
+//       encoding: 'buffer' // Ensures the output is a buffer
+//     });
+//     const base64Image = imageBuffer.toString('base64');
+//     const imageSrc = `data:image/png;base64,${base64Image}`;
+//     // console.log(imageSrc , "imageSrc")
+//     const templateData = {
+//       certificateName: certificateName,
+//       certificateBody: certificateBody,
+//       certificateImage: imageSrc, // Store the image buffer
+//       langCode : langCode
+//     };
+//     const certificate = await Templates.create(templateData);
 
+//     return res.status(201).json({
+//       body: certificate,
+//       statusCode: 200,
+//       message: "Certificate added successfully"
+//     });
+//   } catch (error) {
+//     console.log(error.message);
+//     return res.status(500).json("Unable to POST Template");
+//   }
+// };
 
 exports.addTemplate = async (req, res) => {
   try {
     console.log(req.body, "addTemplate");
+    const { certificateBody, certificateName, langCode } = req.body;
+    console.log(langCode);
 
-    const { certificateBody, certificateName , langCode } = req.user;
-    console.log(langCode)
+    // Install and launch browser
+    const browserFetcher = await install({
+      browser: 'chrome',
+      buildId: 'latest'
+    });
+    const browser = await puppeteer.launch({
+      executablePath: browserFetcher.executablePath,
+    });
+
     const imageBuffer = await nodeHtmlToImage({
       html: certificateBody,
-      encoding: 'buffer' // Ensures the output is a buffer
+      encoding: 'buffer',
+      puppeteer: {
+        browser: browser,
+      },
     });
+
+    await browser.close();
+
     const base64Image = imageBuffer.toString('base64');
     const imageSrc = `data:image/png;base64,${base64Image}`;
-    // console.log(imageSrc , "imageSrc")
+
     const templateData = {
       certificateName: certificateName,
       certificateBody: certificateBody,
-      certificateImage: imageSrc, // Store the image buffer
-      langCode : langCode
+      certificateImage: imageSrc,
+      langCode: langCode
     };
     const certificate = await Templates.create(templateData);
-
     return res.status(201).json({
       body: certificate,
       statusCode: 200,
@@ -43,7 +87,10 @@ exports.addTemplate = async (req, res) => {
     });
   } catch (error) {
     console.log(error.message);
-    return res.status(500).json("Unable to POST Template");
+    return res.status(500).json({
+      error: error.message,
+      message: "Unable to POST Template"
+    });
   }
 };
 
@@ -77,10 +124,10 @@ exports.logicalDeleteTemplate = async (req, res) => {
 
 exports.useTemplate = async (req, res) => {
   try {
-    const { templateData, langCode } = req.user;
+    const { templateData, langCode } = req.body;
     console.log(langCode);
     console.log(templateData ,"useTemplate" )
-    const eventcertificate = await Certificates.create(req.user);
+    const eventcertificate = await Certificates.create(req.body);
     return res.status(201).json({
       body: eventcertificate,
       statusCode: 200,
@@ -187,27 +234,6 @@ exports.getSingleCertificate = async (req, res) => {
   }
 };
 
-exports.getOriantation = async (req, res) => {
-  try {
-    const { type, orientation } = req.query;
-    if (type || orientation) {
-      const certificate = await Templates.find({
-        type: type,
-        orientation: orientation,
-      });
-      console.log(type);
-      console.log(orientation);
-      return res.status(200).json(certificate);
-    } else {
-      const certificate = await certificateTemplateSchema.find();
-      return res.status(200).json(certificate);
-    }
-  } catch (error) {
-    console.log(error.message);
-    res.status(500).send({ message: error.message });
-  }
-};
-
 // exports.singleIssue = async(req, res)=>{
 //   try {
 //       const issueData = req.body;
@@ -251,10 +277,12 @@ function generateNextBumber(certificateSetting) {
 exports.singleIssue = async (req, res) => {
   try {
     // const { issueData, langCode } = req.user;
-    const issueData = req.user 
+    const issueData = req.body 
     console.log(issueData)
     // Fetch event data
-    const eventData = await Event.findOne({ EventName: issueData.eventName });
+    const eventData = await Event.findOne({ _id: issueData.eventid });
+    console.log("eventDataNew", issueData.eventid);
+    console.log("eventData", eventData);
     if (!eventData) {
       return res.status(404).json({ message: "Event not found" });
     }
@@ -357,7 +385,7 @@ exports.bulkIssue = async (req, res) => {
   try {
     // const issueDataList = []; // Assuming req.body contains an array of issue data
     // const { data, langCode } = req.user;
-    const data  = req.user;
+    const data  = req.body;
     console.log("req.user" ,data )
 
     const successfulIssues = [];
@@ -595,7 +623,7 @@ exports.blacklistUsers = async (req, res) => {
     const { email, reason, status } = req.body; // Array of user objects to blacklist
     // Extract user IDs from the array of user objects
 
-    const data= await BlacklistedUser.create(req.user);
+    const data= await BlacklistedUser.create(req.body);
 
     return res.status(200).json({
       success: true,

@@ -12,7 +12,7 @@ exports.createCertificateSetting = async (req, res) => {
 
 
   try {
-  const  certificateSettingData =  req.user;
+  const  certificateSettingData =  req.body;
     console.log(certificateSettingData , "certificateSettingData");
     console.log(req.user , "certificateSettingData");
     
