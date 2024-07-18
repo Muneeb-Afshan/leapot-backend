@@ -52,9 +52,12 @@ exports.addTemplate = async (req, res) => {
     console.log(langCode);
 
     // Install and launch browser
-    const browserFetcher = await install('chrome');
+    const browserFetcher = await install({
+      browser: 'chrome',
+      buildId: 'latest'
+    });
     const browser = await puppeteer.launch({
-      executablePath: browserFetcher.executablePath(),
+      executablePath: browserFetcher.executablePath,
     });
 
     const imageBuffer = await nodeHtmlToImage({
@@ -84,7 +87,10 @@ exports.addTemplate = async (req, res) => {
     });
   } catch (error) {
     console.log(error.message);
-    return res.status(500).json( {error : error.message , message : "Unable to POST Template" } ) ;
+    return res.status(500).json({
+      error: error.message,
+      message: "Unable to POST Template"
+    });
   }
 };
 
