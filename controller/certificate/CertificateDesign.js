@@ -9,33 +9,74 @@ const Event = require("../../model/Events");
 const BlacklistedUser = require("../../model/BlacklistedUser");
 const RegisterLearner = require("../../model/RegistrationSchema");
 // const RegistrationSchema = require("../../model/RegistrationSchema");
-const nodeHtmlToImage = require('node-html-to-image')
+const puppeteer = require('puppeteer-core');
+const { install } = require('@puppeteer/browsers');
+const nodeHtmlToImage = require('node-html-to-image');
 
-// Adjust the import according to your project structure
+// exports.addTemplate = async (req, res) => {
+//   try {
+//     console.log(req.body, "addTemplate");
 
+//     const { certificateBody, certificateName , langCode } = req.body;
+//     console.log(langCode)
+//     const imageBuffer = await nodeHtmlToImage({
+//       html: certificateBody,
+//       encoding: 'buffer' // Ensures the output is a buffer
+//     });
+//     const base64Image = imageBuffer.toString('base64');
+//     const imageSrc = `data:image/png;base64,${base64Image}`;
+//     // console.log(imageSrc , "imageSrc")
+//     const templateData = {
+//       certificateName: certificateName,
+//       certificateBody: certificateBody,
+//       certificateImage: imageSrc, // Store the image buffer
+//       langCode : langCode
+//     };
+//     const certificate = await Templates.create(templateData);
 
+//     return res.status(201).json({
+//       body: certificate,
+//       statusCode: 200,
+//       message: "Certificate added successfully"
+//     });
+//   } catch (error) {
+//     console.log(error.message);
+//     return res.status(500).json("Unable to POST Template");
+//   }
+// };
 
 exports.addTemplate = async (req, res) => {
   try {
     console.log(req.body, "addTemplate");
+    const { certificateBody, certificateName, langCode } = req.body;
+    console.log(langCode);
 
-    const { certificateBody, certificateName , langCode } = req.body;
-    console.log(langCode)
+    // Install and launch browser
+    const browserFetcher = await install('chrome');
+    const browser = await puppeteer.launch({
+      executablePath: browserFetcher.executablePath(),
+    });
+
     const imageBuffer = await nodeHtmlToImage({
       html: certificateBody,
-      encoding: 'buffer' // Ensures the output is a buffer
+      encoding: 'buffer',
+      puppeteer: {
+        browser: browser,
+      },
     });
+
+    await browser.close();
+
     const base64Image = imageBuffer.toString('base64');
     const imageSrc = `data:image/png;base64,${base64Image}`;
-    // console.log(imageSrc , "imageSrc")
+
     const templateData = {
       certificateName: certificateName,
       certificateBody: certificateBody,
-      certificateImage: imageSrc, // Store the image buffer
-      langCode : langCode
+      certificateImage: imageSrc,
+      langCode: langCode
     };
     const certificate = await Templates.create(templateData);
-
     return res.status(201).json({
       body: certificate,
       statusCode: 200,
