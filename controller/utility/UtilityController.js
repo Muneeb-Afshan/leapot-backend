@@ -2,7 +2,7 @@
 
 // controllers/contactController.js
 const Role = require("../../model/Role");
-
+const User = require('../../model/UserSchema'); 
 const ContactForm = require("../../model/ContactForm");
 const nodemailer = require("nodemailer");
 
@@ -172,7 +172,35 @@ exports.fetchRole = async (req, res) => {
   }
 };
 
-const User = require('../../model/UserSchema'); // Adjust the path as needed
+exports.fetchEmail = async (req, res) => {
+  try {
+    const users = await User.find({}, 'firstname lastname email'); // Fetching 'firstname', 'lastname', and 'email' fields
+    const userData = users.map(user => ({
+      firstname: user.firstname,
+      lastname: user.lastname,
+      email: user.email,
+    }));
+    res.json({ users: userData });
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    res.status(500).json({ error: 'Failed to fetch user data' });
+  }
+};
+
+
+// exports.fetchRole = async (req, res) => {
+//   try {
+
+// console.log(req.user)
+//     // Check if the role with the same name already exists
+//     const role = await Role.find();
+//     return res.status(201).json({ success: true, message: 'Role fetch successfully', data: role });
+//   } catch (error) {
+//     console.error('Error adding role:', error);
+//     return res.status(500).json({ success: false, message: 'Failed to fetch role' });
+//   }
+// };
+
 
 exports.getInstructors = async (req, res) => {
   try {
@@ -182,6 +210,3 @@ exports.getInstructors = async (req, res) => {
     res.status(500).json({ message: 'Error fetching instructors', error , success:false });
   }
 };
-
-
-

@@ -52,10 +52,18 @@ exports.createUser = async (req, res) => {
     await transporter.sendEmail({
       from: "contact@leapot.in",
       to: email,
-      subject: "Password Reset Link For Account",
+      subject: "Welcome to Leapot Technologies!",
       html: `
-          <p>You are receiving this email because a request was made to reset the password for your account.</p>
-          <p><a href="${passwordResetLink}" style="background-color: green; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Reset Password</a></p>
+        <p>Hello ${firstname},</p>
+        <p>Welcome to Leapot Technologies! We are excited to have you on board.</p>
+        <p>Your account has been successfully created by our Admin. Here are your account details:</p>
+        <p>Login email id: ${email}</p>
+        <p>To get started, please click on the link below and set your password and start exploring features in.</p>
+        <p><a href="${passwordResetLink}">${passwordResetLink}</a></p>
+        <p>If you have any questions or need assistance, our support team is here to help you. Feel free to reach out to us at contact@leapot.in or +917038585222.</p>
+        <p>Once again, welcome aboard! We look forward to working with you.</p>
+        <p>Best regards,</p>
+        <p>Leapot Team</p>
         `,
     });
 
@@ -151,6 +159,15 @@ exports.passwordResetLink = async (req, res) => {
   console.log("email", email);
 
   try {
+    // Fetch user details from the database
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+    const firstName = user.firstname;
+
     const passwordResetLink = await firebase
       .auth()
       .generatePasswordResetLink(email);
@@ -160,12 +177,24 @@ exports.passwordResetLink = async (req, res) => {
     await transporter.sendEmail({
       from: "intern.lpt@gmail.com",
       to: email,
-      subject: "Password Reset",
+      subject: "Request for Password Reset",
       html: `
-    <p>You are receiving this email because a request was made to reset the password for your account.</p>
-    <p>Please follow these steps to reset your password:</p>
-    <p><a href="${passwordResetLink}" style="background-color: green; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Reset Password</a></p>
-  `,
+        <p>Hello ${firstName},</p>
+        <p>We received a request to reset your password for your Leapot LMS account. If you did not make this request, please ignore this email.</p>
+        <p>To reset your password, click the link below:</p>
+       <p><a href="${passwordResetLink}">${passwordResetLink}</a></p>
+        <p>This link will expire in 24 hours for security reasons. If you need a new link, you can request another password reset <a href="[Password Reset Page Link]">here</a>.</p>
+        <p>If you have any questions or need further assistance, please contact our support team.</p>
+        <p>Thank you,</p>
+        <p>Leapot Support Team</p>
+        <hr/>
+        <p>Security Tip: For your protection, never share your password with anyone.</p>
+        <hr/>
+        <p>Leapot Technologies</p>
+        <p>Phone: +917038585222</p>
+        <p>Email: contact@leapot.in</p>
+        <p>Follow us on : <a href="https://in.linkedin.com/company/leapot-technologies">LinkedIn</a></p>
+      `,
     });
     res.json({ success: true });
   } catch (e) {
@@ -282,7 +311,6 @@ async function uploadToS3(filePath, bucketName) {
 // exports.csvCreateUser = async (req, res) => {
 //   try {
 //     const users = req.body.data;
-//     console.log("Received users data:", users);
 
 //     if (!Array.isArray(users) || users.length === 0) {
 //       return res.status(400).json({ message: "No user data provided" });
@@ -294,13 +322,9 @@ async function uploadToS3(filePath, bucketName) {
 //     const failedRecords = [];
 
 //     const timestamp = moment().format("YYYYMMDD_HHmmss");
-//     // const timestamp = moment().format("MM-DD-YYYY_HH:mm:ss"); //this format does not work for windows file system
 
 //     const successCsvFilePath = `successfulUserRecords_${timestamp}.csv`;
 //     const failureCsvFilePath = `failureUserRecords_${timestamp}.csv`;
-
-//     console.log("Success CSV File Path:", successCsvFilePath);
-//     console.log("Failure CSV File Path:", failureCsvFilePath);
 
 //     const successCsvWriter = createCsvWriter({
 //       path: successCsvFilePath,
@@ -322,6 +346,7 @@ async function uploadToS3(filePath, bucketName) {
 //         { id: "error", title: "Error" },
 //       ],
 //     });
+
 //     for (let i = 0; i < users.length; i++) {
 //       const { firstname, lastname, email, role } = users[i];
 //       const password = "defaultPassword123";
@@ -358,13 +383,20 @@ async function uploadToS3(filePath, bucketName) {
 //           .generatePasswordResetLink(email);
 
 //         await transporter.sendEmail({
-//           from: "intern.lpt@gmail.com",
+//           from: "contact@leapot.in",
 //           to: email,
-//           subject: "Password Reset",
+//           subject: "Welcome to Leapot Technologies!",
 //           html: `
-//             <p>You are receiving this email because a request was made to reset the password for your account.</p>
-//             <p>Please follow these steps to reset your password:</p>
-//             <p><a href="${passwordResetLink}" style="background-color: green; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Reset Password</a></p>
+//             <p>Hello ${firstname},</p>
+//         <p>Welcome to Leapot Technologies! We are excited to have you on board.</p>
+//         <p>Your account has been successfully created by our Admin. Here are your account details:</p>
+//         <p>Login email id: ${email}</p>
+//         <p>To get started, please click on the link below and set your password and start exploring features in.</p>
+//         <p><a href="${passwordResetLink}">${passwordResetLink}</a></p>
+//         <p>If you have any questions or need assistance, our support team is here to help you. Feel free to reach out to us at contact@leapot.in or +917038585222.</p>
+//         <p>Once again, welcome aboard! We look forward to working with you.</p>
+//         <p>Best regards,</p>
+//         <p>Leapot Team</p>
 //           `,
 //         });
 
@@ -403,21 +435,42 @@ async function uploadToS3(filePath, bucketName) {
 //     await successCsvWriter.writeRecords(successfulRecords);
 //     await failureCsvWriter.writeRecords(failedRecords);
 
-//     // Get the last SrNo and increment it
+//     const successFileUrl = (
+//       await uploadToS3(successCsvFilePath, process.env.AWS_BUCKETNAME)
+//     ).Location;
+//     const failureFileUrl = (
+//       await uploadToS3(failureCsvFilePath, process.env.AWS_BUCKETNAME)
+//     ).Location;
+
+//     // Delete local files
+//     fs.unlink(successCsvFilePath, (err) => {
+//       if (err) {
+//         console.error(`Error deleting success CSV file: ${err}`);
+//       } else {
+//         console.log("Success CSV file deleted");
+//       }
+//     });
+
+//     fs.unlink(failureCsvFilePath, (err) => {
+//       if (err) {
+//         console.error(`Error deleting failure CSV file: ${err}`);
+//       } else {
+//         console.log("Failure CSV file deleted");
+//       }
+//     });
+
 //     const lastHistory = await UserHistory.findOne().sort({ SrNo: -1 });
 //     const SrNo = lastHistory ? lastHistory.SrNo + 1 : 1;
-//     // Calculate total records
 //     const totalRecords = successfulRecords.length + failedRecords.length;
 
-//     // Create UserHistory record
 //     const userHistory = new UserHistory({
 //       SrNo,
 //       SuccessfulRecords: successfulRecords.length,
 //       FailedRecords: failedRecords.length,
 //       TotalRecords: totalRecords,
 //       TimeofAction: new Date(),
-//       SuccessFilePath: successCsvFilePath.replace(__dirname, ""),
-//       FailureFilePath: failureCsvFilePath.replace(__dirname, ""),
+//       SuccessFilePath: successFileUrl,
+//       FailureFilePath: failureFileUrl,
 //     });
 //     await userHistory.save();
 
@@ -432,18 +485,25 @@ async function uploadToS3(filePath, bucketName) {
 //     res.status(500).json({ error: "Internal server error" });
 //   }
 // };
+
 exports.csvCreateUser = async (req, res) => {
   try {
-    const users = req.body.data;
+    const { validRecords, invalidRecords } = req.body;
 
-    if (!Array.isArray(users) || users.length === 0) {
+    console.log("Received validRecords:", validRecords);
+    console.log("Received invalidRecords:", invalidRecords);
+
+    if (
+      (!Array.isArray(validRecords) || validRecords.length === 0) &&
+      (!Array.isArray(invalidRecords) || invalidRecords.length === 0)
+    ) {
       return res.status(400).json({ message: "No user data provided" });
     }
 
     const insertUser = [];
     const insertUserDetails = [];
     const successfulRecords = [];
-    const failedRecords = [];
+    const failedRecords = [...invalidRecords]; // Initialize with invalid records
 
     const timestamp = moment().format("YYYYMMDD_HHmmss");
 
@@ -471,26 +531,15 @@ exports.csvCreateUser = async (req, res) => {
       ],
     });
 
-    for (let i = 0; i < users.length; i++) {
-      const { firstname, lastname, email, role } = users[i];
+    for (let i = 0; i < validRecords.length; i++) {
+      const { firstname, lastname, email, role } = validRecords[i];
       const password = "defaultPassword123";
-
-      if (!(firstname && lastname && email && role)) {
-        const error = `Invalid data at index ${i}: All fields are required`;
-        console.error(error);
-        failedRecords.push({ ...users[i], error });
-        await new UserAction({
-          action: "failed records",
-          remarks: error,
-        }).save();
-        continue;
-      }
 
       const oldUser = await User.findOne({ email });
       if (oldUser) {
         const error = `User with email ${email} already exists`;
         console.error(error);
-        failedRecords.push({ ...users[i], error });
+        failedRecords.push({ ...validRecords[i], error });
         await new UserAction({
           action: "failed records",
           remarks: error,
@@ -534,14 +583,14 @@ exports.csvCreateUser = async (req, res) => {
         const savedUserDetails = await newUserDetails.save();
         insertUserDetails.push(savedUserDetails);
 
-        successfulRecords.push(users[i]);
+        successfulRecords.push(validRecords[i]);
         await new UserAction({
           action: "successfully added",
           remarks: "added user in database",
         }).save();
       } catch (error) {
         console.error("Error processing user:", error);
-        failedRecords.push({ ...users[i], error: error.message });
+        failedRecords.push({ ...validRecords[i], error: error.message });
         await new UserAction({
           action: "failed records",
           remarks: error.message,
