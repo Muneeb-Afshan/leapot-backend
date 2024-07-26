@@ -27,8 +27,11 @@ const {
   getUserHistory,
   createImportHistory,
 } = require("../controller/usermodule/UserHistoryController");
+const { verifyOTP, sendOTP } = require("../controller/otpController");
 
 usermoduleRouter.post("/usermodule/createnewusers", createUser);
+usermoduleRouter.post("/usermodule/verifyotp",verifyOTP);
+usermoduleRouter.post("/usermodule/sendotp",sendOTP);
 usermoduleRouter.get("/usermodule/getusersdetails", fetchUser);
 usermoduleRouter.get("/usermodule/getusersdetails/:role", fetchUsersByRole);
 usermoduleRouter.post("/usermodule/passwordResetLink", passwordResetLink);
