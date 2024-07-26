@@ -11,6 +11,7 @@ const createCsvWriter = require("csv-writer").createObjectCsvWriter;
 // To add user, admin will add the user
 exports.createUser = async (req, res) => {
   const { firstname, lastname, email, role, password, referredBy } = req.body;
+  
 
   if (!(email && role)) {
     return res.json({

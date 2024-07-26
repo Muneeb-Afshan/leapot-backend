@@ -10,23 +10,49 @@ const transporter = nodemailer.createTransport({
   service: "Gmail",
   auth: {
     user: "hr.leapot@gmail.com",
-    pass: "tlnb zajb dnqz katg",
+    pass: "tlnb zajb dnqz katg", // Use environment variables for sensitive information
   },
 });
 
+// Email validation function
+const validateEmail = (email) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
+// Mobile validation function
+const validateMobile = (mobile) => {
+  const mobileRegex = /^\d{10}$/;
+  return mobileRegex.test(mobile);
+};
+
+// Controller method for handling contact form submissions
 exports.ContactForm = async (req, res) => {
   try {
-    const { name, email, mobile, message } = req.body;
+    const { name, email, mobile, countryCode, message } = req.body;
 
+    // Validate email and mobile fields
+    if (!validateEmail(email)) {
+      return res.status(400).json({ message: "Invalid email format" });
+    }
+
+    if (!validateMobile(mobile)) {
+      return res.status(400).json({ message: "Invalid mobile number format" });
+    }
+
+    // Create a new contact form entry
     const contactForm = new ContactForm({
       name,
       email,
       mobile,
+      countryCode,
       message,
     });
 
+    // Save the contact form entry to the database
     await contactForm.save();
 
+    // Send a confirmation email to the user
     await transporter.sendMail({
       from: "hr@leapot.in",
       to: email,
@@ -41,7 +67,7 @@ exports.ContactForm = async (req, res) => {
       `,
     });
 
-    // owner
+    // Send a notification email to the owner
     await transporter.sendMail({
       from: email,
       to: "contact@leapot.in",
@@ -53,42 +79,24 @@ exports.ContactForm = async (req, res) => {
         <li><strong>Name:</strong> ${name}</li>
         <li><strong>Email:</strong> ${email}</li>
         <li><strong>Mobile:</strong> ${mobile}</li>
+        <li><strong>Country Code:</strong> ${countryCode}</li>
         <li><strong>Message:</strong> ${message}</li>
         </ul>
         <p>Please review the inquiry at your earliest convenience and reach out to the user to provide assistance or further information.</p>        
         <p>Thank you for your attention to this matter.</p>        
         <p>Best regards,</p>        
         <p>Leapot Technologies</p>        
-
       `,
     });
 
+    // Respond with success message
     res.status(201).json({
       message: "Contact form submitted successfully",
       ContactInfo: contactForm,
     });
   } catch (error) {
     console.error("Error submitting contact form:", error);
-    res
-      .status(500)
-      .json({ message: "An error occurred while processing your request" });
-  }
-};
-
-const Application = require("../../model/CareerSchema");
-
-exports.createApplication = async (req, res) => {
-  try {
-    const application = await Application.create(req.body);
-    res
-      .status(201)
-      .json({
-        message: "Contact form submitted successfully",
-        data: application,
-        statusCode: 200,
-      });
-  } catch (err) {
-    res.status(400).json({ message: err.message });
+    res.status(500).json({ message: "An error occurred while processing your request" });
   }
 };
 

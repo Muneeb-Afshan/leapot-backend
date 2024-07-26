@@ -7,27 +7,24 @@ const YAML = require("yamljs");
 const swaggerDocument = YAML.load("./swagger.yaml");
 const socketIo = require("socket.io");
 const cors = require("cors");
-const AWS = require("aws-sdk");
-const multer = require("multer");
-const unzipper = require("unzipper");
-const { v4: uuidv4 } = require("uuid");
-const fs = require("fs");
-const path = require("path");
 const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
 
-const port = 8000;
+// Load environment variables
+require("dotenv").config();
 
-app.use(express.json());
-app.use(cors());
+// Connect to database
+require("./config/Database").connect();
 
+const port = process.env.PORT || 8000;
 const server = http.createServer(app);
-
 const io = socketIo(server, {
   cors: {
     origin: "*",
   },
 });
 
+// Message storage
 let messages = [];
 
 io.on("connection", (socket) => {
@@ -64,75 +61,55 @@ io.on("connection", (socket) => {
   socket.emit("initialMessages", messages);
 });
 
-//config .env file
-require("dotenv").config();
-//config Database
-require("./config/Database").connect();
-//import and initialize cron jobs
-require("./utilities/cronJobs");
-//routes added here
+// Middleware
+app.use(cors());
+app.use(express.json());
+app.use(morgan(":date[web] :method :url :status :response-time ms - :res[content-length]"));
+
+// Routes
 const router = require("./routes/AuthenticationRoutes");
 const routerTeam = require("./routes/TeamRoutes");
 const userDetail = require("./routes/UserDetailsRoutes");
 const utilityRoutes = require("./routes/UtilityRoutes");
 const EventManagerRoute = require("./routes/EventManagerRoute");
-
 const notificationRoute = require("./routes/NotificationRoutes");
 const courseRouter = require("./routes/CourseRoutes");
 const routerBlog = require("./routes/BlogsRoutes");
 const routerTestimonial = require("./routes/TestimonialsRoutes");
-
 const calendarRoute = require("./routes/CalendarRoutes");
 const certificateRoute = require("./routes/CertificateRoutes");
 const routerJob = require("./routes/JobRoutes");
 const usermoduleRoute = require("./routes/UserModuleRoutes");
-
 const dashboardModuleRouter = require("./routes/DashboardModuleRoutes");
+const RouterSiteBuilder = require('./routes/SiteBuilderRoutes');
 
-
-
-const RouterSiteBuilder = require('./routes/SiteBuilderRoutes')
-
-//middleWares
-// app.use(morgan('combined'));
-app.use(
-  morgan(
-    ":date[web] :method :url :status :response-time ms - :res[content-length]"
-  )
-);
-app.use(bodyParser.json({ extended: true }));
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.json());
-app.use(cors());
-
-//Map Router to Path
+// Use routes
 app.use("/api", router);
 app.use("/api", routerTeam);
 app.use("/api", userDetail);
 app.use("/api", EventManagerRoute);
-
 app.use("/api", certificateRoute);
 app.use("/api", notificationRoute);
-
 app.use("/api", calendarRoute);
-
 app.use("/api", courseRouter);
 app.use("/api", utilityRoutes);
 app.use("/api", routerBlog);
 app.use("/api", routerTestimonial);
 app.use("/api", routerJob);
 app.use("/api", usermoduleRoute);
-
 app.use("/api", dashboardModuleRouter);
-
-
-
 app.use("/api", RouterSiteBuilder);
 
-// api document
+// Swagger UI
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-//server listen
-server.listen(process.env.PORT, () => {
-  console.log(`server is started ${process.env.PORT}`);
+// Error handling middleware (must be placed last)
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something went wrong!');
+});
+
+// Start server
+server.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
 });
