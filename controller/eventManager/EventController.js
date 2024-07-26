@@ -24,12 +24,13 @@ const fs = require('fs');
 
 
   //FETCH
- exports.fetchEvent = (req, res) => { 
-  EventModel.find({ isDeleted: false })
-
-  .then(event => res.json (event)) 
-  .catch(err => res.json(err))
-}
+  exports.fetchEvent = (req, res) => { 
+    EventModel.find({ isDeleted: false })
+      .sort({ createdAt: -1 }) // Sort by createdAt in descending order
+      .then(events => res.json(events)) 
+      .catch(err => res.status(500).json({ error: "Internal Server Error" }));
+  };
+  
 
 exports.fetchEventName = (req, res) => { 
   EventModel.find({ isDeleted: false }, 'EventName _id ')
