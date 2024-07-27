@@ -28,6 +28,8 @@ console.log("inauth controller for google",req.body);
           picture: user.picture,
           user_id: user.user_id,
           role: user.role,
+          lastLogin: user.lastLogin 
+
         },
         message: 'User login successful',
       });
@@ -113,29 +115,42 @@ const login = async (req, res) => {
 const loginWithEmail = async (req, res) => {
   const { email } = req.user;
   try {
-    // check if user already exist
-    // Validate if user exist in our database
-    const oldUser = await UserDetails.findOne({ email: email }).populate(
-      "userid"
-    );
-    if (oldUser) {
-      // Save the updated user document
+    // Check if user exists in UserDetails
+    const userDetails = await UserDetails.findOne({ email: email }).populate('userid');
+    if (userDetails) {
+      // Fetch the related user document
+      const user = await User.findById(userDetails.userid);
+      if (user) {
       return res.status(200).json({
-        user: oldUser,
-        message: "User Login Successfull",
-      });
+          user: {
+            email: user.email,
+            firstname: user.firstname,
+            lastname: user.lastname,
+            picture: user.picture,
+            user_id: user.user_id,
+            role: user.role,
+            lastLogin: user.lastLogin, 
+          },
+          message: "User Login Successful",
+        });
+      } else {
+        return res.status(404).json({
+          message: "User details exist but user not found!",
+        });
+      }
     } else {
-      return res.json({
-        message: "User doesn't exist !  Contact Admit for account creation",
+      return res.status(404).json({
+        message: "User doesn't exist! Contact admin for account creation",
       });
     }
   } catch (error) {
-    return res.json({
-      message: "Error occured during Login.",
+    return res.status(500).json({
+      message: "Error occurred during login.",
       error: error,
     });
   }
 };
+
 
 const logout = async (req, res) => {
   const { email } = req.body; // Ensure the email is being sent in the request body

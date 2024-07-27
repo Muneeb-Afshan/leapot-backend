@@ -2,8 +2,8 @@
 const UserDetails = require('../../model/UserDetailsSchema')
 const User = require('../../model/UserSchema');
   exports.GetUserProfileByEmail = async (req, res) =>{
-    const {email , firstname, lastname, dateofbirth,bio,country,state ,city,address1,address2,phoneNo,picture, langCode } = req.user;
-
+    const {email , firstname, lastname, dateofbirth,bio,country,state, countryCode,city,address1,address2,phoneNo,picture, langCode } = req.user;
+    console.log(req.user.email)
     try {
          
         const oldDetails = await UserDetails.findOne({email:email}).populate('userid')
@@ -26,7 +26,10 @@ const User = require('../../model/UserSchema');
 
             await oldDetails.save();
             await oldDetails.userid.save();
+            console.log("USER",oldDetails)
             return  res.status(200).json({ user:oldDetails  , message:"user profile update successfully" , statusCode:200});
+        }else{
+          return  res.status(400).json({ user:oldDetails  , message:"ERORR " , statusCode:400});
         }
         console.log(langCode);
 
