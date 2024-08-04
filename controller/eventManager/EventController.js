@@ -7,16 +7,20 @@ const fs = require('fs');
 // POST
  exports.createEvent =  async (req, res) => {
     try {
+      console.log("Request body received:", req.body);
+      
       // Create a new instance of EventModel
       const newEvent = new EventModel({
         ...req.body,
         dynamicFields: req.body.dynamicFields, // Ensure this part is correctly passed
       });
+
+    console.log("New event instance created:", newEvent);
       
       // Save the new event
       const event = await newEvent.save();
       
-      res.json(event);
+      res.json(event);//sending as response wateevr is saved on UI
     } catch (error) {
       res.status(500).json({ error: "Internal Server Error" });
     }

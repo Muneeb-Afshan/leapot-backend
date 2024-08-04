@@ -150,6 +150,9 @@ exports.cancelAnnouncement = async (req, res) => {
 
 exports.addAnnouncements = async (req, res) => {
   try {
+    console.log("Request received");
+    console.log("Request body:", req.body);
+
     const {
       announcementNo,
       eventName,
@@ -162,6 +165,18 @@ exports.addAnnouncements = async (req, res) => {
       active,
       langCode,
     } = req.body;
+
+    console.log("announcementNo:", announcementNo);
+    console.log("eventName:", eventName);
+    console.log("eventDate:", eventDate);
+    console.log("eventEndDate:", eventEndDate);
+    console.log("type:", type);
+    console.log("image:", image);
+    console.log("startTime:", startTime);
+    console.log("endTime:", endTime);
+    console.log("active:", active);
+    console.log("langCode:", langCode);
+
     const newAnnouncement = await AddAnnouncements.create({
       announcementNo,
       eventName,
@@ -174,17 +189,20 @@ exports.addAnnouncements = async (req, res) => {
       active,
       langCode,
     });
-    console.log(langCode);
+
+    console.log("New announcement created:", newAnnouncement);
+
     return res.status(200).send({
       newAnnouncement: newAnnouncement,
       statusCode: 200,
-      message: "announcements fetched successfully",
+      message: "Announcements fetched successfully",
     });
-    // return res.status(200).json(newAnnouncement);
   } catch (error) {
+    console.error("Error creating announcement:", error);
     res.status(500).json({ message: error.message });
   }
 };
+
 
 //controller to fetch announcement information about specific announcement
 exports.getAnnouncementInfo = async (req, res) => {
