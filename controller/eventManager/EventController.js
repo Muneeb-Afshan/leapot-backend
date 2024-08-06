@@ -28,12 +28,18 @@ const fs = require('fs');
 
 
   //FETCH
-  exports.fetchEvent = (req, res) => { 
-    EventModel.find({ isDeleted: false })
-      .sort({ createdAt: -1 }) // Sort by createdAt in descending order
-      .then(events => res.json(events)) 
-      .catch(err => res.status(500).json({ error: "Internal Server Error" }));
+  exports.fetchEvent = async (req, res) => {
+    console.log("inside endpoint");
+    try {
+      const events = await EventModel.find({ isDeleted: false }).sort({ createdAt: -1 });
+      res.json(events);
+      console.log("inside endpoint");
+    } catch (err) {
+      console.error(err,"from controller"); // Log the error for debugging
+      res.status(500).json({ error: "Internal Server Error FROM CONTROLLER" });
+    }
   };
+  
   
 
 exports.fetchEventName = (req, res) => { 

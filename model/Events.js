@@ -53,7 +53,7 @@ const EventSchema = new mongoose.Schema(
     CourseFees: { type: String },
     CourseAvailable: { type: String },
     dynamicFields: { type: Array },
-    createdBy: { type: String, default: "purvadhopade@gmail.com" },
+    createdBy: { type: String, default: "Shashank@gmail.com" },
     updatedBy: { type: String },
     isDeleted: { type: Boolean, default: false },
     langCode: { type: String, required: true, default: "en" },
@@ -61,6 +61,7 @@ const EventSchema = new mongoose.Schema(
     image: { type: String },
     MultipleStartDate:{type: Array},
     SingleDateEvents:{type: Array},
+    Dynamic:{type: Array},
   },
   { timestamps: true }
 );

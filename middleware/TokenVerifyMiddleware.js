@@ -1,26 +1,35 @@
-const admin = require("../config/firebase-config");
+const admin = require('../config/firebase-config.js');
 
 const verifyTokenForAllUrl = async (req, res, next) => {
-  console.log("geloo from middelware");
-  console.log(req.body, "verifyTokenForAllUrl");
-  console.log(req.headers, "headers");
-  // Extract the token from the request headers
-  const token = req.headers.authorization.split(" ")[1];
-  console.log(token, "token");
+  console.log("Entered middleware verify token");
+
+  const authHeader = req.headers.authorization;
+  let token;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    token = authHeader.split(' ')[1];
+    console.log("Token extracted:",token);//TODO:TOCKEN TILL HERE
+  } else {
+    console.warn('Authorization header missing or invalid format');
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
   const langCode = req.headers["accept-language"];
-  console.log(langCode, "verifyTokenForAllUrl");
+  console.log("Language code extracted:", langCode);
+
   try {
-    const decodeValue = await admin.auth().verifyIdToken(token);
-    console.log(decodeValue, "decodeValue");
-    if (decodeValue) {
-      console.log("inside clg");
-      req.user = { ...req.body, langCode: langCode }; // , langCode : langCode here it adding
-      return next();
+    const decodedValue = await admin.auth().verifyIdToken(token);
+    console.log("Token verified successfully. Decoded value:", decodedValue);
+    req.user = { ...decodedValue, langCode };
+    return next();
+  } catch (error) {
+    console.error("Error verifying token:", error.message);
+    if (error.code === 'auth/id-token-expired') {
+      return res.status(401).json({ message: 'Firebase ID token expired. Please refresh your token.' });
+    } else if (error.code === 'auth/argument-error') {
+      return res.status(400).json({ message: 'Invalid token format. Please provide a valid token.' });
+    } else {
+      return res.status(500).json({ message: 'Internal Server Error' });
     }
-    return res.json({ message: "Un authorize user" });
-  } catch (e) {
-    console.log(e.message,"Error from verify token");
-    return res.json({ message: "Internal Error" });
   }
 };
 
