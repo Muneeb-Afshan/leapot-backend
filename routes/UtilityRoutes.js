@@ -16,6 +16,7 @@ const {
   uploadAttachments,
   uploadscrom,
   uploadUserImages,
+  profileImage
 } = require("../controller/fileUpload/uploadFileController");
 
 // const {
@@ -34,6 +35,8 @@ UtilityRoutes.post("/upload", uploadImages);
 UtilityRoutes.post("/uploadResume", uploadResume);
 UtilityRoutes.post("/uploadAttachments", uploadAttachments);
 UtilityRoutes.post("/uploadUserImages", uploadUserImages);
+UtilityRoutes.post("/generate-presigned-url" ,profileImage);
+UtilityRoutes.get("/generate-presigned-url" ,profileImage);
 UtilityRoutes.post("/uploadscrom", uploadscrom);
 UtilityRoutes.get("/fetchEmail", fetchEmail);
 

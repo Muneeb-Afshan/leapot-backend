@@ -1,6 +1,7 @@
 const express = require('express');
 const certificateRouter = express.Router();
 const verifyToken = require('../middleware/TokenVerifyMiddleware');
+const {handleFileUpload,uploadFile} = require('../controller/certificate/uploadController');
 
 const {createCertificateSetting , updateCertificateSetting} = require('../controller/certificate/CourseSettingController');
 const {addTemplate , logicalDeleteTemplate ,  useTemplate , editCertificate , logicalDeleteCertificate , getAllTemplates , getAllCertificate,getSingleCertificate , singleIssue , bulkIssue, fetchIssueCertificate ,fetchSetting,fetchSingleSetting, DeleteSettingOfEvent ,blacklistUsers ,getBlacklistedUsers} = require('../controller/certificate/CertificateDesign')
@@ -24,4 +25,6 @@ certificateRouter.post('/certificate/bulkIssue',bulkIssue);
 certificateRouter.get('/certificate/fetchIssueCertificate',fetchIssueCertificate); 
 certificateRouter.post('/certificate/blacklist', blacklistUsers); 
 certificateRouter.get('/certificate/getBlacklistedUsers', getBlacklistedUsers); 
+certificateRouter.post('/upload', uploadFile, handleFileUpload);
+
 module.exports = certificateRouter;

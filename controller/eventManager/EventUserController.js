@@ -241,7 +241,7 @@ exports.createUsersByCSV = async (req, res) => {
 
 // //fetching the users details
 exports.fetchUser = async (req, res) => {
-  User.find({ deleteStatus: false })
+  User.find({ deleteStatus: false }).sort({createdAt:-1})
     .then((user) => res.json(user))
     .catch((err) => res.json(err));
 };

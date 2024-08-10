@@ -131,6 +131,9 @@ app.use("/api", RouterSiteBuilder);
 
 // api document
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/uploads', express.static(path.join(__dirname, './utilities/uploads')));
+
+
 
 //server listen
 server.listen(process.env.PORT, () => {

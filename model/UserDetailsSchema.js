@@ -13,7 +13,10 @@ const UserDetailsSchema = new Schema({
   address1: { type: String },
   address2: { type: String },
   langCode:{type: String, required: true , default : "en"},
-
-});
+  
+},{
+  timestamps:true
+}
+);
 
 module.exports = mongoose.model('UserDetails', UserDetailsSchema);

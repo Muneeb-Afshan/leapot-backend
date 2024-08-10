@@ -16,11 +16,12 @@ const transporter = nodemailer.createTransport({
 
 exports.ContactForm = async (req, res) => {
   try {
-    const { name, email, mobile, message } = req.body;
+    const { name, email,countryCode, mobile, message } = req.body;
 
     const contactForm = new ContactForm({
       name,
       email,
+      countryCode,
       mobile,
       message,
     });
@@ -52,7 +53,7 @@ exports.ContactForm = async (req, res) => {
         <ul>
         <li><strong>Name:</strong> ${name}</li>
         <li><strong>Email:</strong> ${email}</li>
-        <li><strong>Mobile:</strong> ${mobile}</li>
+        <li><strong>Mobile:</strong>${countryCode}-${mobile}</li>
         <li><strong>Message:</strong> ${message}</li>
         </ul>
         <p>Please review the inquiry at your earliest convenience and reach out to the user to provide assistance or further information.</p>        
