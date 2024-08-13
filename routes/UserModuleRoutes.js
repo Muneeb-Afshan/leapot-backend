@@ -3,6 +3,9 @@ const path = require("path");
 const usermoduleRouter = express.Router();
 const UserHistory = require("../model/UserHistorySchema");
 
+
+
+
 const {
   createUser,
   fetchUser,
@@ -27,9 +30,10 @@ const {
   getUserHistory,
   createImportHistory,
 } = require("../controller/usermodule/UserHistoryController");
+const verifyToken = require("../middleware/AuthMiddleware");
 
 usermoduleRouter.post("/usermodule/createnewusers", createUser);
-usermoduleRouter.get("/usermodule/getusersdetails", fetchUser);
+usermoduleRouter.get("/usermodule/getusersdetails",verifyToken, fetchUser);
 usermoduleRouter.get("/usermodule/getusersdetails/:role", fetchUsersByRole);
 usermoduleRouter.post("/usermodule/passwordResetLink", passwordResetLink);
 usermoduleRouter.put("/usermodule/deleteUser/:id", logicalUserDelete);

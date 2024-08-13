@@ -89,7 +89,7 @@ eventManagerRouter.get(
 // user related routes
 eventManagerRouter.post("/eventManager/passwordResetLink", passwordResetLink);
 eventManagerRouter.post("/eventManager/users", createUser);
-eventManagerRouter.get("/eventManager/getUsers", fetchUser);//FIXME:
+eventManagerRouter.get("/eventManager/getUsers",verifyToken, fetchUser);//FIXME:
 eventManagerRouter.put("/eventManager/deleteUser/:id", logicalUserDelete);
 eventManagerRouter.delete("/eventManager/deleteAllUser/", logicalAllUserDelete);
 eventManagerRouter.get("/eventManager/getUser/:id", fetchUserById);

@@ -1,35 +1,39 @@
-const admin = require('../config/firebase-config.js');
+const admin = require("../config/firebase-config");
 
 const verifyTokenForAllUrl = async (req, res, next) => {
-  console.log("Entered middleware verify token");
+  // console.log("geloo from middleware");
+  console.log(req.body, "verifyTokenForAllUrl");
+  console.log(req.headers, "headers");
 
-  const authHeader = req.headers.authorization;
-  let token;
-  if (authHeader && authHeader.startsWith('Bearer ')) {
-    token = authHeader.split(' ')[1];
-    console.log("Token extracted:",token);//TODO:TOCKEN TILL HERE
-  } else {
-    console.warn('Authorization header missing or invalid format');
-    return res.status(401).json({ message: 'Unauthorized' });
+  // Check if authorization header is present
+  if (!req.headers.authorization) {
+    return res.status(401).json({ message: "Unauthorized" });
   }
 
-  const langCode = req.headers["accept-language"];
-  console.log("Language code extracted:", langCode);
+  // Extract the token from the authorization header
+  const token = req.headers.authorization.split(" ")[1];
+  if (!token) {
+    return res.status(401).json({ message: "Token is missing" });
+  }
 
+  console.log(token, "token");
+  const langCode = req.headers["accept-language"];
+  console.log(langCode, "verifyTokenForAllUrl");
   try {
-    const decodedValue = await admin.auth().verifyIdToken(token);
-    console.log("Token verified successfully. Decoded value:", decodedValue);
-    req.user = { ...decodedValue, langCode };
-    return next();
-  } catch (error) {
-    console.error("Error verifying token:", error.message);
-    if (error.code === 'auth/id-token-expired') {
-      return res.status(401).json({ message: 'Firebase ID token expired. Please refresh your token.' });
-    } else if (error.code === 'auth/argument-error') {
-      return res.status(400).json({ message: 'Invalid token format. Please provide a valid token.' });
-    } else {
-      return res.status(500).json({ message: 'Internal Server Error' });
+    const decodeValue = await admin.auth().verifyIdToken(token);
+    console.log(decodeValue, "decodeValue");
+
+    if (decodeValue) {
+      console.log("inside clg");
+      req.user = { ...req.body, langCode: langCode, email: decodeValue.email }; // Include email in req.user
+      console.log(req.user, "req.user in middleware"); // Log req.user to verify it includes email
+      return next();
     }
+
+    return res.status(401).json({ message: "Unauthorized user" });
+  } catch (e) {
+    console.log(e.message, "Error from verify token");
+    return res.status(500).json({ message: "Internal Error" });
   }
 };
 
