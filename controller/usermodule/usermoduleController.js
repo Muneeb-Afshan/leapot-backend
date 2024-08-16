@@ -208,9 +208,10 @@ exports.passwordResetLink = async (req, res) => {
 
 exports.updateUserProfile = async (req, res) => {
   const { id } = req.params;
-  const { firstname, lastname, phoneNo, picture, role, referredBy } = req.body;
-
+  const { firstname, lastname,countryCode,userState,userStateLNo,userCountry, phoneNo, picture, role, referredBy } = req.body;
+console.log("outside try in update",req.body)
   try {
+    console.log("inside try in update",req.body)
     // Find the user by ID
     const user = await User.findById(id);
 
@@ -223,6 +224,10 @@ exports.updateUserProfile = async (req, res) => {
     // Update fields only if new data is provided
     if (firstname !== undefined) user.firstname = firstname;
     if (lastname !== undefined) user.lastname = lastname;
+    if (countryCode !== undefined) user.countryCode = countryCode;
+    if (userState !== undefined) user.userState = userState;
+    if (userStateLNo !== undefined) user.userStateLNo = userStateLNo;
+    if (userCountry !== undefined) user.userCountry = userCountry;
     if (phoneNo !== undefined) user.phoneNo = phoneNo;
     if (picture !== undefined) user.picture = picture;
     if (role !== undefined) user.role = role;
