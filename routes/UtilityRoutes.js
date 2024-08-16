@@ -8,15 +8,19 @@ const {
   addRole,
   fetchRole,
   fetchEmail,
-  getInstructors
+  getInstructors,
+  refreshToken,
 } = require("../controller/utility/UtilityController");
 const {
-  uploadImages,
+  // uploadImages,
   uploadResume,
   uploadAttachments,
   uploadscrom,
   uploadUserImages,
+  
+  uploadEventImage
 } = require("../controller/fileUpload/uploadFileController");
+
 
 // const {
 //   uploadscorm
@@ -28,9 +32,11 @@ UtilityRoutes.get("/FAQ", getAllFAQs);
 UtilityRoutes.post("/role", verifyToken, addRole);
 UtilityRoutes.post("/role", verifyToken, addRole);
 UtilityRoutes.get("/getInstructors" , getInstructors);
+UtilityRoutes.get("/generate-presigned-url" , uploadEventImage);//  FIXME:
+UtilityRoutes.get("refreshToken",refreshToken);
 
 UtilityRoutes.get("/fetchRole", fetchRole);
-UtilityRoutes.post("/upload", uploadImages);
+// UtilityRoutes.post("/upload", uploadImages);
 UtilityRoutes.post("/uploadResume", uploadResume);
 UtilityRoutes.post("/uploadAttachments", uploadAttachments);
 UtilityRoutes.post("/uploadUserImages", uploadUserImages);

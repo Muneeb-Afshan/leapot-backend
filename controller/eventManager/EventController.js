@@ -7,16 +7,20 @@ const fs = require('fs');
 // POST
  exports.createEvent =  async (req, res) => {
     try {
+      console.log("Request body received:", req.body);
+      
       // Create a new instance of EventModel
       const newEvent = new EventModel({
         ...req.body,
         dynamicFields: req.body.dynamicFields, // Ensure this part is correctly passed
       });
+
+    console.log("New event instance created:", newEvent);
       
       // Save the new event
       const event = await newEvent.save();
       
-      res.json(event);
+      res.json(event);//sending as response wateevr is saved on UI
     } catch (error) {
       res.status(500).json({ error: "Internal Server Error" });
     }
@@ -24,12 +28,19 @@ const fs = require('fs');
 
 
   //FETCH
- exports.fetchEvent = (req, res) => { 
-  EventModel.find({ isDeleted: false })
-
-  .then(event => res.json (event)) 
-  .catch(err => res.json(err))
-}
+  exports.fetchEvent = async (req, res) => {
+    console.log("inside endpoint");
+    try {
+      const events = await EventModel.find({ isDeleted: false }).sort({ createdAt: -1 });
+      res.json(events);
+      console.log("inside endpoint");
+    } catch (err) {
+      console.error(err,"from controller"); // Log the error for debugging
+      res.status(500).json({ error: "Internal Server Error FROM CONTROLLER" });
+    }
+  };
+  
+  
 
 exports.fetchEventName = (req, res) => { 
   EventModel.find({ isDeleted: false }, 'EventName _id ')
