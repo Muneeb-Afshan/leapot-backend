@@ -1,6 +1,7 @@
 const admin = require("../config/firebase-config");
 
 const verifyTokenForAllUrl = async (req, res, next) => {
+
   console.log("geloo from middleware");
   console.log(req.body, "verifyTokenForAllUrl");
   console.log(req.headers, "headers");

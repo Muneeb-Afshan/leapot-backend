@@ -3,6 +3,7 @@ const eventManagerRouter = express.Router();
 const auth = require("../middleware/AuthMiddleware");
 const apicache = require("apicache");
 const cache = apicache.middleware;
+const verifyToken = require('../middleware/TokenVerifyMiddleware');
 //controller added here
 
 const {
@@ -49,7 +50,7 @@ eventManagerRouter.get("/eventManager/signIn", auth, eventManagerSign);
 
 //event related routes
 eventManagerRouter.post("/eventManager/createEvent", createEvent);
-eventManagerRouter.get("/eventManager/getEvents", fetchEvent);
+eventManagerRouter.get("/eventManager/getEvents",verifyToken, fetchEvent);//FIXME:
 eventManagerRouter.get("/eventManager/getEventsName", fetchEventName);
 
 eventManagerRouter.get("/eventManager/getEventById/:id", fetchEventById);
@@ -88,7 +89,7 @@ eventManagerRouter.get(
 // user related routes
 eventManagerRouter.post("/eventManager/passwordResetLink", passwordResetLink);
 eventManagerRouter.post("/eventManager/users", createUser);
-eventManagerRouter.get("/eventManager/getUsers", fetchUser);
+eventManagerRouter.get("/eventManager/getUsers",verifyToken, fetchUser);//FIXME:
 eventManagerRouter.put("/eventManager/deleteUser/:id", logicalUserDelete);
 eventManagerRouter.delete("/eventManager/deleteAllUser/", logicalAllUserDelete);
 eventManagerRouter.get("/eventManager/getUser/:id", fetchUserById);
