@@ -1,6 +1,47 @@
+const admin = require('firebase-admin');
+
 const User = require("../../model/UserSchema");
 const UserDetails = require("../../model/UserDetailsSchema");
 //All Authentications rest API are list here
+const loginWithGoogle = async (req, res) => {
+  const { token } = req.body;
+console.log("inauth controller for google",req.body);
+  if (!token) {
+    return res.status(400).json({ message: 'Token is required' });
+  }
+
+  try {
+    // Verify the token with Firebase
+    const decodedToken = await admin.auth().verifyIdToken(token);
+    const email = decodedToken.email;
+
+    // Check if user exists in the database
+    const user = await User.findOne({ email });
+
+    if (user) {
+      // User exists in the database
+      return res.status(200).json({
+        user: {
+          email: user.email,
+          firstname: user.firstname,
+          lastname: user.lastname,
+          picture: user.picture,
+          user_id: user.user_id,
+          role: user.role,
+        },
+        message: 'User login successful',
+      });
+    } else {
+      // User does not exist
+      return res.status(404).json({
+        message: 'User does not exist. Contact admin to add you.',
+      });
+    }
+  } catch (error) {
+    console.error('Error verifying token or checking user existence:', error);
+    res.status(500).send('Internal Server Error');
+  }
+};
 
 // To add user, admin will add the user
 const register = async (req, res) => {
@@ -105,7 +146,7 @@ const logout = async (req, res) => {
       return res.status(404).json({ message: "User not found." });
     }
 
-    user.lastSignOut = new Date();
+    user.lastLogin = new Date();
 
     await user.save();
 
@@ -119,4 +160,5 @@ module.exports = {
   login,
   loginWithEmail,
   logout,
+  loginWithGoogle
 };

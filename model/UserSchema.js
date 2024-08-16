@@ -19,6 +19,7 @@ const UserSchema = new Schema(
     lastname: { type: String },
     // username: { type: String },
     password: { type: String },
+    countryCode: { type: Number },
     phoneNo: { type: Number },
     role: { type: String, required: true, default: "Learner" },
     token: { type: String },
@@ -33,6 +34,8 @@ const UserSchema = new Schema(
     lastLogin: { type: Date, default: null },
     learnerDetails: { type: LearnerDetailsSchema, default: () => ({}) },
     langCode: { type: String, required: true, default: "en" },
+    otp: { type: String },
+    otpExpiration: { type: Date },
   },
   {
     timestamps: true,
