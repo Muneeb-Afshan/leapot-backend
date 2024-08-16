@@ -17,7 +17,6 @@ const {
   uploadAttachments,
   uploadscrom,
   uploadUserImages,
-  
   uploadEventImage
 } = require("../controller/fileUpload/uploadFileController");
 
@@ -40,6 +39,8 @@ UtilityRoutes.get("/fetchRole", fetchRole);
 UtilityRoutes.post("/uploadResume", uploadResume);
 UtilityRoutes.post("/uploadAttachments", uploadAttachments);
 UtilityRoutes.post("/uploadUserImages", uploadUserImages);
+UtilityRoutes.post("/generate-presigned-url" ,profileImage);
+UtilityRoutes.get("/generate-presigned-url" ,profileImage);
 UtilityRoutes.post("/uploadscrom", uploadscrom);
 UtilityRoutes.get("/fetchEmail", fetchEmail);
 

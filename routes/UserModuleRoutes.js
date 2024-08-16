@@ -30,12 +30,15 @@ const {
   getUserHistory,
   createImportHistory,
 } = require("../controller/usermodule/UserHistoryController");
+const { verifyOTP, sendOTP } = require("../controller/otpController");
 
 const verifyToken = require("../middleware/AuthMiddleware");
 
 usermoduleRouter.post("/usermodule/createnewusers", createUser);
 usermoduleRouter.get("/usermodule/getusersdetails",verifyToken, fetchUser);
-
+usermoduleRouter.post("/usermodule/verifyotp",verifyOTP);
+usermoduleRouter.post("/usermodule/sendotp",sendOTP);
+usermoduleRouter.get("/usermodule/getusersdetails", fetchUser);
 usermoduleRouter.get("/usermodule/getusersdetails/:role", fetchUsersByRole);
 usermoduleRouter.post("/usermodule/passwordResetLink", passwordResetLink);
 usermoduleRouter.put("/usermodule/deleteUser/:id", logicalUserDelete);

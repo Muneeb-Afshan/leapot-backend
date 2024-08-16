@@ -102,6 +102,9 @@ app.use("/api", RouterSiteBuilder);
 
 // Swagger UI
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/uploads', express.static(path.join(__dirname, './utilities/uploads')));
+
+
 
 // Error handling middleware (must be placed last)
 app.use((err, req, res, next) => {

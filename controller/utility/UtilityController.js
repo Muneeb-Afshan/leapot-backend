@@ -29,7 +29,9 @@ const validateMobile = (mobile) => {
 // Controller method for handling contact form submissions
 exports.ContactForm = async (req, res) => {
   try {
-    const { name, email, mobile, countryCode, message } = req.body;
+
+    const { name, email,countryCode, mobile, message } = req.body;
+
 
     // Validate email and mobile fields
     if (!validateEmail(email)) {
@@ -44,6 +46,7 @@ exports.ContactForm = async (req, res) => {
     const contactForm = new ContactForm({
       name,
       email,
+      countryCode,
       mobile,
       countryCode,
       message,
@@ -78,8 +81,7 @@ exports.ContactForm = async (req, res) => {
         <ul>
         <li><strong>Name:</strong> ${name}</li>
         <li><strong>Email:</strong> ${email}</li>
-        <li><strong>Mobile:</strong> ${mobile}</li>
-        <li><strong>Country Code:</strong> ${countryCode}</li>
+        <li><strong>Mobile:</strong>${countryCode}-${mobile}</li>
         <li><strong>Message:</strong> ${message}</li>
         </ul>
         <p>Please review the inquiry at your earliest convenience and reach out to the user to provide assistance or further information.</p>        

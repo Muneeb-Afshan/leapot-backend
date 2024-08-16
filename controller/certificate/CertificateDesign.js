@@ -13,86 +13,43 @@ const puppeteer = require('puppeteer-core');
 const { install } = require('@puppeteer/browsers');
 const nodeHtmlToImage = require('node-html-to-image');
 
-// exports.addTemplate = async (req, res) => {
-//   try {
-//     console.log(req.body, "addTemplate");
 
-//     const { certificateBody, certificateName , langCode } = req.body;
-//     console.log(langCode)
-//     const imageBuffer = await nodeHtmlToImage({
-//       html: certificateBody,
-//       encoding: 'buffer' // Ensures the output is a buffer
-//     });
-//     const base64Image = imageBuffer.toString('base64');
-//     const imageSrc = `data:image/png;base64,${base64Image}`;
-//     // console.log(imageSrc , "imageSrc")
-//     const templateData = {
-//       certificateName: certificateName,
-//       certificateBody: certificateBody,
-//       certificateImage: imageSrc, // Store the image buffer
-//       langCode : langCode
-//     };
-//     const certificate = await Templates.create(templateData);
-
-//     return res.status(201).json({
-//       body: certificate,
-//       statusCode: 200,
-//       message: "Certificate added successfully"
-//     });
-//   } catch (error) {
-//     console.log(error.message);
-//     return res.status(500).json("Unable to POST Template");
-//   }
-// };
+const puppeteerExtra = require('puppeteer-extra');
+const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+puppeteerExtra.use(StealthPlugin());
 
 exports.addTemplate = async (req, res) => {
-  try {
-    console.log(req.body, "addTemplate");
-    const { certificateBody, certificateName, langCode } = req.body;
-    console.log(langCode);
+  const { certificateBody, certificateName ,langCode} = req.body;
 
-    // Install and launch browser
-    const browserFetcher = await install({
-      browser: 'chrome',
-      buildId: 'latest'
-    });
-    const browser = await puppeteer.launch({
-      executablePath: browserFetcher.executablePath,
-    });
+  if (!certificateBody || !certificateName) {
+    return res.status(400).json({ message: "Invalid request body" });
+  }
 
-    const imageBuffer = await nodeHtmlToImage({
-      html: certificateBody,
-      encoding: 'buffer',
-      puppeteer: {
-        browser: browser,
-      },
-    });
+  const browser = await puppeteerExtra.launch({ headless: true });
+  const page = await browser.newPage();
+  await page.setContent(certificateBody);
+  const imageBuffer = await page.screenshot({ type: 'png' });
+  await browser.close();
 
-    await browser.close();
+  const base64Image = imageBuffer.toString('base64');
+  const imageSrc = `data:image/png;base64,${base64Image}`;
 
-    const base64Image = imageBuffer.toString('base64');
-    const imageSrc = `data:image/png;base64,${base64Image}`;
-
-    const templateData = {
-      certificateName: certificateName,
-      certificateBody: certificateBody,
-      certificateImage: imageSrc,
-      langCode: langCode
-    };
-    const certificate = await Templates.create(templateData);
-    return res.status(201).json({
+  const templateData = {
+    certificateName: certificateName,
+    certificateBody: certificateBody,
+    certificateImage: imageSrc,
+    langCode:langCode,
+  };
+  Templates.create(templateData)
+    .then(certificate => res.status(201).json({
       body: certificate,
       statusCode: 200,
       message: "Certificate added successfully"
-    });
-  } catch (error) {
-    console.log(error.message);
-    return res.status(500).json({
-      error: error.message,
-      message: "Unable to POST Template"
-    });
-  }
+    }))
+    .catch(err => res.status(500).json({ message: "Database create failed" }));
 };
+
+
 
 // Controller method to logically delete a template
 exports.logicalDeleteTemplate = async (req, res) => {
@@ -620,14 +577,24 @@ exports.fetchIssueCertificate = async (req, res) => {
 
 exports.blacklistUsers = async (req, res) => {
   try {
-    const { email, reason, status } = req.body; // Array of user objects to blacklist
-    // Extract user IDs from the array of user objects
+    const { email, reason, status } = req.body;
 
-    const data= await BlacklistedUser.create(req.body);
+    // Check if the email already exists in the blacklist
+    const existingUser = await BlacklistedUser.findOne({ email });
+
+    if (existingUser) {
+      return res.status(409).json({
+        success: false,
+        message: "User already exists in the blacklist",
+      });
+    }
+
+    // Create a new blacklisted user record
+    const data = await BlacklistedUser.create(req.body);
 
     return res.status(200).json({
       success: true,
-      message: "Users blacklisted successfully",
+      message: "User blacklisted successfully",
       statusCode: 200,
       data: data,
     });
@@ -635,10 +602,11 @@ exports.blacklistUsers = async (req, res) => {
     console.error("Error blacklisting users:", error);
     return res.status(500).json({
       success: false,
-      message: "Failed to blacklist users",
+      message: "Failed to blacklist user",
     });
   }
 };
+
 
 exports.getBlacklistedUsers = async (req, res) => {
   try {
