@@ -41,7 +41,7 @@ const eventManagerSignUp = async (req, res) => {
   const oldUser = await User.findOne({ email: email });
   if (oldUser) {
     return res.json({
-      message: "Learner Allready Added in Database",
+      message: "Learner Already Added in Database",
       success: false,
     });
   }

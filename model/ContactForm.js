@@ -11,22 +11,30 @@ const contactFormSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  mobile: {type : Number},
+  mobile: {
+    type: String, // Change to String to store phone numbers with country code
+    required: true
+  },
+  countryCode: {
+    type: String,
+    required: true
+  },
   message: {
     type: String,
     required: true
   },
-//   attachments: [String],
   status: {
     type: String,
     enum: ['new', 'in progress', 'resolved'],
     default: 'new'
   },
-  langCode:{type: String, required: true , default : "en"},
-},
-{
-    timestamps: true
-}
-);
+  langCode: {
+    type: String,
+    required: true,
+    default: 'en'
+  }
+}, {
+  timestamps: true
+});
 
 module.exports = mongoose.model('ContactForm', contactFormSchema);
