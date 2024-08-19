@@ -6,7 +6,6 @@ const CreateNotificationSchema = new mongoose.Schema({
     type: String,
     enum: [
       "Admin",
-      "Admin",
       "Learner",
       "Instructor",
       "Course Reviewer",
@@ -61,7 +60,7 @@ const SendNotificationSchema = new mongoose.Schema({
       message: "Invalid email address",
     },
   },
-  cc: { type: String },
+  cc: [{ type: String }],
   bcc: { type: String },
   email_Subject: {
     type: String,

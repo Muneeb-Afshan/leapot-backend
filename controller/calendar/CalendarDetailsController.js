@@ -9,6 +9,8 @@ const {
 } = require("../../model/CalendarSchema");
 const EventModel = require("../../model/Events");
 const User = require("../../model/UserSchema");
+const RegisterLearner = require("../../model/RegistrationSchema");
+
 
 // Controller to handle POST request to add tags to the database
 exports.putAllTags = async (req, res) => {
@@ -331,14 +333,30 @@ exports.enrollUsersforEvent = async (req, res) => {
       return res.status(404).json({ message: "Event not found" });
     }
     console.log("Event found:", event); // Debugging log
+
     // Find users by email and enroll them in the event
     const users = await User.find({ email: { $in: emails } });
 
-    // Add event to user's events array
+    // Add event to user's events array and create a registration record
     users.forEach(async (user) => {
       if (!user.events.includes(eventName)) {
         user.events.push(eventName);
         await user.save();
+
+        // Create a new registration record for the user
+        const registration = new RegisterLearner({
+          email: user.email,
+          userid: user._id, // Reference to the user
+          eventid: event._id, // Reference to the event
+          eventname: event.eventName, // Reference to the event 
+          registrationDate: new Date(), // Current date and time
+          registrationStatus: true, // Assuming the user is successfully registered
+          langCode: "en", // Default language code
+          // Add courseid, paymentid, and other fields as needed
+        });
+
+        await registration.save();
+        console.log(`User ${user.email} enrolled and registration record created.`);
       }
     });
 
@@ -350,6 +368,7 @@ exports.enrollUsersforEvent = async (req, res) => {
       .json({ message: "Error enrolling users", error: error.message });
   }
 };
+
 //controller to fetch users based on event Name
 exports.getEnrolledUsers = async (req, res) => {
   try {

@@ -48,7 +48,7 @@ const EventSchema = new mongoose.Schema(
     // Tags:{type : String},
     CancelPolicy: { type: String },
     OptOut: { type: String },
-    Certificate: { type: String },
+    Certificate: { type: Boolean },
     // tagsInput:{type : String},
     tags: { type: Array },
     CourseFees: { type: String },
