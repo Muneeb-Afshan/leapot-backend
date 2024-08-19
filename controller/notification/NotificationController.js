@@ -9,6 +9,7 @@ const {
 exports.createNotification = async (req, res) => {
   try {
     const { notificationType, subject, notificationBody, role } = req.body;
+    console.log("check",req.body)
     const newnotifications = await CreateNotification.create({
       role,
       notificationType,
@@ -74,7 +75,8 @@ exports.updateNotification = async (req, res) => {
 exports.logicalDeleteNotification = async (req, res) => {
   try {
     const notificationId = req.params.id;
-
+    console.log("checkin param ",notificationId);
+    
     // Find the notification by ID and update it
     const deleteNotification = await CreateNotification.findOneAndUpdate(
       { _id: notificationId },
