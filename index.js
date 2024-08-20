@@ -17,7 +17,7 @@ require("dotenv").config();
 // Connect to database
 require("./config/Database").connect();
 
-const port = process.env.PORT || 8000;
+// const port = process.env.PORT || 8000;
 const port = process.env.PORT || 8000;
 const server = http.createServer(app);
 const io = socketIo(server, {
