@@ -9,6 +9,7 @@ const socketIo = require("socket.io");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const path=require("path")
 
 // Load environment variables
 require("dotenv").config();
@@ -16,6 +17,7 @@ require("dotenv").config();
 // Connect to database
 require("./config/Database").connect();
 
+// const port = process.env.PORT || 8000;
 const port = process.env.PORT || 8000;
 const server = http.createServer(app);
 const io = socketIo(server, {
@@ -24,6 +26,7 @@ const io = socketIo(server, {
   },
 });
 
+// Message storage
 // Message storage
 let messages = [];
 

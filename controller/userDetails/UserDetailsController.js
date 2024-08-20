@@ -3,8 +3,12 @@ const UserDetails = require('../../model/UserDetailsSchema')
 const User = require('../../model/UserSchema');
 
 exports.GetUserProfileByEmail = async (req, res) => {
+  // const { 
+  //   email, firstname, lastname, dateofbirth, bio, country, state, countryCode, city, 
+  //   address1, address2, phoneNo, picture, langCode 
+  // } = req.user;
   const { 
-    email, firstname, lastname, dateofbirth, bio, country, state, countryCode, city, 
+    email, firstname, lastname, country, state, countryCode,  
     address1, address2, phoneNo, picture, langCode 
   } = req.user;
 

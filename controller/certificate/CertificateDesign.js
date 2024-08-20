@@ -233,27 +233,28 @@ function generateNextBumber(certificateSetting) {
 
 exports.singleIssue = async (req, res) => {
   try {
-    // const { issueData, langCode } = req.user;
-    const issueData = req.body 
-    console.log(issueData)
-    // Fetch event data
+    const issueData = req.body;
+    console.log("ISSUE DATA", issueData);
+
+    const allUsers = await IssueCertificate.find({});
+    console.log("All Users associated with event:", allUsers);
+
     const eventData = await Event.findOne({ _id: issueData.eventid });
-    console.log("eventDataNew", issueData.eventid);
-    console.log("eventData", eventData);
     if (!eventData) {
       return res.status(404).json({ message: "Event not found" });
     }
+    console.log("eventDataNew", eventData.EventName);
 
-    // Check if the user is registered for the event
-      const registrationData = await RegisterLearner.findOne({
-        email: issueData.email,
-        eventid: eventData._id,
-      }).populate("userid");
-      if (!registrationData) {
-        return res
-          .status(400)
-          .json({ message: "User is not registered for the event" });
-      }
+    const registrationData = await RegisterLearner.findOne({
+      email: issueData.email,
+      eventid: eventData._id,
+    }).populate("userid");
+
+    if (!registrationData) {
+      return res
+        .status(400)
+        .json({ message: "User is not registered for the event" });
+    }
 
     const certificateSetting = await CertificateSetting.findOne({
       eventId: eventData._id,
@@ -266,20 +267,19 @@ exports.singleIssue = async (req, res) => {
 
     const existingCertificate = await IssueCertificate.findOne({
       email: issueData.email,
-      eventName: issueData.eventName
-    })
+      eventName: eventData.EventName,
+    });
     if (existingCertificate) {
       return res
         .status(400)
-        .json({ message: "Certificate has already issue to user  for the event" });
+        .json({ message: "Certificate has already been issued to the user for the event" });
     }
-    // Generate serial number based on serial number type
+
     let serialNumber;
     if (certificateSetting.serialNumberType.type === "Random") {
       serialNumber = generateRandomValue();
     } else if (certificateSetting.serialNumberType.type === "Incremental") {
-      serialNumber = generateNextBumber(certificateSetting);
-      console.log(serialNumber);
+      serialNumber = generateNextNumber(certificateSetting);
       certificateSetting.serialNumberType.nextNumber = serialNumber;
       await certificateSetting.save();
     } else {
@@ -291,23 +291,31 @@ exports.singleIssue = async (req, res) => {
         });
     }
 
-    // Issue certificate
+    issueData.eventName = eventData.EventName;
+
     const issue = await IssueCertificate.create({
       ...issueData,
       serialNumber,
       username: registrationData.userid.username,
+      eventName: eventData.EventName,
     });
 
     return res.status(201).json({
       issueData: issue,
+      allUsers,
       message: "Certificate issued successfully",
       statusCode: 200,
     });
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ message: "Unable to issue certificate" });
+    console.error("Error details:", error);
+    return res.status(500).json({
+      message: error.message || "Unable to issue certificate",
+      error: error // Include the full error object for more context if needed
+    });
   }
 };
+
+
 
 // exports.bulkIssue = async (req, res) => {
 //   try {
@@ -525,6 +533,7 @@ exports.fetchIssueCertificate = async (req, res) => {
   try {
     // Fetch issued certificates from the database
     const issuedCertificates = await IssueCertificate.find();
+console.log("issue",issuedCertificates);
 
     // Return the fetched certificates as a response
     return res.status(200).json({

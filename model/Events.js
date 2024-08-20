@@ -48,7 +48,7 @@ const EventSchema = new mongoose.Schema(
     OutlookCal: { type: String },
     CancelPolicy: { type: String },
     OptOut: { type: String },
-    Certificate: { type: String },
+    Certificate: { type: Boolean },
     tags: { type: Array },
     CourseFees: { type: String },
     CourseAvailable: { type: String },
