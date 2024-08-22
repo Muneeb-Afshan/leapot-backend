@@ -11,7 +11,6 @@ const createCsvWriter = require("csv-writer").createObjectCsvWriter;
 // To add user, admin will add the user
 exports.createUser = async (req, res) => {
   const { firstname, lastname, email, role, password, referredBy } = req.body;
-  
 
   if (!(email && role)) {
     return res.json({
@@ -208,10 +207,21 @@ exports.passwordResetLink = async (req, res) => {
 
 exports.updateUserProfile = async (req, res) => {
   const { id } = req.params;
-  const { firstname, lastname,countryCode,userState,userStateLNo,userCountry, phoneNo, picture, role, referredBy } = req.body;
-console.log("outside try in update",req.body)
+  const {
+    firstname,
+    lastname,
+    countryCode,
+    userState,
+    userStateLNo,
+    userCountry,
+    phoneNo,
+    picture,
+    role,
+    referredBy,
+  } = req.body;
+  console.log("outside try in update", req.body);
   try {
-    console.log("inside try in update",req.body)
+    console.log("inside try in update", req.body);
     // Find the user by ID
     const user = await User.findById(id);
 

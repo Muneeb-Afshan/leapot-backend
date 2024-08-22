@@ -1,4 +1,4 @@
-const { sendEmail } = require('../emailUtility/SendEmailFunction')
+const { sendEmail } = require("../emailUtility/SendEmailFunction");
 const {
   CreateNotification,
   SendNotification,
@@ -9,7 +9,7 @@ const {
 exports.createNotification = async (req, res) => {
   try {
     const { notificationType, subject, notificationBody, role } = req.body;
-    console.log("check",req.body)
+    console.log("check", req.body);
     const newnotifications = await CreateNotification.create({
       role,
       notificationType,
@@ -75,8 +75,8 @@ exports.updateNotification = async (req, res) => {
 exports.logicalDeleteNotification = async (req, res) => {
   try {
     const notificationId = req.params.id;
-    console.log("checkin param ",notificationId);
-    
+    console.log("checkin param ", notificationId);
+
     // Find the notification by ID and update it
     const deleteNotification = await CreateNotification.findOneAndUpdate(
       { _id: notificationId },
@@ -104,8 +104,15 @@ exports.logicalDeleteNotification = async (req, res) => {
 //controller to post notifications to  user
 exports.sendNotifications = async (req, res) => {
   try {
-    const { email_Type, email_Subject, email_Body, cc, bcc, user_recipients, langCode } =
-      req.body;
+    const {
+      email_Type,
+      email_Subject,
+      email_Body,
+      cc,
+      bcc,
+      user_recipients,
+      langCode,
+    } = req.body;
     const individualnotification = await SendNotification.create({
       email_Type,
       cc,
@@ -226,7 +233,7 @@ exports.createNotificationSettings = async (req, res) => {
       settingsName,
       description,
       roles: rolesToSave,
-      langCode
+      langCode,
     });
 
     return res.status(200).json(newNotificationSettings);
@@ -251,6 +258,27 @@ exports.getAllNotifications = async (req, res) => {
     return res.status(200).json(notifications);
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+};
+// controller.js or your controller file
+exports.DeleteNotificationSettings = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    console.log("Attempting to delete setting with ID:", id);
+    const result = await NotificationSettings.findByIdAndDelete(id);
+    if (result) {
+      console.log("Successfully deleted setting with ID:", id);
+      res
+        .status(200)
+        .json({ message: "Notification setting deleted successfully" });
+    } else {
+      console.log("No setting found with ID:", id);
+      res.status(404).json({ message: "Notification setting not found" });
+    }
+  } catch (err) {
+    console.error("Error during deletion:", err.message);
+    res.status(500).json({ message: "Server error", error: err.message });
   }
 };
 
@@ -337,6 +365,48 @@ exports.toggleNotificationSettings = async (req, res) => {
   } catch (error) {
     // Handle any errors
     console.error("Error in toggleNotificationSettings:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+// Controller function to update notification settings
+exports.UpdateNotificationSettings = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, description } = req.body;
+
+    console.log(`Updating notification settings for ID: ${id}`);
+    console.log("Request Body:", {
+      name,
+      description,
+    });
+
+    // Validate the presence of required fields
+    if (!id || !name || !description) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+    settingsName = name;
+    // Find the settings by ID and update it
+    const updatedNotificationSettings =
+      await NotificationSettings.findByIdAndUpdate(
+        id,
+        { settingsName, description },
+        { new: true } // Return the updated document
+      );
+
+    // If the settings don't exist, return 404 Not Found
+    if (!updatedNotificationSettings) {
+      return res.status(404).json({ error: "Notification settings not found" });
+    }
+
+    // Respond with success message
+    return res.status(200).json({
+      message: "Notification settings updated successfully",
+      notification: updatedNotificationSettings,
+    });
+  } catch (error) {
+    // Handle any errors
+    console.error("Error in UpdateNotificationSettings:", error.message);
+    console.error("Stack Trace:", error.stack);
     return res.status(500).json({ error: "Internal server error" });
   }
 };

@@ -9,17 +9,16 @@ const Event = require("../../model/Events");
 const BlacklistedUser = require("../../model/BlacklistedUser");
 const RegisterLearner = require("../../model/RegistrationSchema");
 // const RegistrationSchema = require("../../model/RegistrationSchema");
-const puppeteer = require('puppeteer-core');
-const { install } = require('@puppeteer/browsers');
-const nodeHtmlToImage = require('node-html-to-image');
+const puppeteer = require("puppeteer-core");
+const { install } = require("@puppeteer/browsers");
+const nodeHtmlToImage = require("node-html-to-image");
 
-
-const puppeteerExtra = require('puppeteer-extra');
-const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+const puppeteerExtra = require("puppeteer-extra");
+const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 puppeteerExtra.use(StealthPlugin());
 
 exports.addTemplate = async (req, res) => {
-  const { certificateBody, certificateName ,langCode} = req.body;
+  const { certificateBody, certificateName, langCode } = req.body;
 
   if (!certificateBody || !certificateName) {
     return res.status(400).json({ message: "Invalid request body" });
@@ -28,28 +27,30 @@ exports.addTemplate = async (req, res) => {
   const browser = await puppeteerExtra.launch({ headless: true });
   const page = await browser.newPage();
   await page.setContent(certificateBody);
-  const imageBuffer = await page.screenshot({ type: 'png' });
+  const imageBuffer = await page.screenshot({ type: "png" });
   await browser.close();
 
-  const base64Image = imageBuffer.toString('base64');
+  const base64Image = imageBuffer.toString("base64");
   const imageSrc = `data:image/png;base64,${base64Image}`;
 
   const templateData = {
     certificateName: certificateName,
     certificateBody: certificateBody,
     certificateImage: imageSrc,
-    langCode:langCode,
+    langCode: langCode,
   };
   Templates.create(templateData)
-    .then(certificate => res.status(201).json({
-      body: certificate,
-      statusCode: 200,
-      message: "Certificate added successfully"
-    }))
-    .catch(err => res.status(500).json({ message: "Database create failed" }));
+    .then((certificate) =>
+      res.status(201).json({
+        body: certificate,
+        statusCode: 200,
+        message: "Certificate added successfully",
+      })
+    )
+    .catch((err) =>
+      res.status(500).json({ message: "Database create failed" })
+    );
 };
-
-
 
 // Controller method to logically delete a template
 exports.logicalDeleteTemplate = async (req, res) => {
@@ -83,7 +84,7 @@ exports.useTemplate = async (req, res) => {
   try {
     const { templateData, langCode } = req.body;
     console.log(langCode);
-    console.log(templateData ,"useTemplate" )
+    console.log(templateData, "useTemplate");
     const eventcertificate = await Certificates.create(req.body);
     return res.status(201).json({
       body: eventcertificate,
@@ -153,7 +154,7 @@ exports.logicalDeleteCertificate = async (req, res) => {
 exports.getAllTemplates = async (req, res) => {
   try {
     const templates = await Templates.find({ isDeleted: false });
-  
+
     return res.status(200).send({
       templates: templates,
       statusCode: 200,
@@ -272,7 +273,10 @@ exports.singleIssue = async (req, res) => {
     if (existingCertificate) {
       return res
         .status(400)
-        .json({ message: "Certificate has already been issued to the user for the event" });
+        .json({
+          message:
+            "Certificate has already been issued to the user for the event",
+        });
     }
 
     let serialNumber;
@@ -283,12 +287,10 @@ exports.singleIssue = async (req, res) => {
       certificateSetting.serialNumberType.nextNumber = serialNumber;
       await certificateSetting.save();
     } else {
-      return res
-        .status(400)
-        .json({
-          message:
-            "Invalid serialNumberType. Allowed values are 'Random' and 'Incremental'.",
-        });
+      return res.status(400).json({
+        message:
+          "Invalid serialNumberType. Allowed values are 'Random' and 'Incremental'.",
+      });
     }
 
     issueData.eventName = eventData.EventName;
@@ -302,7 +304,7 @@ exports.singleIssue = async (req, res) => {
 
     return res.status(201).json({
       issueData: issue,
-      allUsers,
+      // allUsers,
       message: "Certificate issued successfully",
       statusCode: 200,
     });
@@ -310,12 +312,10 @@ exports.singleIssue = async (req, res) => {
     console.error("Error details:", error);
     return res.status(500).json({
       message: error.message || "Unable to issue certificate",
-      error: error // Include the full error object for more context if needed
+      error: error, // Include the full error object for more context if needed
     });
   }
 };
-
-
 
 // exports.bulkIssue = async (req, res) => {
 //   try {
@@ -350,17 +350,17 @@ exports.bulkIssue = async (req, res) => {
   try {
     // const issueDataList = []; // Assuming req.body contains an array of issue data
     // const { data, langCode } = req.user;
-    const data  = req.body;
-    console.log("req.user" ,data )
+    const data = req.body;
+    console.log("req.user", data);
 
     const successfulIssues = [];
     const failedIssues = [];
- 
+
     const issueDataList = await RegisterLearner.find({
       eventid: data.eventid,
-    }); 
+    });
 
-    console.log(issueDataList, "issueDataList")
+    console.log(issueDataList, "issueDataList");
     if (!issueDataList) {
       return res
         .status(400)
@@ -376,35 +376,39 @@ exports.bulkIssue = async (req, res) => {
         .json({ message: "Certificate Setting not found for the event" });
     }
 
-
-  // Fetch event data
-  const eventData = await Event.findOne({ _id: data.eventid });
-  if (!eventData) {
-    if (!certificateSetting) {
-      return res
-        .status(400)
-        .json({ message: "Event Name is not found " });
+    // Fetch event data
+    const eventData = await Event.findOne({ _id: data.eventid });
+    if (!eventData) {
+      if (!certificateSetting) {
+        return res.status(400).json({ message: "Event Name is not found " });
+      }
     }
-
-  } 
-  const eventName = eventData.EventName
-  const issueDate = data.issueDate
+    const eventName = eventData.EventName;
+    const issueDate = data.issueDate;
     for (const issueData of issueDataList) {
       const { email } = issueData;
 
-    
-
       // Check if the user is registered for the event
-      const registrationData = await RegisterLearner.findOne({ email, eventid: data.eventid  }).populate('userid');
-      console.log(registrationData , "registrationData")
+      const registrationData = await RegisterLearner.findOne({
+        email,
+        eventid: data.eventid,
+      }).populate("userid");
+      console.log(registrationData, "registrationData");
       if (!registrationData) {
-        failedIssues.push({ message: `User with email ${email} is not registered for the event ${eventData.EventName}` });
+        failedIssues.push({
+          message: `User with email ${email} is not registered for the event ${eventData.EventName}`,
+        });
         continue; // Continue to the next issueData
       }
 
-      const issueCertificate = await IssueCertificate.findOne({ email, eventName: eventData.EventName});
+      const issueCertificate = await IssueCertificate.findOne({
+        email,
+        eventName: eventData.EventName,
+      });
       if (issueCertificate) {
-        failedIssues.push({ message: `Certificate is already issued to ${email}` });
+        failedIssues.push({
+          message: `Certificate is already issued to ${email}`,
+        });
         continue; // Continue to the next issueData
       }
       // Generate serial number based on serial number type
@@ -417,41 +421,49 @@ exports.bulkIssue = async (req, res) => {
         certificateSetting.serialNumberType.nextNumber = serialNumber;
         await certificateSetting.save();
       } else {
-        return res
-          .status(400)
-          .json({
-            message:
-              "Invalid serialNumberType. Allowed values are 'Random' and 'Incremental'.",
-          });
+        return res.status(400).json({
+          message:
+            "Invalid serialNumberType. Allowed values are 'Random' and 'Incremental'.",
+        });
       }
 
       // Proceed with issuing the certificate
       try {
-        const issue = await IssueCertificate.create({ email ,  issueDate , eventName, serialNumber, username: registrationData.userid.username });
-        successfulIssues.push({ message: `Certificate is successful issued to ${email} ` });
+        const issue = await IssueCertificate.create({
+          email,
+          issueDate,
+          eventName,
+          serialNumber,
+          username: registrationData.userid.username,
+        });
+        successfulIssues.push({
+          message: `Certificate is successful issued to ${email} `,
+        });
       } catch (error) {
-        console.log(error.message)
-        failedIssues.push({ message: `Unable to issue certificate to ${email}` });
+        console.log(error.message);
+        failedIssues.push({
+          message: `Unable to issue certificate to ${email}`,
+        });
       }
     }
 
     return res.status(200).json({
       successfulIssues,
       failedIssues,
-      message: "Bulk certificate issuance completed"
+      message: "Bulk certificate issuance completed",
     });
   } catch (error) {
     console.log(error);
-    return res.status(500).json('Unable to issue certificates');
+    return res.status(500).json("Unable to issue certificates");
   }
-}
+};
 
 exports.fetchSetting = async (req, res) => {
   try {
     // Fetch issued certificates from the database
-    const certificatesSetting = await CertificateSetting.find().populate(
-      "eventId"      
-    ).populate("certificateId");
+    const certificatesSetting = await CertificateSetting.find()
+      .populate("eventId")
+      .populate("certificateId");
     console.log(certificatesSetting);
 
     // Return the fetched certificates as a response
@@ -476,9 +488,9 @@ exports.fetchSingleSetting = async (req, res) => {
 
   try {
     // Fetch issued certificates from the database
-    const certificatesSetting = await CertificateSetting.find({ _id: id }).populate(
-      "eventId"      
-    ).populate("certificateId");
+    const certificatesSetting = await CertificateSetting.find({ _id: id })
+      .populate("eventId")
+      .populate("certificateId");
 
     // Return the fetched certificates as a response
     return res.status(200).json({
@@ -516,12 +528,10 @@ exports.DeleteSettingOfEvent = async (req, res) => {
     }
 
     // Respond with success message
-    return res
-      .status(200)
-      .json({
-        message: "Certificate Setting deleted",
-        template: DeleteCertificateSetting,
-      });
+    return res.status(200).json({
+      message: "Certificate Setting deleted",
+      template: DeleteCertificateSetting,
+    });
   } catch (error) {
     // Handle any errors
     console.error("Error in DeleteCertificateSetting:", error);
@@ -533,7 +543,7 @@ exports.fetchIssueCertificate = async (req, res) => {
   try {
     // Fetch issued certificates from the database
     const issuedCertificates = await IssueCertificate.find();
-console.log("issue",issuedCertificates);
+    console.log("issue", issuedCertificates);
 
     // Return the fetched certificates as a response
     return res.status(200).json({
@@ -615,7 +625,6 @@ exports.blacklistUsers = async (req, res) => {
     });
   }
 };
-
 
 exports.getBlacklistedUsers = async (req, res) => {
   try {

@@ -3,9 +3,6 @@ const path = require("path");
 const usermoduleRouter = express.Router();
 const UserHistory = require("../model/UserHistorySchema");
 
-
-
-
 const {
   createUser,
   fetchUser,
@@ -32,10 +29,7 @@ const {
 } = require("../controller/usermodule/UserHistoryController");
 const { verifyOTP, sendOTP } = require("../controller/otpController");
 
-const verifyToken = require("../middleware/AuthMiddleware");
-
 usermoduleRouter.post("/usermodule/createnewusers", createUser);
-usermoduleRouter.get("/usermodule/getusersdetails",verifyToken, fetchUser);
 usermoduleRouter.post("/usermodule/verifyotp",verifyOTP);
 usermoduleRouter.post("/usermodule/sendotp",sendOTP);
 usermoduleRouter.get("/usermodule/getusersdetails", fetchUser);
