@@ -1,35 +1,45 @@
-
-const UserDetails = require('../../model/UserDetailsSchema')
-const User = require('../../model/UserSchema');
+const UserDetails = require("../../model/UserDetailsSchema");
+const User = require("../../model/UserSchema");
 
 exports.GetUserProfileByEmail = async (req, res) => {
-  // const { 
-  //   email, firstname, lastname, dateofbirth, bio, country, state, countryCode, city, 
-  //   address1, address2, phoneNo, picture, langCode 
+  // const {
+  //   email, firstname, lastname, dateofbirth, bio, country, state, countryCode, city,
+  //   address1, address2, phoneNo, picture, langCode
   // } = req.user;
-  const { 
-    email, firstname, lastname, country, state, countryCode,  
-    address1, address2, phoneNo, picture, langCode 
+  const {
+    email,
+    firstname,
+    lastname,
+    country,
+    state,
+    countryCode,
+    address1,
+    address2,
+    phoneNo,
+    picture,
+    langCode,
   } = req.user;
 
   console.log(req.user.email);
 
   try {
-    const oldDetails = await UserDetails.findOne({ email: email }).populate('userid');
+    const oldDetails = await UserDetails.findOne({ email: email }).populate(
+      "userid"
+    );
 
     if (oldDetails) {
       // Update the user profile with provided details
-      oldDetails.bio = bio ?? oldDetails.bio;
+      // oldDetails.bio = bio ?? oldDetails.bio;
       oldDetails.userid.firstname = firstname ?? oldDetails?.userid?.firstname;
       oldDetails.userid.lastname = lastname ?? oldDetails?.userid?.lastname;
       oldDetails.userid.phoneNo = phoneNo ?? oldDetails?.userid?.phoneNo;
       oldDetails.userid.picture = picture ?? oldDetails?.userid?.picture;
       oldDetails.userid.profile_complete = true;
 
-      oldDetails.dateofbirth = dateofbirth ?? oldDetails?.dateofbirth;
+      // oldDetails.dateofbirth = dateofbirth ?? oldDetails?.dateofbirth;
       oldDetails.country = country ?? oldDetails?.country;
       oldDetails.state = state ?? oldDetails?.state;
-      oldDetails.city = city ?? oldDetails?.city;
+      // oldDetails.city = city ?? oldDetails?.city;
       oldDetails.countryCode = countryCode ?? oldDetails?.countryCode; // Update countryCode
 
       oldDetails.address1 = address1 ?? oldDetails?.address1;
@@ -44,20 +54,19 @@ exports.GetUserProfileByEmail = async (req, res) => {
       return res.status(200).json({
         user: oldDetails,
         message: "User profile updated successfully",
-        statusCode: 200
+        statusCode: 200,
       });
     } else {
       return res.status(400).json({
         user: oldDetails,
         message: "Error: User not found",
-        statusCode: 400
+        statusCode: 400,
       });
     }
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return res.status(500).json({ message: `hello${err.message}` });
   }
 };
-
 
 exports.FindUsersDetails = async (req, res) => {
   try {
@@ -119,9 +128,9 @@ exports.updateDeleteStatusByEmail = async (req, res) => {
   }
 };
 
-exports.refreshToken=async (req, res) => {
+exports.refreshToken = async (req, res) => {
   try {
-    const { refreshToken } = req.body;  // Get the refresh token from the request body
+    const { refreshToken } = req.body; // Get the refresh token from the request body
 
     // Validate the refresh token (e.g., using Firebase Admin SDK)
     // For demonstration, assuming you have a function `verifyRefreshToken` for this purpose
@@ -134,12 +143,11 @@ exports.refreshToken=async (req, res) => {
     // const newRefreshToken = await generateNewRefreshToken(decodedToken.uid);
 
     res.json({ token: newToken });
-
   } catch (error) {
-    console.error('Error refreshing token:', error);
-    res.status(401).json({ message: 'Invalid or expired refresh token' });
+    console.error("Error refreshing token:", error);
+    res.status(401).json({ message: "Invalid or expired refresh token" });
   }
-}
+};
 
 // Dummy function for generating a new access token
 const generateNewAccessToken = async (uid) => {
