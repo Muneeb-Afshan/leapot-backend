@@ -12,10 +12,19 @@ const RegisterLearner = require("../../model/RegistrationSchema");
 const puppeteer = require("puppeteer-core");
 const { install } = require("@puppeteer/browsers");
 const nodeHtmlToImage = require("node-html-to-image");
+const nodemailer = require("nodemailer");
 
 const puppeteerExtra = require("puppeteer-extra");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 puppeteerExtra.use(StealthPlugin());
+
+const transporter = nodemailer.createTransport({
+  service: "Gmail", // Use your preferred email service
+  auth: {
+    user: "hr.leapot@gmail.com", // Your email address from environment variable
+    pass: "tlnb zajb dnqz katg", // Your email password or app password
+  },
+});
 
 exports.addTemplate = async (req, res) => {
   const { certificateBody, certificateName, langCode } = req.body;
@@ -303,12 +312,27 @@ exports.singleIssue = async (req, res) => {
       eventName: eventData.EventName,
       eventDate: eventData.SDate,
       issueType: "Single",
-      issueMethod: issueData.issueMethod || "Manual", // Set the issue method (default to "Generated" if not provided)
+      issueMethod: issueData.issueMethod || "Manual",
     });
+
+    // Prepare email content
+    const mailOptions = {
+      from: "hr.leapot@gmail.com",
+      to: issueData.email,
+      subject: "Your Certificate",
+      text: `Dear ${registrationData.firstname},\n\nCongratulations! Your certificate for the event '${eventData.EventName}' has been issued successfully.\n\nCertificate Serial Number: ${serialNumber}\n\nThank you for participating in the event.\n\nBest Regards,\nYour Organization `,
+    };
+
+    // Send email
+    const info = await transporter.sendMail(mailOptions);
+
+    // Log email details
+    console.log(`Email sent: ${info.response}`);
+    console.log(`To: ${issueData.email}`);
 
     return res.status(201).json({
       issueData: issue,
-      message: "Certificate issued successfully",
+      message: "Certificate issued and email sent successfully",
       statusCode: 200,
     });
   } catch (error) {
@@ -319,7 +343,6 @@ exports.singleIssue = async (req, res) => {
     });
   }
 };
-
 // exports.bulkIssue = async (req, res) => {
 //   try {
 //     const { users, eventName, issueDate, status, serialNumber } = req.body; // Array of user objects to blacklist

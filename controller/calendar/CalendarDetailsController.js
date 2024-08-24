@@ -11,7 +11,6 @@ const EventModel = require("../../model/Events");
 const User = require("../../model/UserSchema");
 const RegisterLearner = require("../../model/RegistrationSchema");
 
-
 // Controller to handle POST request to add tags to the database
 exports.putAllTags = async (req, res) => {
   try {
@@ -346,9 +345,11 @@ exports.enrollUsersforEvent = async (req, res) => {
         // Create a new registration record for the user
         const registration = new RegisterLearner({
           email: user.email,
+          firstname: user.firstname,
+          lastname: user.lastname,
           userid: user._id, // Reference to the user
           eventid: event._id, // Reference to the event
-          eventname: event.eventName, // Reference to the event 
+          eventname: event.eventName, // Reference to the event
           registrationDate: new Date(), // Current date and time
           registrationStatus: true, // Assuming the user is successfully registered
           langCode: "en", // Default language code
@@ -356,7 +357,9 @@ exports.enrollUsersforEvent = async (req, res) => {
         });
 
         await registration.save();
-        console.log(`User ${user.email} enrolled and registration record created.`);
+        console.log(
+          `User ${user.email} enrolled and registration record created.`
+        );
       }
     });
 

@@ -129,7 +129,7 @@ const issueCertificateSchema = new mongoose.Schema(
     },
     issueMethod: {
       type: String,
-      required: true,
+      required: false,
       enum: ["Generated", "Manual"],
     },
     langCode: { type: String, required: true, default: "en" },
