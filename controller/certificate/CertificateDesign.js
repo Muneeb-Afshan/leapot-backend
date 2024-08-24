@@ -12,10 +12,19 @@ const RegisterLearner = require("../../model/RegistrationSchema");
 const puppeteer = require("puppeteer-core");
 const { install } = require("@puppeteer/browsers");
 const nodeHtmlToImage = require("node-html-to-image");
+const nodemailer = require("nodemailer");
 
 const puppeteerExtra = require("puppeteer-extra");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 puppeteerExtra.use(StealthPlugin());
+
+const transporter = nodemailer.createTransport({
+  service: "Gmail", // Use your preferred email service
+  auth: {
+    user: "hr.leapot@gmail.com", // Your email address from environment variable
+    pass: "tlnb zajb dnqz katg", // Your email password or app password
+  },
+});
 
 exports.addTemplate = async (req, res) => {
   const { certificateBody, certificateName, langCode } = req.body;
@@ -270,13 +279,14 @@ exports.singleIssue = async (req, res) => {
       email: issueData.email,
       eventName: eventData.EventName,
     });
+
     if (existingCertificate) {
-      return res
-        .status(400)
-        .json({
-          message:
-            "Certificate has already been issued to the user for the event",
-        });
+      existingCertificate.issueCount += 1; // Increment the issue count if the certificate already exists
+      await existingCertificate.save();
+      return res.status(200).json({
+        message: "Certificate issue count updated successfully",
+        statusCode: 200,
+      });
     }
 
     let serialNumber;
@@ -300,23 +310,39 @@ exports.singleIssue = async (req, res) => {
       serialNumber,
       username: registrationData.userid.username,
       eventName: eventData.EventName,
+      eventDate: eventData.SDate,
+      issueType: "Single",
+      issueMethod: issueData.issueMethod || "Manual",
     });
+
+    // Prepare email content
+    const mailOptions = {
+      from: "hr.leapot@gmail.com",
+      to: issueData.email,
+      subject: "Your Certificate",
+      text: `Dear ${registrationData.firstname},\n\nCongratulations! Your certificate for the event '${eventData.EventName}' has been issued successfully.\n\nCertificate Serial Number: ${serialNumber}\n\nThank you for participating in the event.\n\nBest Regards,\nYour Organization `,
+    };
+
+    // Send email
+    const info = await transporter.sendMail(mailOptions);
+
+    // Log email details
+    console.log(`Email sent: ${info.response}`);
+    console.log(`To: ${issueData.email}`);
 
     return res.status(201).json({
       issueData: issue,
-      // allUsers,
-      message: "Certificate issued successfully",
+      message: "Certificate issued and email sent successfully",
       statusCode: 200,
     });
   } catch (error) {
     console.error("Error details:", error);
     return res.status(500).json({
       message: error.message || "Unable to issue certificate",
-      error: error, // Include the full error object for more context if needed
+      error: error,
     });
   }
 };
-
 // exports.bulkIssue = async (req, res) => {
 //   try {
 //     const { users, eventName, issueDate, status, serialNumber } = req.body; // Array of user objects to blacklist
@@ -435,6 +461,8 @@ exports.bulkIssue = async (req, res) => {
           eventName,
           serialNumber,
           username: registrationData.userid.username,
+          eventDate: eventData.SDate,
+          issueType: "Bulk",
         });
         successfulIssues.push({
           message: `Certificate is successful issued to ${email} `,
@@ -596,20 +624,47 @@ exports.fetchIssueCertificate = async (req, res) => {
 
 exports.blacklistUsers = async (req, res) => {
   try {
-    const { email, reason, status } = req.body;
+    const { email, reason, disqualifiedBy } = req.body;
+
+    console.log("Request received to blacklist user with email:", email);
+    console.log("Disqualified by:", disqualifiedBy);
+    console.log("Reason for blacklisting:", reason);
+
+    // Check if the user exists in the User collection
+    const user = await User.findOne({ email });
+    console.log("User found in the database:", user);
+
+    await User.updateOne({ email }, { blacklisted: true });
+    console.log("User successfully updated to blacklisted");
+
+    if (!user) {
+      console.log("User not found");
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
 
     // Check if the email already exists in the blacklist
-    const existingUser = await BlacklistedUser.findOne({ email });
+    const existingBlacklistedUser = await BlacklistedUser.findOne({ email });
+    console.log("Existing blacklisted user check:", existingBlacklistedUser);
 
-    if (existingUser) {
+    if (existingBlacklistedUser) {
+      console.log("User already exists in the blacklist");
       return res.status(409).json({
         success: false,
         message: "User already exists in the blacklist",
       });
     }
 
-    // Create a new blacklisted user record
-    const data = await BlacklistedUser.create(req.body);
+    // Create a new blacklisted user record with disqualifiedBy
+    const data = await BlacklistedUser.create({
+      email,
+      reason,
+      disqualifiedBy,
+      createdAt: new Date(),
+    });
+    console.log("Blacklisted user record created:", data);
 
     return res.status(200).json({
       success: true,
@@ -643,6 +698,76 @@ exports.getBlacklistedUsers = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Failed to fetch blacklisted users",
+    });
+  }
+};
+exports.UpdateBlacklistedUsers = async (req, res) => {
+  try {
+    const { email } = req.params;
+    const { reason, disqualifiedBy } = req.body;
+
+    console.log("Request parameters:", req.params);
+    console.log("Request body:", req.body);
+
+    // Find the blacklisted user by email
+    const existingBlacklistedUser = await BlacklistedUser.findOne({ email });
+
+    if (!existingBlacklistedUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found in blacklist",
+      });
+    }
+
+    // Update the blacklisted user
+    const updatedUser = await BlacklistedUser.findOneAndUpdate(
+      { email },
+      { reason, disqualifiedBy, updatedAt: new Date() },
+      { new: true } // Return the updated document
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Blacklisted user updated successfully",
+      data: updatedUser,
+    });
+  } catch (error) {
+    console.error("Error updating blacklisted user:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to update blacklisted user",
+    });
+  }
+};
+
+exports.deleteblacklistUsers = async (req, res) => {
+  try {
+    const { email } = req.params;
+
+    // Find and delete the blacklisted user by email
+    const result = await BlacklistedUser.findOneAndDelete({ email });
+
+    // If the blacklisted user doesn't exist, return 404 Not Found
+    if (!result) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found in blacklist",
+      });
+    }
+
+    // Remove the blacklisted status from the User collection
+    await User.updateOne({ email }, { blacklisted: false });
+
+    return res.status(200).json({
+      success: true,
+      message: "Blacklisted user removed successfully",
+      data: result,
+    });
+  } catch (error) {
+    console.error("Error deleting blacklisted user:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to delete blacklisted user",
     });
   }
 };
