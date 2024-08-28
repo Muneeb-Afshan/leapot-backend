@@ -11,7 +11,6 @@ const createCsvWriter = require("csv-writer").createObjectCsvWriter;
 // To add user, admin will add the user
 exports.createUser = async (req, res) => {
   const { firstname, lastname, email, role, password, referredBy } = req.body;
-  
 
   if (!(email && role)) {
     return res.json({
@@ -208,10 +207,21 @@ exports.passwordResetLink = async (req, res) => {
 
 exports.updateUserProfile = async (req, res) => {
   const { id } = req.params;
-  const { firstname, lastname,countryCode,userState,userStateLNo,userCountry, phoneNo, picture, role, referredBy } = req.body;
-console.log("outside try in update",req.body)
+  const {
+    firstname,
+    lastname,
+    countryCode,
+    userState,
+    userStateLNo,
+    userCountry,
+    phoneNo,
+    picture,
+    role,
+    referredBy,
+  } = req.body;
+  console.log("outside try in update", req.body);
   try {
-    console.log("inside try in update",req.body)
+    console.log("inside try in update", req.body);
     // Find the user by ID
     const user = await User.findById(id);
 
@@ -655,5 +665,154 @@ exports.csvCreateUser = async (req, res) => {
   } catch (error) {
     console.error("Error processing CSV data:", error);
     res.status(500).json({ error: "Internal server error" });
+  }
+};
+exports.blacklistUsers = async (req, res) => {
+  try {
+    const { email, reason, disqualifiedBy } = req.body;
+
+    console.log("Request received to blacklist user with email:", email);
+    console.log("Disqualified by:", disqualifiedBy);
+    console.log("Reason for blacklisting:", reason);
+
+    // Check if the user exists in the User collection
+    const user = await User.findOne({ email });
+    console.log("User found in the database:", user);
+
+    await User.updateOne({ email }, { blacklisted: true });
+    console.log("User successfully updated to blacklisted");
+
+    if (!user) {
+      console.log("User not found");
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Check if the email already exists in the blacklist
+    const existingBlacklistedUser = await BlacklistedUser.findOne({ email });
+    console.log("Existing blacklisted user check:", existingBlacklistedUser);
+
+    if (existingBlacklistedUser) {
+      console.log("User already exists in the blacklist");
+      return res.status(409).json({
+        success: false,
+        message: "User already exists in the blacklist",
+      });
+    }
+
+    // Create a new blacklisted user record with disqualifiedBy
+    const data = await BlacklistedUser.create({
+      email,
+      reason,
+      disqualifiedBy,
+      createdAt: new Date(),
+    });
+    console.log("Blacklisted user record created:", data);
+
+    return res.status(200).json({
+      success: true,
+      message: "User blacklisted successfully",
+      statusCode: 200,
+      data: data,
+    });
+  } catch (error) {
+    console.error("Error blacklisting users:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to blacklist user",
+    });
+  }
+};
+
+exports.getBlacklistedUsers = async (req, res) => {
+  try {
+    // Fetch blacklisted users from the database
+    const blacklistedUsers = await BlacklistedUser.find({ blacklisted: true });
+
+    // Return the fetched blacklisted users as a response
+    return res.status(200).json({
+      success: true,
+      message: "Blacklisted users fetched successfully",
+      data: blacklistedUsers,
+      statusCode: 200,
+    });
+  } catch (error) {
+    console.error("Error fetching blacklisted users:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch blacklisted users",
+    });
+  }
+};
+exports.UpdateBlacklistedUsers = async (req, res) => {
+  try {
+    const { email } = req.params;
+    const { reason, disqualifiedBy } = req.body;
+
+    console.log("Request parameters:", req.params);
+    console.log("Request body:", req.body);
+
+    // Find the blacklisted user by email
+    const existingBlacklistedUser = await BlacklistedUser.findOne({ email });
+
+    if (!existingBlacklistedUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found in blacklist",
+      });
+    }
+
+    // Update the blacklisted user
+    const updatedUser = await BlacklistedUser.findOneAndUpdate(
+      { email },
+      { reason, disqualifiedBy, updatedAt: new Date() },
+      { new: true } // Return the updated document
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Blacklisted user updated successfully",
+      data: updatedUser,
+    });
+  } catch (error) {
+    console.error("Error updating blacklisted user:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to update blacklisted user",
+    });
+  }
+};
+
+exports.deleteblacklistUsers = async (req, res) => {
+  try {
+    const { email } = req.params;
+
+    // Find and delete the blacklisted user by email
+    const result = await BlacklistedUser.findOneAndDelete({ email });
+
+    // If the blacklisted user doesn't exist, return 404 Not Found
+    if (!result) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found in blacklist",
+      });
+    }
+
+    // Remove the blacklisted status from the User collection
+    await User.updateOne({ email }, { blacklisted: false });
+
+    return res.status(200).json({
+      success: true,
+      message: "Blacklisted user removed successfully",
+      data: result,
+    });
+  } catch (error) {
+    console.error("Error deleting blacklisted user:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to delete blacklisted user",
+    });
   }
 };

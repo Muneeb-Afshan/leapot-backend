@@ -29,6 +29,7 @@ console.log("inauth controller for google",req.body);
           user_id: user.user_id,
           role: user.role,
           lastLogin: user.lastLogin 
+
         },
         message: 'User login successful',
       });

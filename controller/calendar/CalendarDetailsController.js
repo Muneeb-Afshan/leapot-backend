@@ -9,6 +9,7 @@ const {
 } = require("../../model/CalendarSchema");
 const EventModel = require("../../model/Events");
 const User = require("../../model/UserSchema");
+const RegisterLearner = require("../../model/RegistrationSchema");
 
 // Controller to handle POST request to add tags to the database
 exports.putAllTags = async (req, res) => {
@@ -75,46 +76,11 @@ exports.getAllEvents = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-exports.enrollUsersforEvent = async (req, res) => {
-  console.log("Enroll users endpoint hit"); // Debugging log
 
-  const { eventName } = req.params; // Assuming you pass eventName as a parameter
-  const { emails } = req.body; // An array of emails to enroll
-
-  try {
-    console.log(`Finding event: ${eventName}`); // Debugging log
-
-    // Find event by eventName
-    const event = await EventModel.findOne({ EventName: eventName });
-    if (!event) {
-      return res.status(404).json({ message: "Event not found" });
-    }
-    console.log("Event found:", event); // Debugging log
-    // Find users by email and enroll them in the event
-    const users = await User.find({ email: { $in: emails } });
-
-    // Add event to user's events array
-    users.forEach(async (user) => {
-      if (!user.events.includes(eventName)) {
-        user.events.push(eventName);
-        await user.save();
-      }
-    });
-
-    res.status(200).json({ message: "Users enrolled successfully", users });
-  } catch (error) {
-    console.error("Error enrolling users:", error);
-    res
-      .status(500)
-      .json({ message: "Error enrolling users", error: error.message });
-  }
-};
 // Controller to fetch a particular event details
-exports.getEventDetails = async (req, res) => {//FIXME:
-  console.log("Event details endpoint hit");
+exports.getEventDetails = async (req, res) => {
   try {
     const { eventname } = req.params;
-    console.log(eventname,"event name which backend is recieving ")
     const eventdetails = await EventModel.findOne({ EventName: eventname });
     if (!eventdetails) {
       return res.status(404).json({ message: "Event not found" });
@@ -185,9 +151,6 @@ exports.cancelAnnouncement = async (req, res) => {
 
 exports.addAnnouncements = async (req, res) => {
   try {
-    console.log("Request received");
-    console.log("Request body:", req.body);
-
     const {
       announcementNo,
       eventName,
@@ -200,18 +163,6 @@ exports.addAnnouncements = async (req, res) => {
       active,
       langCode,
     } = req.body;
-
-    console.log("announcementNo:", announcementNo);
-    console.log("eventName:", eventName);
-    console.log("eventDate:", eventDate);
-    console.log("eventEndDate:", eventEndDate);
-    console.log("type:", type);
-    console.log("image:", image);
-    console.log("startTime:", startTime);
-    console.log("endTime:", endTime);
-    console.log("active:", active);
-    console.log("langCode:", langCode);
-
     const newAnnouncement = await AddAnnouncements.create({
       announcementNo,
       eventName,
@@ -224,20 +175,17 @@ exports.addAnnouncements = async (req, res) => {
       active,
       langCode,
     });
-
-    console.log("New announcement created:", newAnnouncement);
-
+    console.log(langCode);
     return res.status(200).send({
       newAnnouncement: newAnnouncement,
       statusCode: 200,
-      message: "Announcements fetched successfully",
+      message: "announcements fetched successfully",
     });
+    // return res.status(200).json(newAnnouncement);
   } catch (error) {
-    console.error("Error creating announcement:", error);
     res.status(500).json({ message: error.message });
   }
 };
-
 
 //controller to fetch announcement information about specific announcement
 exports.getAnnouncementInfo = async (req, res) => {
@@ -384,14 +332,34 @@ exports.enrollUsersforEvent = async (req, res) => {
       return res.status(404).json({ message: "Event not found" });
     }
     console.log("Event found:", event); // Debugging log
+
     // Find users by email and enroll them in the event
     const users = await User.find({ email: { $in: emails } });
 
-    // Add event to user's events array
+    // Add event to user's events array and create a registration record
     users.forEach(async (user) => {
       if (!user.events.includes(eventName)) {
         user.events.push(eventName);
         await user.save();
+
+        // Create a new registration record for the user
+        const registration = new RegisterLearner({
+          email: user.email,
+          firstname: user.firstname,
+          lastname: user.lastname,
+          userid: user._id, // Reference to the user
+          eventid: event._id, // Reference to the event
+          eventname: event.eventName, // Reference to the event
+          registrationDate: new Date(), // Current date and time
+          registrationStatus: true, // Assuming the user is successfully registered
+          langCode: "en", // Default language code
+          // Add courseid, paymentid, and other fields as needed
+        });
+
+        await registration.save();
+        console.log(
+          `User ${user.email} enrolled and registration record created.`
+        );
       }
     });
 
@@ -403,6 +371,7 @@ exports.enrollUsersforEvent = async (req, res) => {
       .json({ message: "Error enrolling users", error: error.message });
   }
 };
+
 //controller to fetch users based on event Name
 exports.getEnrolledUsers = async (req, res) => {
   try {

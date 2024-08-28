@@ -220,31 +220,3 @@ exports.getInstructors = async (req, res) => {
     res.status(500).json({ message: 'Error fetching instructors', error , success:false });
   }
 };
-
-exports.refreshToken=async (req, res) => {
-  try {
-    const { refreshToken } = req.body;  // Get the refresh token from the request body
-
-    // Validate the refresh token (e.g., using Firebase Admin SDK)
-    // For demonstration, assuming you have a function verifyRefreshToken for this purpose
-    const decodedToken = await admin.auth().verifyIdToken(refreshToken);
-
-    // Generate a new access token
-    const newToken = await generateNewAccessToken(decodedToken.uid);
-
-    // Optionally, generate and return a new refresh token
-    // const newRefreshToken = await generateNewRefreshToken(decodedToken.uid);
-
-    res.json({ token: newToken });
-
-  } catch (error) {
-    console.error('Error refreshing token:', error);
-    res.status(401).json({ message: 'Invalid or expired refresh token' });
-  }
-}
-
-// Dummy function for generating a new access token
-const generateNewAccessToken = async (uid) => {
-  // Generate a new access token using Firebase Admin SDK
-  return admin.auth().createCustomToken(uid);
-};

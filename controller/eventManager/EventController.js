@@ -1,67 +1,67 @@
-
-const EventModel = require('../../model/Events')
-const createCsvWriter = require('csv-writer').createObjectCsvWriter;
-const fs = require('fs');
-
+const EventModel = require("../../model/Events");
+const createCsvWriter = require("csv-writer").createObjectCsvWriter;
+const fs = require("fs");
 
 // POST
- exports.createEvent =  async (req, res) => {
-    try {
-      console.log("Request body received:", req.body);
-      
-      // Create a new instance of EventModel
-      const newEvent = new EventModel({
-        ...req.body,
-        dynamicFields: req.body.dynamicFields, // Ensure this part is correctly passed
-      });
+exports.createEvent = async (req, res) => {
+  try {
+    // Create a new instance of EventModel
+    const newEvent = new EventModel({
+      ...req.body,
+      dynamicFields: req.body.dynamicFields, // Ensure this part is correctly passed
+    });
 
-    console.log("New event instance created:", newEvent);
-      
-      // Save the new event
-      const event = await newEvent.save();
-      
-      res.json(event);//sending as response wateevr is saved on UI
-    } catch (error) {
-      res.status(500).json({ error: "Internal Server Error" });
-    }
-  };
+    // Save the new event
+    const event = await newEvent.save();
 
+    res.json(event);
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
 
-  //FETCH
-  exports.fetchEvent = async (req, res) => {
-    console.log("inside endpoint");
-    try {
-      const events = await EventModel.find({ isDeleted: false }).sort({ createdAt: -1 });
+//FETCH
+exports.fetchEvent = (req, res) => {
+  console.log("Fetching events...");
+
+  EventModel.find({ isDeleted: false })
+    .sort({ createdAt: -1 }) // Sort by createdAt in descending order
+    .then((events) => {
+      if (!events || events.length === 0) {
+        console.log("No events found.");
+        return res.status(404).json({ message: "No events found" });
+      }
+
+      console.log("Events fetched successfully:", events);
       res.json(events);
-      console.log("inside endpoint");
-    } catch (err) {
-      console.error(err,"from controller"); // Log the error for debugging
-      res.status(500).json({ error: "Internal Server Error FROM CONTROLLER" });
-    }
-  };
-  
-  
+    })
+    .catch((err) => {
+      console.error("Error fetching events:", err);
+      res.status(500).json({ error: "Internal Server Error" });
+    });
+};
 
-exports.fetchEventName = (req, res) => { 
-  EventModel.find({ isDeleted: false }, 'EventName _id ')
+exports.fetchEventName = (req, res) => {
+  EventModel.find({ isDeleted: false }, "EventName _id ")
 
-  .then(event => res.json (event)) 
-  .catch(err => res.json(err))
-}
-
+    .then((event) => res.json(event))
+    .catch((err) => res.json(err));
+};
 
 //UPDATE
- exports.fetchEventById = async (req, res) => {
+exports.fetchEventById = async (req, res) => {
   const id = req.params.id;
-  EventModel.findById({_id:id})
-  .then(event => res.json (event)) 
-  .catch(err => res.json(err))
-}
+  EventModel.findById({ _id: id })
+    .then((event) => res.json(event))
+    .catch((err) => res.json(err));
+};
 
- exports.updateEvent = async (req, res) => {
+exports.updateEvent = async (req, res) => {
   const id = req.params.id;
   // EventModel.findByIdAndUpdate(id, req.body, { new: true })
-  EventModel.findByIdAndUpdate({_id: id}, {
+  EventModel.findByIdAndUpdate(
+    { _id: id },
+    {
       EventName: req.body.EventName,
       OrgName: req.body.OrgName,
       SDate: req.body.SDate,
@@ -83,7 +83,7 @@ exports.fetchEventName = (req, res) => {
       Exam: req.body.Exam,
       EventId: req.body.EventId,
       OrgId: req.body.OrgId,
-      CourseAvailable : req.body.CourseAvailable,
+      CourseAvailable: req.body.CourseAvailable,
       EventDesp: req.body.EventDesp,
       SchoolId: req.body.SchoolId,
       SponsorName: req.body.SponsorName,
@@ -112,26 +112,27 @@ exports.fetchEventName = (req, res) => {
       OptOut: req.body.OptOut,
       Certificate: req.body.Certificate,
       tagsInput: req.body.tagsInput,
-      dynamicFields: Array.isArray(req.body.dynamicFields) ? req.body.dynamicFields : [],
-      updatedBy: req.body.updatedBy 
-    }, { new: true })
-  .then(event => res.json (event)) 
-  .catch(err => res.json(err))
-}
-
-
-// PATCH route to logically delete an event
- exports.logicalEventDelete = async (req, res) => {
-  const id = req.params.id;
-  EventModel.findByIdAndUpdate(id, { isDeleted: true })
-      .then(() => res.json({ message: 'Event logically deleted' }))
-      .catch(err => res.status(500).json(err))
+      dynamicFields: Array.isArray(req.body.dynamicFields)
+        ? req.body.dynamicFields
+        : [],
+      updatedBy: req.body.updatedBy,
+    },
+    { new: true }
+  )
+    .then((event) => res.json(event))
+    .catch((err) => res.json(err));
 };
 
-
+// PATCH route to logically delete an event
+exports.logicalEventDelete = async (req, res) => {
+  const id = req.params.id;
+  EventModel.findByIdAndUpdate(id, { isDeleted: true })
+    .then(() => res.json({ message: "Event logically deleted" }))
+    .catch((err) => res.status(500).json(err));
+};
 
 //CSV POST
-//  exports.csvCreateEvent = async (req, res) => { 
+//  exports.csvCreateEvent = async (req, res) => {
 //   console.log(req.body)
 //   const headers = Object.keys(req.body[0]);
 //   const csvWriter = createCsvWriter({
@@ -139,18 +140,18 @@ exports.fetchEventName = (req, res) => {
 //       header: headers, // Assuming all objects have the same structure
 //       append: true, // Add this option to append to the existing file
 //     });
-    
+
 //     // Check if the file exists, if not, create a new file with headers
 //     if (!fs.existsSync('output.csv')) {
 //       csvWriter.writeRecords([{}])
 //         .then(() => console.log('CSV file created successfully'));
 //     }
-    
+
 //     csvWriter.writeRecords(req.body[0])
 //       .then(() => console.log('Data appended to CSV file successfully'));
-  
-//   EventModel.create(req.body[0]) 
-//   .then(event => res.json (event)) 
+
+//   EventModel.create(req.body[0])
+//   .then(event => res.json (event))
 //   .catch(err => res.json(err))
 // }
 
@@ -161,7 +162,7 @@ exports.csvCreateEvent = async (req, res) => {
     const headers = Object.keys(req.body[0]);
 
     const csvWriter = createCsvWriter({
-      path: 'output.csv',
+      path: "output.csv",
       header: headers,
       append: true,
     });
@@ -170,10 +171,9 @@ exports.csvCreateEvent = async (req, res) => {
 
     await EventModel.insertMany(req.body);
 
-    res.status(200).json({ message: 'CSV data processed successfully.' });
+    res.status(200).json({ message: "CSV data processed successfully." });
   } catch (error) {
-    console.error('Error processing CSV data:', error);
-    res.status(500).json({ error: 'Internal server error.' });
+    console.error("Error processing CSV data:", error);
+    res.status(500).json({ error: "Internal server error." });
   }
 };
-
