@@ -1,8 +1,12 @@
 // controllers/authController.js
 const User = require("../model/UserSchema");
-const nodemailer = require('nodemailer');
-const otpGenerator = require('otp-generator');
-require('dotenv').config();
+const nodemailer = require("nodemailer");
+const otpGenerator = require("otp-generator");
+require("dotenv").config();
+const fs = require('fs');
+const handlebars = require('handlebars');
+const { promisify } = require('util');
+const readFileAsync = promisify(fs.readFile);
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -19,8 +23,11 @@ exports.sendOTP = async (req, res) => {
     return res.status(400).json({ message: "Email is required", success: false });
   }
 
-  const otp = otpGenerator.generate(6, { upperCase: false, specialChars: false });
-  const otpExpiration = new Date(Date.now() + 10 * 60 * 1000); // OTP expires in 10 minutes
+  const otp = otpGenerator.generate(6, {
+    upperCase: false,
+    specialChars: false,
+  });
+  const otpExpiration = new Date(Date.now() + 15 * 60 * 1000); // OTP expires in 15 minutes
 
   try {
     await User.findOneAndUpdate(
@@ -30,11 +37,28 @@ exports.sendOTP = async (req, res) => {
     );
     console.log(`Generated OTP: ${otp}`); // Log the generated OTP
 
+    //htmlTempate  
+    const htmlTemplate = await readFileAsync('template/emailTemplate.html', 'utf-8');
+    const template = handlebars.compile(htmlTemplate);
+    const replacements = {
+      email,
+      otp
+    };
+    const htmlToSend = template(replacements);
+    const imageAttachment = await readFileAsync('template/NoBackground.png');
+
     const mailOptions = {
       from: process.env.EMAIL, // Sender email address
       to: email, // Recipient email address
-      subject: 'Your OTP Code',
-      text: `Your OTP code is ${otp}`, // OTP message
+      subject: "One Time Password (OTP) for Account verification process on Leapot",
+      html: htmlToSend,
+      //text: `Your OTP code is ${otp}`, // OTP message
+      attachments: [{
+        filename: 'NoBackground.png',
+        content: imageAttachment,
+        encoding: 'base64',
+        cid: 'uniqueImageCID', // Referenced in the HTML template
+    }],
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
