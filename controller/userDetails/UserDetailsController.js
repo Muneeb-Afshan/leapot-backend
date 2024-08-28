@@ -40,7 +40,8 @@ exports.GetUserProfileByEmail = async (req, res) => {
       oldDetails.country = country ?? oldDetails?.country;
       oldDetails.state = state ?? oldDetails?.state;
       // oldDetails.city = city ?? oldDetails?.city;
-      oldDetails.countryCode = countryCode ?? oldDetails?.countryCode; // Update countryCode
+      oldDetails.userid.countryCode =
+        countryCode ?? oldDetails?.userid?.countryCode; // Update countryCode
 
       oldDetails.address1 = address1 ?? oldDetails?.address1;
       oldDetails.address2 = address2 ?? oldDetails?.address2;

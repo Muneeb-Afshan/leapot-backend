@@ -16,7 +16,10 @@ const {
   uploadAttachments,
   uploadscrom,
   uploadUserImages,
-  profileImage,
+
+  uploadEventImage,
+  profileImage
+
 } = require("../controller/fileUpload/uploadFileController");
 
 // const {

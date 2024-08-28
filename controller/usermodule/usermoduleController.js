@@ -7,7 +7,8 @@ const firebase = require("firebase-admin");
 const nodemailer = require("nodemailer");
 const transporter = require("../emailUtility/SendEmailFunction");
 const createCsvWriter = require("csv-writer").createObjectCsvWriter;
-
+const BlacklistedUser = require("../../model/BlacklistedUser");
+const SendersMail = "contact@leapot.in";
 // To add user, admin will add the user
 exports.createUser = async (req, res) => {
   const { firstname, lastname, email, role, password, referredBy } = req.body;
@@ -324,184 +325,6 @@ async function uploadToS3(filePath, bucketName) {
   return s3.upload(params).promise();
 }
 
-// exports.csvCreateUser = async (req, res) => {
-//   try {
-//     const users = req.body.data;
-
-//     if (!Array.isArray(users) || users.length === 0) {
-//       return res.status(400).json({ message: "No user data provided" });
-//     }
-
-//     const insertUser = [];
-//     const insertUserDetails = [];
-//     const successfulRecords = [];
-//     const failedRecords = [];
-
-//     const timestamp = moment().format("YYYYMMDD_HHmmss");
-
-//     const successCsvFilePath = `successfulUserRecords_${timestamp}.csv`;
-//     const failureCsvFilePath = `failureUserRecords_${timestamp}.csv`;
-
-//     const successCsvWriter = createCsvWriter({
-//       path: successCsvFilePath,
-//       header: [
-//         { id: "firstname", title: "First Name" },
-//         { id: "lastname", title: "Last Name" },
-//         { id: "email", title: "Email" },
-//         { id: "role", title: "Role" },
-//       ],
-//     });
-
-//     const failureCsvWriter = createCsvWriter({
-//       path: failureCsvFilePath,
-//       header: [
-//         { id: "firstname", title: "First Name" },
-//         { id: "lastname", title: "Last Name" },
-//         { id: "email", title: "Email" },
-//         { id: "role", title: "Role" },
-//         { id: "error", title: "Error" },
-//       ],
-//     });
-
-//     for (let i = 0; i < users.length; i++) {
-//       const { firstname, lastname, email, role } = users[i];
-//       const password = "defaultPassword123";
-
-//       if (!(firstname && lastname && email && role)) {
-//         const error = `Invalid data at index ${i}: All fields are required`;
-//         console.error(error);
-//         failedRecords.push({ ...users[i], error });
-//         await new UserAction({
-//           action: "failed records",
-//           remarks: error,
-//         }).save();
-//         continue;
-//       }
-
-//       const oldUser = await User.findOne({ email });
-//       if (oldUser) {
-//         const error = `User with email ${email} already exists`;
-//         console.error(error);
-//         failedRecords.push({ ...users[i], error });
-//         await new UserAction({
-//           action: "failed records",
-//           remarks: error,
-//         }).save();
-//         continue;
-//       }
-
-//       try {
-//         const userRecord = await firebase
-//           .auth()
-//           .createUser({ email, password });
-//         const passwordResetLink = await firebase
-//           .auth()
-//           .generatePasswordResetLink(email);
-
-//         await transporter.sendEmail({
-//           from: "contact@leapot.in",
-//           to: email,
-//           subject: "Welcome to Leapot Technologies!",
-//           html: `
-//             <p>Hello ${firstname},</p>
-//         <p>Welcome to Leapot Technologies! We are excited to have you on board.</p>
-//         <p>Your account has been successfully created by our Admin. Here are your account details:</p>
-//         <p>Login email id: ${email}</p>
-//         <p>To get started, please click on the link below and set your password and start exploring features in.</p>
-//         <p><a href="${passwordResetLink}">${passwordResetLink}</a></p>
-//         <p>If you have any questions or need assistance, our support team is here to help you. Feel free to reach out to us at contact@leapot.in or +917038585222.</p>
-//         <p>Once again, welcome aboard! We look forward to working with you.</p>
-//         <p>Best regards,</p>
-//         <p>Leapot Team</p>
-//           `,
-//         });
-
-//         const newUser = new User({
-//           firstname,
-//           lastname,
-//           email: userRecord.email,
-//           role,
-//           user_id: userRecord.uid,
-//         });
-//         const savedUser = await newUser.save();
-//         insertUser.push(savedUser);
-
-//         const newUserDetails = new UserDetails({
-//           email,
-//           userid: savedUser._id,
-//         });
-//         const savedUserDetails = await newUserDetails.save();
-//         insertUserDetails.push(savedUserDetails);
-
-//         successfulRecords.push(users[i]);
-//         await new UserAction({
-//           action: "successfully added",
-//           remarks: "added user in database",
-//         }).save();
-//       } catch (error) {
-//         console.error("Error processing user:", error);
-//         failedRecords.push({ ...users[i], error: error.message });
-//         await new UserAction({
-//           action: "failed records",
-//           remarks: error.message,
-//         }).save();
-//       }
-//     }
-
-//     await successCsvWriter.writeRecords(successfulRecords);
-//     await failureCsvWriter.writeRecords(failedRecords);
-
-//     const successFileUrl = (
-//       await uploadToS3(successCsvFilePath, process.env.AWS_BUCKETNAME)
-//     ).Location;
-//     const failureFileUrl = (
-//       await uploadToS3(failureCsvFilePath, process.env.AWS_BUCKETNAME)
-//     ).Location;
-
-//     // Delete local files
-//     fs.unlink(successCsvFilePath, (err) => {
-//       if (err) {
-//         console.error(`Error deleting success CSV file: ${err}`);
-//       } else {
-//         console.log("Success CSV file deleted");
-//       }
-//     });
-
-//     fs.unlink(failureCsvFilePath, (err) => {
-//       if (err) {
-//         console.error(`Error deleting failure CSV file: ${err}`);
-//       } else {
-//         console.log("Failure CSV file deleted");
-//       }
-//     });
-
-//     const lastHistory = await UserHistory.findOne().sort({ SrNo: -1 });
-//     const SrNo = lastHistory ? lastHistory.SrNo + 1 : 1;
-//     const totalRecords = successfulRecords.length + failedRecords.length;
-
-//     const userHistory = new UserHistory({
-//       SrNo,
-//       SuccessfulRecords: successfulRecords.length,
-//       FailedRecords: failedRecords.length,
-//       TotalRecords: totalRecords,
-//       TimeofAction: new Date(),
-//       SuccessFilePath: successFileUrl,
-//       FailureFilePath: failureFileUrl,
-//     });
-//     await userHistory.save();
-
-//     res.status(201).json({
-//       message: "Users added successfully",
-//       success: true,
-//       users: insertUser,
-//       userDetails: insertUserDetails,
-//     });
-//   } catch (error) {
-//     console.error("Error processing CSV data:", error);
-//     res.status(500).json({ error: "Internal server error" });
-//   }
-// };
-
 exports.csvCreateUser = async (req, res) => {
   try {
     const { validRecords, invalidRecords } = req.body;
@@ -710,6 +533,16 @@ exports.blacklistUsers = async (req, res) => {
       createdAt: new Date(),
     });
     console.log("Blacklisted user record created:", data);
+    const mailOptions = {
+      from: SendersMail,
+      to: email,
+      // to: "atharavuttekar@gmail.com",
+
+      subject: "You have been blacklisted",
+      text: `Dear user, you have been blacklisted for the following reason: ${reason}.`,
+    };
+
+    await transporter.sendEmail(mailOptions);
 
     return res.status(200).json({
       success: true,
@@ -771,6 +604,19 @@ exports.UpdateBlacklistedUsers = async (req, res) => {
       { new: true } // Return the updated document
     );
 
+    // Send email notification
+    const mailOptions = {
+      from: SendersMail,
+      to: "atharavuttekar@gmail.com", // Replace with actual user's email
+      // to: email, // Replace with actual user's email
+      subject: "Your blacklist status has been updated",
+      text: `Dear user, your blacklist status has been updated with the following reason: ${reason}.`,
+    };
+
+    await sendEmail(mailOptions);
+
+    console.log("Update operation completed and email sent");
+
     return res.status(200).json({
       success: true,
       message: "Blacklisted user updated successfully",
@@ -789,10 +635,8 @@ exports.deleteblacklistUsers = async (req, res) => {
   try {
     const { email } = req.params;
 
-    // Find and delete the blacklisted user by email
     const result = await BlacklistedUser.findOneAndDelete({ email });
 
-    // If the blacklisted user doesn't exist, return 404 Not Found
     if (!result) {
       return res.status(404).json({
         success: false,
@@ -800,12 +644,22 @@ exports.deleteblacklistUsers = async (req, res) => {
       });
     }
 
-    // Remove the blacklisted status from the User collection
     await User.updateOne({ email }, { blacklisted: false });
+
+    // Send email notification
+    const mailOptions = {
+      from: SendersMail,
+      to: email,
+      // to: "atharavuttekar@gmail.com",
+      subject: "You have been removed from the blacklist",
+      text: `Dear user, you have been removed from the blacklist and can access the services again.`,
+    };
+
+    await transporter.sendEmail(mailOptions);
 
     return res.status(200).json({
       success: true,
-      message: "Blacklisted user removed successfully",
+      message: "Blacklisted user removed successfully and notified via email",
       data: result,
     });
   } catch (error) {
