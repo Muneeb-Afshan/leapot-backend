@@ -333,11 +333,20 @@ exports.enrollUsersforEvent = async (req, res) => {
     }
     console.log("Event found:", event); // Debugging log
 
-    // Find users by email and enroll them in the event
+    // Find users by email
     const users = await User.find({ email: { $in: emails } });
 
+    const enrolledUsers = [];
+    const failedUsers = [];
+
     // Add event to user's events array and create a registration record
-    users.forEach(async (user) => {
+    for (const user of users) {
+      if (user.blacklisted) {
+        alert(`User ${user.email} is blacklisted. Skipping enrollment.`);
+        failedUsers.push(user.email);
+        continue;
+      }
+
       if (!user.events.includes(eventName)) {
         user.events.push(eventName);
         await user.save();
@@ -360,15 +369,21 @@ exports.enrollUsersforEvent = async (req, res) => {
         console.log(
           `User ${user.email} enrolled and registration record created.`
         );
+        enrolledUsers.push(user.email);
       }
-    });
+    }
 
-    res.status(200).json({ message: "Users enrolled successfully", users });
+    res.status(200).json({
+      message: "Users enrolled successfully",
+      enrolledUsers,
+      failedUsers,
+    });
   } catch (error) {
     console.error("Error enrolling users:", error);
-    res
-      .status(500)
-      .json({ message: "Error enrolling users", error: error.message });
+    res.status(500).json({
+      message: "Error enrolling users",
+      error: error.message,
+    });
   }
 };
 
