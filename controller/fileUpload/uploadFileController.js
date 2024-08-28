@@ -39,14 +39,14 @@ exports.profileImage =
     }
   });
 
-exports.uploadImages =
-  ("/upload",
-  async (req, res) => {
-    console.log("hello");
-    const region = process.env.AWS_REGION;
-    const bucketName = process.env.AWS_BUCKETNAME;
-    const accessKeyId = process.env.AWS_ACCESSKEYID;
-    const secretAccessKey = process.env.AWS_SECRETACCESSKEY;
+// exports.uploadImages =
+//   ("/upload",
+//   async (req, res) => {
+//     console.log("hello");
+//     const region = process.env.AWS_REGION;
+//     const bucketName = process.env.AWS_BUCKETNAME;
+//     const accessKeyId = process.env.AWS_ACCESSKEYID;
+//     const secretAccessKey = process.env.AWS_SECRETACCESSKEY;
 
     const s3 = new AWS.S3({
       region,
