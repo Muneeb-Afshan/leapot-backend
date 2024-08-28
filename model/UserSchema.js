@@ -33,7 +33,7 @@ const UserSchema = new Schema(
     events: [{ type: String }],
     lastLogin: { type: Date, default: null },
     learnerDetails: { type: LearnerDetailsSchema, default: () => ({}) },
-    langCode: { type: String, required: true, default: "en" },
+    langCode: { type: String, required: true },
     otp: { type: String },
     otpExpiration: { type: Date },
   },

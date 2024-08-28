@@ -26,7 +26,7 @@ const {
   fetchSingleSetting,
   DeleteSettingOfEvent,
   blacklistUsers,
-  getBlacklistedUsers,
+  GetBlacklistedCertificate,
   UpdateBlacklistedUsers,
   deleteblacklistUsers,
 } = require("../controller/certificate/CertificateDesign");
@@ -74,7 +74,10 @@ certificateRouter.put(
   "/certificate/deleteBlacklist/:email",
   deleteblacklistUsers
 );
-certificateRouter.get("/certificate/getBlacklistedUsers", getBlacklistedUsers);
+certificateRouter.get(
+  "/certificate/GetBlacklistedCertificate",
+  GetBlacklistedCertificate
+);
 certificateRouter.put(
   "/certificate/updateBlacklist/:email",
   UpdateBlacklistedUsers

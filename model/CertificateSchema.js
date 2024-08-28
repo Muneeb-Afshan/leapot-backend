@@ -107,7 +107,7 @@ const issueCertificateSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    issueType: { type: String, required: true, enum: ["Single", "Bulk"] },
+    issueType: { type: String, enum: ["Single", "Bulk"] },
     issueCount: {
       type: Number,
       default: 1,
@@ -133,6 +133,12 @@ const issueCertificateSchema = new mongoose.Schema(
       enum: ["Generated", "Manual"],
     },
     langCode: { type: String, required: true, default: "en" },
+    certificateId: {
+      type: Schema.Types.ObjectId,
+      ref: "Certificates",
+      unique: false,
+    },
+
     // status: {
     //   type: String,
     //   required: true
