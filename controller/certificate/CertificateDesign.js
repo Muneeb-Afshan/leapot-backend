@@ -12,6 +12,7 @@ const puppeteer = require("puppeteer-core");
 const { install } = require("@puppeteer/browsers");
 const nodeHtmlToImage = require("node-html-to-image");
 const nodemailer = require("nodemailer");
+const mongoose = require("mongoose");
 
 const puppeteerExtra = require("puppeteer-extra");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
@@ -219,17 +220,20 @@ function generateNextBumber(certificateSetting) {
 exports.singleIssue = async (req, res) => {
   try {
     const issueData = req.body;
-    console.log("ISSUE DATA", issueData);
+    console.log("ISSUE DATA:", issueData);
 
+    // Fetch all issued certificates (likely for reference or logging)
     const allUsers = await IssueCertificate.find({});
     console.log("All Users associated with event:", allUsers);
 
-    const eventData = await Event.findOne({ _id: issueData.eventid });
+    // Retrieve event data based on event ID
+    const eventData = await Event.findById(issueData.eventid);
     if (!eventData) {
       return res.status(404).json({ message: "Event not found" });
     }
-    console.log("eventDataNew", eventData.EventName);
+    console.log("Event Data:", eventData.EventName);
 
+    // Find the user's registration record for the event
     const registrationData = await RegisterLearner.findOne({
       email: issueData.email,
       eventid: eventData._id,
@@ -241,16 +245,25 @@ exports.singleIssue = async (req, res) => {
         .json({ message: "User is not registered for the event" });
     }
 
+    // Check if the user is blacklisted
+    if (registrationData.blacklisted) {
+      return res.status(403).json({
+        message: "User is blacklisted and cannot be issued a certificate",
+      });
+    }
+
+    // Retrieve the certificate setting associated with the event
     const certificateSetting = await CertificateSetting.findOne({
       eventId: eventData._id,
-    }).populate("certificateId"); // Populate the certificate data
+    }).populate("certificateId");
+
     if (!certificateSetting) {
       return res
         .status(400)
         .json({ message: "Certificate Setting not found for the event" });
     }
-    const certificate = certificateSetting.certificateId;
 
+    // Check if the user already has a certificate for the event
     const existingCertificate = await IssueCertificate.findOne({
       email: issueData.email,
       eventName: eventData.EventName,
@@ -265,6 +278,7 @@ exports.singleIssue = async (req, res) => {
       });
     }
 
+    // Generate the serial number based on the type specified in the certificate settings
     let serialNumber;
     if (certificateSetting.serialNumberType.type === "Random") {
       serialNumber = generateRandomValue();
@@ -279,9 +293,7 @@ exports.singleIssue = async (req, res) => {
       });
     }
 
-    issueData.eventName = eventData.EventName;
-    console.log("checking certificate id", certificate);
-
+    // Prepare data for issuing the certificate
     const issue = await IssueCertificate.create({
       ...issueData,
       serialNumber,
@@ -290,16 +302,16 @@ exports.singleIssue = async (req, res) => {
       eventDate: eventData.SDate,
       issueType: "Single",
       issueMethod: issueData.issueMethod || "Manual",
-      certificateId: certificate,
+      certificateId: certificateSetting.certificateId._id,
     });
 
     // Prepare email content
     const mailOptions = {
       from: "hr.leapot@gmail.com",
-      // to: issueData.email,
-      to: "atharavuttekar@gmail.com",
+      to: issueData.email, // Uncomment this line and comment the line below for production
+      // to: "atharavuttekar@gmail.com", // Replace with issueData.email for real use
       subject: "Your Certificate",
-      text: `Dear ${registrationData.firstname},\n\nCongratulations! Your certificate for the event '${eventData.EventName}' has been issued successfully${certificate}.\n\nCertificate Serial Number: ${serialNumber}\n\nThank you for participating in the event.\n\nBest Regards,\nYour Organization `,
+      text: `Dear ${registrationData.userid.firstname},\n\nCongratulations! Your certificate for the event '${eventData.EventName}' has been issued successfully.\n\nCertificate Serial Number: ${serialNumber}\n\nThank you for participating in the event.\n\nBest Regards,\nYour Organization`,
     };
 
     // Send email
@@ -309,16 +321,17 @@ exports.singleIssue = async (req, res) => {
     console.log(`Email sent: ${info.response}`);
     console.log(`To: ${issueData.email}`);
 
+    // Respond with success
     return res.status(201).json({
       issueData: issue,
       message: "Certificate issued and email sent successfully",
       statusCode: 200,
     });
   } catch (error) {
-    console.error("Error details:", error);
+    console.error("Error issuing certificate:", error);
     return res.status(500).json({
-      message: error.message || "Unable to issue certificate",
-      error: error,
+      message: "Unable to issue certificate",
+      error: error.message,
     });
   }
 };
@@ -415,7 +428,7 @@ exports.bulkIssue = async (req, res) => {
           username: registrationData.userid.username,
           eventDate: eventData.SDate,
           issueType: "Bulk",
-          issueMethod: "Manual",
+          issueMethod: issueData.issueMethod || "Manual",
           certificateId: certificate,
         });
         successfulIssues.push({
@@ -569,9 +582,6 @@ exports.blacklistUsers = async (req, res) => {
       eventid: event,
       email,
     });
-    const eventname = eventRecord.eventname;
-
-    console.log("Event name retrieved:", eventname);
     if (!eventRecord) {
       console.log("User is not part of the specified event");
       return res.status(404).json({
@@ -579,13 +589,18 @@ exports.blacklistUsers = async (req, res) => {
         message: "User is not part of the specified event",
       });
     }
-    console.log("Event record found for user:", eventRecord);
+    const eventname = eventRecord.eventname;
+    console.log("Event name retrieved:", eventname);
 
-    // Check if the email already exists in the blacklist
+    // Convert event to ObjectId and query the blacklist
+    const objectId = new mongoose.Types.ObjectId(event);
+    console.log("Querying with event:", objectId, "and email:", email);
     const existingBlacklistedUser = await BlacklistCertificate.findOne({
-      eventid: event,
+      event: objectId,
       email,
     });
+    console.log("Existing blacklisted user:", existingBlacklistedUser);
+
     if (existingBlacklistedUser) {
       console.log("User already exists in the blacklist");
       return res.status(409).json({
@@ -593,45 +608,54 @@ exports.blacklistUsers = async (req, res) => {
         message: "User already exists in the blacklist",
       });
     }
-    console.log("Existing blacklisted user check:", existingBlacklistedUser);
-
-    // Update user to be blacklisted
-    // await User.updateOne({ email }, { blacklisted: true });
-    console.log("User successfully updated to blacklisted");
-    console.log("User successfully updated to blacklisted", eventname);
 
     // Retrieve certificate to add watermark
     const certificate = await IssueCertificate.findOne({
       email,
       eventName: eventname,
     });
-    // const certificateId = certificate.certificateId;
-    // console.log("Certificate ID:", certificateId);
+
     if (certificate) {
       const certificateId = certificate.certificateId;
-      console.log("Certificate ID:", certificateId); // Ensure this is not null
-    }
-    if (!certificate) {
-      console.log("Certificate not found for the user");
-      return res.status(404).json({
-        success: false,
-        message: "Certificate not found for the user",
-      });
-    }
-    const certificateId = certificate.certificateId;
-    if (!certificateId) {
-      console.log("Certificate ID is missing");
-      return res.status(404).json({
-        success: false,
-        message: "Certificate ID is missing",
-      });
-    }
-    console.log("Certificate found:", certificate);
+      if (certificateId) {
+        console.log("Certificate found:", certificate);
 
-    // await IssueCertificate.updateOne({ email, eventName: eventname });
-    console.log("event found:", event);
-    console.log("blacklit found:", disqualifiedBy);
-    console.log("certificateId found:", certificateId);
+        // Check if the certificate ID is present in the Certificates collection
+        const certificateRecord = await Certificates.findOne({
+          _id: certificateId,
+        });
+        if (certificateRecord) {
+          console.log("Certificate settings found:", certificateRecord);
+
+          // Add watermark to the certificate body
+          const updatedCertificateBody =
+            certificateRecord.certificateBody.replace(
+              "</div>",
+              '<div style="position: absolute; bottom: 10px; right: 10px; font-size: 36px; color: red; opacity: 0.5;">INVALID</div></div>'
+            );
+
+          // Update the certificate with the watermark
+          await Certificates.updateOne(
+            { _id: certificateId },
+            { certificateBody: updatedCertificateBody }
+          );
+          console.log("Certificate watermark added and updated");
+        } else {
+          console.log("Certificate ID not found in certificate settings");
+          return res.status(404).json({
+            success: false,
+            message: "Certificate ID not found in certificate settings",
+          });
+        }
+      }
+    }
+
+    // Update the blacklisted field in the RegisterLearner schema to true
+    await RegisterLearner.updateOne(
+      { email, eventid: event },
+      { blacklisted: true }
+    );
+    console.log("RegisterLearner blacklisted field updated to true");
 
     // Create a new blacklisted user record
     const data = await BlacklistCertificate.create({
@@ -640,14 +664,14 @@ exports.blacklistUsers = async (req, res) => {
       disqualifiedBy,
       eventname,
       createdAt: new Date(),
-      certificateId,
-      event, // Add event to the blacklisted record
+      certificateId: certificate ? certificate.certificateId : null,
+      event: objectId, // Ensure event is ObjectId
     });
     console.log("Blacklisted user record created:", data);
 
     return res.status(200).json({
       success: true,
-      message: "User blacklisted successfully and certificate updated",
+      message: "User blacklisted successfully",
       data,
     });
   } catch (error) {

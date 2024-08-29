@@ -136,7 +136,10 @@ const issueCertificateSchema = new mongoose.Schema(
     certificateId: {
       type: Schema.Types.ObjectId,
       ref: "Certificates",
-      unique: false,
+    },
+    blacklisted: {
+      type: Boolean,
+      default: false, // Default value set to true
     },
 
     // status: {

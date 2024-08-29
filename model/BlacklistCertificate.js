@@ -1,10 +1,12 @@
-// models/BlacklistedCertificate.js
-
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const blacklistedCertificateSchema = new Schema({
-  certificateId: {}, // Make sure to set required to false if not always required
+  certificateId: {
+    type: Schema.Types.ObjectId,
+    ref: "IssueCertificate", // Assuming you have a Certificate model
+    required: false, // Set required to false as it's not always needed
+  },
   email: {
     type: String,
     required: true,
