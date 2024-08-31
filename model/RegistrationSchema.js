@@ -9,6 +9,7 @@ const LearnerToCourseRegistration = new mongoose.Schema({
   lastname: { type: String }, // Changed from ObjectId to String
   courseid: { type: mongoose.Schema.Types.ObjectId, ref: "Course" },
   registrationDate: { type: Date, required: true },
+  blacklisted: { type: Boolean },
   cancelled: { type: Boolean, default: false },
   cancellationDate: Date,
   cancellationReason: { type: mongoose.Schema.Types.ObjectId, required: false }, // This field may not be required if a registration is not cancelled.

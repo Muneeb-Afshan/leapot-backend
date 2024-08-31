@@ -324,14 +324,14 @@ exports.enrollUsersforEvent = async (req, res) => {
   const { emails } = req.body; // An array of emails to enroll
 
   try {
-    console.log(`Finding event: ${eventName}`); // Debugging log
+    // console.log(`Finding event: ${eventName}`); // Debugging log
 
     // Find event by eventName
     const event = await EventModel.findOne({ EventName: eventName });
     if (!event) {
       return res.status(404).json({ message: "Event not found" });
     }
-    console.log("Event found:", event); // Debugging log
+    // console.log("Event found:", event); // Debugging log
 
     // Find users by email
     const users = await User.find({ email: { $in: emails } });
@@ -342,7 +342,7 @@ exports.enrollUsersforEvent = async (req, res) => {
     // Add event to user's events array and create a registration record
     for (const user of users) {
       if (user.blacklisted) {
-        alert(`User ${user.email} is blacklisted. Skipping enrollment.`);
+        console.log(`User ${user.email} is blacklisted. Skipping enrollment.`);
         failedUsers.push(user.email);
         continue;
       }
@@ -358,7 +358,8 @@ exports.enrollUsersforEvent = async (req, res) => {
           lastname: user.lastname,
           userid: user._id, // Reference to the user
           eventid: event._id, // Reference to the event
-          eventname: event.eventName, // Reference to the event
+          eventname: eventName, // Reference to the event
+          blacklisted: false,
           registrationDate: new Date(), // Current date and time
           registrationStatus: true, // Assuming the user is successfully registered
           langCode: "en", // Default language code
