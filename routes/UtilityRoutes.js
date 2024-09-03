@@ -18,8 +18,7 @@ const {
   uploadUserImages,
 
   uploadEventImage,
-  profileImage
-
+  profileImage,
 } = require("../controller/fileUpload/uploadFileController");
 
 // const {
@@ -34,12 +33,12 @@ UtilityRoutes.post("/role", verifyToken, addRole);
 UtilityRoutes.get("/getInstructors", getInstructors);
 
 UtilityRoutes.get("/fetchRole", fetchRole);
-UtilityRoutes.post("/upload", uploadImages);
+// UtilityRoutes.post("/upload", uploadImages);
 UtilityRoutes.post("/uploadResume", uploadResume);
 UtilityRoutes.post("/uploadAttachments", uploadAttachments);
 UtilityRoutes.post("/uploadUserImages", uploadUserImages);
-UtilityRoutes.post("/generate-presigned-url", profileImage);
-UtilityRoutes.get("/generate-presigned-url", profileImage);
+// UtilityRoutes.post("/generate-presigned-url", profileImage);
+// UtilityRoutes.get("/generate-presigned-url", profileImage);
 UtilityRoutes.post("/uploadscrom", uploadscrom);
 UtilityRoutes.get("/fetchEmail", fetchEmail);
 
