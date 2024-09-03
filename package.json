@@ -4,7 +4,6 @@
   "description": "This is for Complete Backend for LMS",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"No test specified\"",
     "start": "nodemon index.js"
   },
   "repository": {
