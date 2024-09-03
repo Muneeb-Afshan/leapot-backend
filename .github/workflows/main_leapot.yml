@@ -32,7 +32,7 @@ jobs:
           tar -czf node-modules.tar.gz ./node_modules
 
       - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: build-output
           path: build-output.tar.gz
@@ -52,12 +52,12 @@ jobs:
 
     steps:
       - name: Download artifact from build job
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
         with:
           name: node-app
 
       - name: "Deploy to Azure Web App"
-        uses: azure/webapps-deploy@v4
+        uses: azure/webapps-deploy@v2
         id: deploy-to-webapp
         with:
           app-name: "Leapot"
